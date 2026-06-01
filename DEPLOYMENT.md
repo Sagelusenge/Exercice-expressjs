@@ -15,6 +15,8 @@
    - Importe de preference `Kbsbd-clever-basic.sql`.
    - Ce fichier est adapte au MySQL mutualise Clever Cloud: pas de `CREATE DATABASE`, pas de `USE ...`, pas de fonctions, pas de triggers, pas de procedures, pas d'events.
    - La logique qui etait dans les triggers/procedures/events est maintenant faite par le backend Node: generation des references/codes, validation/rejet des factures, confirmation des ventes, expiration des reservations et rappels.
+   - Apres l'import du schema, execute `Kbsbd-clever-seed-admin.sql` pour creer/rehabiliter le super admin initial.
+   - Connexion admin initiale: `serge.balezi@kbs-immobilier.com` / `KbsAdmin@2026`.
 
 ## 2. Backend Render
 
@@ -31,8 +33,8 @@ Variables Render:
 NODE_ENV=production
 JWT_SECRET=une_valeur_longue_et_secrete
 JWT_EXPIRES_IN=7d
-FRONTEND_URL=https://ton-frontend.onrender.com
-CORS_ORIGIN=https://ton-frontend.onrender.com
+FRONTEND_URL=https://exercice-expressjs.onrender.com
+CORS_ORIGIN=https://exercice-expressjs.onrender.com
 DB_HOST=MYSQL_ADDON_HOST
 DB_PORT=MYSQL_ADDON_PORT
 DB_USER=MYSQL_ADDON_USER
@@ -48,7 +50,7 @@ SMTP_FROM=KBS Buildings <ton_email>
 Apres deploy, teste:
 
 ```txt
-https://ton-backend.onrender.com/health
+https://backend-dx5f.onrender.com/health
 ```
 
 ## 3. Frontend Render
@@ -63,7 +65,7 @@ Service Render:
 Variables Render:
 
 ```txt
-VITE_API_URL=https://ton-backend.onrender.com/api/v1
+VITE_API_URL=https://backend-dx5f.onrender.com/api/v1
 VITE_TENANT_SLUG=kbs-immobilier
 ```
 
