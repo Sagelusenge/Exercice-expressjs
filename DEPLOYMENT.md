@@ -12,7 +12,8 @@
 3. Importe le schema:
    - Ouvre phpMyAdmin / Adminer / MySQL Workbench.
    - Connecte-toi avec les identifiants Clever Cloud.
-   - Importe `kbs-backend/Kbsbd.sql`.
+   - Importe `Kbsbd-clever-no-events.sql`.
+   - Ce fichier est adapte a Clever Cloud: il ne contient pas `CREATE DATABASE`, pas `USE ...`, et pas d'events MySQL.
 
 ## 2. Backend Render
 
