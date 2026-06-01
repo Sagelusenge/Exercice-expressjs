@@ -11,6 +11,7 @@ const { notificationService } = require("../../services/notification.service");
 const emailService = require("../../services/email.service");
 const EmailTemplates = require("../../services/email.templates");
 const { logger } = require("../../utils/logger.util");
+const sequenceService = require("../../services/sequence.service");
 
 const normalizeDate = (value) => {
   if (!value) return null;
@@ -95,15 +96,20 @@ router.post(
 
       const code = generateVerificationCode();
       const expireAt = new Date(Date.now() + 30 * 60 * 1000);
+      const nomUser = data.categorie === "SIMPLE" ? data.nom : (data.nom_representant || "Representant");
+      const prenomUser = data.categorie === "SIMPLE" ? (data.prenom || "") : "";
+      const codeUser = await sequenceService.codeUser({ tenantId: req.tenantId, nom: nomUser, prenom: prenomUser, role: "LOCATAIRE" });
+      const codeLocataire = await sequenceService.codeLocataire({ tenantId: req.tenantId, categorie: data.categorie });
 
       const result = await withTransaction(async (conn) => {
         const [userResult] = await conn.execute(
           `INSERT INTO users
-           (tenant_id, nom, prenom, email, telephone, mot_de_passe,
+           (tenant_id, code_user, module_accessible, nom, prenom, email, telephone, mot_de_passe,
             role, statut, email_verifie, code_verification_email, code_verification_expire_at, cree_par)
-           VALUES (?, ?, ?, ?, ?, ?, 'LOCATAIRE', 'ACTIF', 0, ?, ?, ?)`,
+           VALUES (?, ?, 'KBS', ?, ?, ?, ?, ?, 'LOCATAIRE', 'EN_ATTENTE_VERIFICATION', 0, ?, ?, ?)`,
           [
             req.tenantId,
+            codeUser,
             data.categorie === "SIMPLE" ? data.nom : (data.nom_representant || "Représentant"),
             data.categorie === "SIMPLE" ? (data.prenom || "") : "",
             emailUser,
@@ -118,16 +124,16 @@ router.post(
 
         const [locResult] = await conn.execute(
           `INSERT INTO kbs_locataires
-           (tenant_id, user_id, categorie,
+           (code_locataire, tenant_id, user_id, categorie,
             nom, prenom, date_naissance, telephone_personnel, adresse_personnelle,
             type_piece_identite, photo_identite_url, photo_piece_identite_url,
             nom_entreprise, secteur_activite, numero_rccm, numero_nif,
             nom_representant, telephone_entreprise, email_entreprise,
             adresse_siege, numero_local, logo_entreprise_url,
             date_debut_loyer, date_fin_loyer, montant_mensuel_loyer, devise, cree_par)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
-            req.tenantId, userId, data.categorie,
+            codeLocataire, req.tenantId, userId, data.categorie,
             data.nom || null, data.prenom || null,
             normalizeDate(data.date_naissance), data.telephone_personnel || null,
             data.adresse_personnelle || null, data.type_piece_identite || null,

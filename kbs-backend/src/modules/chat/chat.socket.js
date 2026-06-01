@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const { query } = require("../../config/database");
 const { logger } = require("../../utils/logger.util");
+const sequenceService = require("../../services/sequence.service");
 
 const initChatSocket = (io) => {
   io.use(async (socket, next) => {
@@ -39,11 +40,12 @@ const initChatSocket = (io) => {
     socket.on("send:message", async (data) => {
       try {
         const { conversation_id, contenu, type_message, fichier_url } = data;
+        const reference = await sequenceService.referenceMessage(user.tenant_id);
         const result = await query(
           `INSERT INTO chat_messages
-           (conversation_id, sender_id, contenu, type_message, fichier_url)
-           VALUES (?, ?, ?, ?, ?)`,
-          [conversation_id, user.id, contenu, type_message || "TEXTE", fichier_url]
+           (reference, conversation_id, sender_id, contenu, type_message, fichier_url)
+           VALUES (?, ?, ?, ?, ?, ?)`,
+          [reference, conversation_id, user.id, contenu, type_message || "TEXTE", fichier_url]
         );
 
         await query(

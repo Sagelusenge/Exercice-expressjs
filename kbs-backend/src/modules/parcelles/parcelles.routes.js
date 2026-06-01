@@ -2,13 +2,14 @@ const router = require("express").Router();
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
-const { query, callProcedure } = require("../../config/database");
+const { query } = require("../../config/database");
 const R = require("../../utils/response.util");
 const { authenticate, optionalAuth } = require("../../middleware/auth.middleware");
 const { requireRole } = require("../../middleware/role.middleware");
 const { enforceTenant } = require("../../middleware/tenant.middleware");
 const { logActivity } = require("../../middleware/activityLog.middleware");
 const { paginate, buildPagination } = require("../../utils/pagination.util");
+const sequenceService = require("../../services/sequence.service");
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -92,21 +93,22 @@ router.get("/populaires", enforceTenant, async (req, res) => {
 // GET /parcelles/recherche
 router.get("/recherche", enforceTenant, async (req, res) => {
   const { ville, commune, superficie_min, superficie_max, type_parcelle } = req.query;
-  // Fallback si la procédure n'existe pas
-  try {
-    const results = await callProcedure("CALL sp_recherche_parcelles(?, ?, ?, ?, ?, ?)", [
-      req.tenantId,
-      ville || null,
-      commune || null,
-      superficie_min || null,
-      superficie_max || null,
-      type_parcelle || null,
-    ]);
-    return R.success(res, Array.isArray(results[0]) ? results[0] : results);
-  } catch (e) {
-    const data = await query("SELECT * FROM parcelles WHERE tenant_id = ? AND deleted_at IS NULL", [req.tenantId]);
-    return R.success(res, data);
-  }
+  let where = "WHERE p.tenant_id = ? AND p.statut = 'DISPONIBLE' AND p.deleted_at IS NULL";
+  const params = [req.tenantId];
+  if (ville) { where += " AND p.ville LIKE ?"; params.push(`%${ville}%`); }
+  if (commune) { where += " AND p.commune LIKE ?"; params.push(`%${commune}%`); }
+  if (superficie_min) { where += " AND p.superficie >= ?"; params.push(superficie_min); }
+  if (superficie_max) { where += " AND p.superficie <= ?"; params.push(superficie_max); }
+  if (type_parcelle) { where += " AND p.type_parcelle = ?"; params.push(type_parcelle); }
+  const data = await query(
+    `SELECT p.*, pi_main.url_image AS image_principale
+     FROM parcelles p
+     LEFT JOIN parcelle_images pi_main ON pi_main.parcelle_id = p.id AND pi_main.est_principale = 1
+     ${where}
+     ORDER BY p.est_vedette DESC, p.created_at DESC`,
+    params
+  );
+  return R.success(res, data);
 });
 
 // GET /parcelles/:id/public
@@ -188,17 +190,10 @@ router.post("/", upload.single("photo"), authenticate, requireRole("SUPER_ADMIN"
       typeParcelle = 'RESIDENTIELLE';
     }
 
-    // Générer une référence unique si pas fournie
-    let reference = data.reference || data.code_parcelle;
-    if (!reference) {
-      // Compter le nombre de parcelles existantes pour ce tenant
-      const [countResult] = await query(
-        'SELECT COUNT(*) as count FROM parcelles WHERE tenant_id = ?',
-        [req.tenantId]
-      );
-      const nextNumber = countResult.count + 1;
-      reference = `KBS-PARC-${String(nextNumber).padStart(4, '0')}`;
-    }
+    const reference =
+      data.reference ||
+      data.code_parcelle ||
+      await sequenceService.referenceParcelle({ tenantId: req.tenantId, typeParcelle });
 
     const result = await query(
       `INSERT INTO parcelles (tenant_id, reference, titre, description, localisation, ville, commune, quartier, superficie, type_parcelle, prix_vente_confidentiel, statut, latitude, longitude, est_vedette, publie_par)
@@ -228,9 +223,10 @@ router.post("/", upload.single("photo"), authenticate, requireRole("SUPER_ADMIN"
     // If we have a photo, save it to parcelle_images
     if (req.file) {
       const imageUrl = `/uploads/${req.file.filename}`;
+      const codeImage = await sequenceService.referenceParcelleImage(req.tenantId);
       await query(
-        `INSERT INTO parcelle_images (parcelle_id, url_image, ordre) VALUES (?, ?, 1)`,
-        [parcelleId, imageUrl]
+        `INSERT INTO parcelle_images (code_image, parcelle_id, url_image, ordre) VALUES (?, ?, ?, 1)`,
+        [codeImage, parcelleId, imageUrl]
       );
     }
 
@@ -292,9 +288,10 @@ router.put("/:id", upload.single("photo"), authenticate, requireRole("SUPER_ADMI
       );
     } else {
       // Insert new image
+      const codeImage = await sequenceService.referenceParcelleImage(req.tenantId);
       await query(
-        `INSERT INTO parcelle_images (parcelle_id, url_image, ordre) VALUES (?, ?, 1)`,
-        [req.params.id, imageUrl]
+        `INSERT INTO parcelle_images (code_image, parcelle_id, url_image, ordre) VALUES (?, ?, ?, 1)`,
+        [codeImage, req.params.id, imageUrl]
       );
     }
   }

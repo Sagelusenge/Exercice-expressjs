@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { query, callProcedure } = require("../../config/database");
+const { query } = require("../../config/database");
 const R = require("../../utils/response.util");
 const { authenticate } = require("../../middleware/auth.middleware");
 const { requireRole } = require("../../middleware/role.middleware");
@@ -7,6 +7,7 @@ const { enforceTenant } = require("../../middleware/tenant.middleware");
 const { logActivity } = require("../../middleware/activityLog.middleware");
 const { paginate, buildPagination } = require("../../utils/pagination.util");
 const { notificationService } = require("../../services/notification.service");
+const sequenceService = require("../../services/sequence.service");
 
 const nullIfUndefined = (value) => value === undefined ? null : value;
 
@@ -89,21 +90,24 @@ router.post(
     if (!["USD", "CDF"].includes(devise || "USD")) {
       return R.badRequest(res, "Devise invalide");
     }
+    const reference = await sequenceService.referenceVente(req.tenantId);
     const result = await query(
       `INSERT INTO ventes
-       (tenant_id, user_id, parcelle_id, reservation_id, montant_total, devise, notes, valide_par)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [req.tenantId, user_id, parcelle_id, reservation_id || null,
+       (reference, tenant_id, user_id, parcelle_id, reservation_id, montant_total, devise, notes, valide_par)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [reference, req.tenantId, user_id, parcelle_id, reservation_id || null,
        montant_total, devise || "USD", notes, req.user.id]
     );
     const tranche = Number(montant_paye_initial || 0);
     if (Number.isFinite(tranche) && tranche > 0) {
+      const paiementReference = await sequenceService.referencePaiement(req.tenantId);
       await query(
         `INSERT INTO paiements
-         (tenant_id, user_id, parcelle_id, reservation_id, vente_id, montant, devise,
+         (reference, tenant_id, user_id, parcelle_id, reservation_id, vente_id, montant, devise,
           mode_paiement, reference_transaction, statut, valide_par, date_paiement, date_validation, notes)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'PAYE', ?, NOW(), NOW(), ?)`,
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PAYE', ?, NOW(), NOW(), ?)`,
         [
+          paiementReference,
           req.tenantId,
           user_id,
           parcelle_id,
@@ -151,7 +155,19 @@ router.patch(
   logActivity("VENTES", "VENTE_CONFIRMEE"),
   async (req, res) => {
     try {
-      await callProcedure("CALL sp_confirmer_vente(?, ?)", [req.params.id, req.user.id]);
+      const [vente] = await query("SELECT * FROM ventes WHERE id = ? AND tenant_id = ?", [req.params.id, req.tenantId]);
+      if (!vente) return R.notFound(res, "Vente introuvable");
+      if (vente.montant_paye < vente.montant_total) {
+        return R.badRequest(res, "Le paiement total n'a pas encore été effectué.");
+      }
+      await query(
+        "UPDATE ventes SET statut = 'COMPLETE', valide_par = ?, updated_at = NOW() WHERE id = ? AND tenant_id = ?",
+        [req.user.id, req.params.id, req.tenantId]
+      );
+      await query(
+        "UPDATE parcelles SET statut = 'VENDUE', vendu_a = ?, date_vente = NOW(), updated_at = NOW() WHERE id = ? AND tenant_id = ?",
+        [vente.user_id, vente.parcelle_id, req.tenantId]
+      );
     } catch (err) {
       if (err.message && err.message.includes("ERREUR KBS:")) {
         return R.badRequest(res, err.message.replace("ERREUR KBS:", ""));
@@ -182,10 +198,11 @@ router.post(
   enforceTenant,
   async (req, res) => {
     const { type_document, nom_fichier, url_fichier } = req.body;
+    const codeDoc = await sequenceService.referenceVenteDocument(req.tenantId);
     const result = await query(
-      `INSERT INTO vente_documents (vente_id, user_id, type_document, nom_fichier, url_fichier)
-       VALUES (?, ?, ?, ?, ?)`,
-      [req.params.id, req.user.id, type_document, nom_fichier, url_fichier]
+      `INSERT INTO vente_documents (code_doc, vente_id, user_id, type_document, nom_fichier, url_fichier)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [codeDoc, req.params.id, req.user.id, type_document, nom_fichier, url_fichier]
     );
     return R.created(res, { id: result.insertId }, "Document ajouté à la vente");
   }

@@ -1,15 +1,11 @@
-const { query, withTransaction } = require("../../config/database");
+const { query } = require("../../config/database");
 const { paginate, buildPagination } = require("../../utils/pagination.util");
+const sequenceService = require("../../services/sequence.service");
 
-/**
- * Lister les parcelles publiques — utilise la VUE v_parcelles_publiques
- * SANS PRIX (respecte la BD : prix_vente_confidentiel jamais exposé publiquement)
- */
 const listPubliques = async (tenantId, filters = {}, page = 1, limit = 20) => {
   const { ville, commune, superficie_min, superficie_max, type_parcelle, search } = filters;
   const { offset, limit: l } = paginate(page, limit);
 
-  // Utilisation de la VUE v_parcelles_publiques
   let where = "WHERE p.tenant_id = ?";
   const params = [tenantId];
 
@@ -39,10 +35,6 @@ const listPubliques = async (tenantId, filters = {}, page = 1, limit = 20) => {
   return { parcelles, pagination: buildPagination(total, page, l) };
 };
 
-/**
- * Lister les parcelles pour l'admin — utilise la VUE v_parcelles_admin
- * AVEC PRIX (confidentiel, accès admin uniquement)
- */
 const listAdmin = async (tenantId, filters = {}, page = 1, limit = 20) => {
   const { statut, type_parcelle, search } = filters;
   const { offset, limit: l } = paginate(page, limit);
@@ -59,7 +51,8 @@ const listAdmin = async (tenantId, filters = {}, page = 1, limit = 20) => {
   }
 
   const [{ total }] = await query(
-    `SELECT COUNT(*) AS total FROM v_parcelles_admin ${where}`, params
+    `SELECT COUNT(*) AS total FROM v_parcelles_admin ${where}`,
+    params
   );
 
   const parcelles = await query(
@@ -71,18 +64,14 @@ const listAdmin = async (tenantId, filters = {}, page = 1, limit = 20) => {
   return { parcelles, pagination: buildPagination(total, page, l) };
 };
 
-/**
- * Détail d'une parcelle publique (incrémente nombre_vues)
- */
 const getPublicDetail = async (tenantId, parcelleId) => {
-  // Incrémenter le compteur de vues
   await query(
     "UPDATE parcelles SET nombre_vues = nombre_vues + 1 WHERE id = ? AND tenant_id = ?",
     [parcelleId, tenantId]
   );
 
   const parcelles = await query(
-    `SELECT p.*, 
+    `SELECT p.*,
             GROUP_CONCAT(DISTINCT pi.url_image ORDER BY pi.ordre) AS images,
             GROUP_CONCAT(DISTINCT CASE WHEN pd.est_public = 1 THEN pd.url_fichier END) AS documents_publics
      FROM parcelles p
@@ -96,16 +85,11 @@ const getPublicDetail = async (tenantId, parcelleId) => {
 
   if (!parcelles.length) throw { status: 404, message: "Parcelle introuvable" };
 
-  const p = parcelles[0];
-  // Ne JAMAIS exposer prix_vente_confidentiel en public
-  delete p.prix_vente_confidentiel;
-
-  return p;
+  const parcelle = parcelles[0];
+  delete parcelle.prix_vente_confidentiel;
+  return parcelle;
 };
 
-/**
- * Détail admin (avec prix confidentiel)
- */
 const getAdminDetail = async (tenantId, parcelleId) => {
   const parcelles = await query(
     `SELECT p.*,
@@ -129,26 +113,24 @@ const getAdminDetail = async (tenantId, parcelleId) => {
   return parcelles[0];
 };
 
-/**
- * Créer une parcelle
- * Le trigger trg_parcelle_before_insert génère la référence automatiquement
- */
 const createParcelle = async (tenantId, adminId, data) => {
   const {
     titre, description, localisation, ville, commune, quartier,
     superficie, devise, type_parcelle, latitude, longitude,
     prix_vente_confidentiel, est_vedette,
   } = data;
+  const typeParcelle = type_parcelle || "RESIDENTIELLE";
+  const reference = await sequenceService.referenceParcelle({ tenantId, typeParcelle });
 
   const result = await query(
     `INSERT INTO parcelles
-     (tenant_id, titre, description, localisation, ville, commune, quartier,
+     (tenant_id, reference, titre, description, localisation, ville, commune, quartier,
       superficie, devise, type_parcelle, latitude, longitude,
       prix_vente_confidentiel, est_vedette, publie_par)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
-      tenantId, titre, description, localisation, ville, commune, quartier,
-      superficie, devise || "USD", type_parcelle || "RESIDENTIELLE",
+      tenantId, reference, titre, description, localisation, ville, commune, quartier,
+      superficie, devise || "USD", typeParcelle,
       latitude, longitude, prix_vente_confidentiel, est_vedette || 0, adminId,
     ]
   );
@@ -156,9 +138,6 @@ const createParcelle = async (tenantId, adminId, data) => {
   return getAdminDetail(tenantId, result.insertId);
 };
 
-/**
- * Mettre à jour une parcelle
- */
 const updateParcelle = async (tenantId, parcelleId, data) => {
   const fields = [
     "titre", "description", "localisation", "ville", "commune",
@@ -166,15 +145,13 @@ const updateParcelle = async (tenantId, parcelleId, data) => {
     "latitude", "longitude", "prix_vente_confidentiel", "est_vedette",
   ];
 
-  const sets = fields
-    .filter((f) => data[f] !== undefined)
-    .map((f) => `${f} = ?`);
+  const sets = fields.filter((f) => data[f] !== undefined).map((f) => `${f} = ?`);
   const values = fields.filter((f) => data[f] !== undefined).map((f) => data[f]);
 
-  if (!sets.length) throw { status: 400, message: "Aucun champ à mettre à jour" };
+  if (!sets.length) throw { status: 400, message: "Aucun champ a mettre a jour" };
 
   await query(
-    `UPDATE parcelles SET ${sets.join(", ")} 
+    `UPDATE parcelles SET ${sets.join(", ")}
      WHERE id = ? AND tenant_id = ? AND deleted_at IS NULL`,
     [...values, parcelleId, tenantId]
   );
@@ -182,46 +159,40 @@ const updateParcelle = async (tenantId, parcelleId, data) => {
   return getAdminDetail(tenantId, parcelleId);
 };
 
-/**
- * Ajouter une image — le trigger génère code_image
- */
 const addImage = async (parcelleId, urlImage, estPrincipale = false, ordre = 0) => {
-  // Si principale → désactiver les autres
   if (estPrincipale) {
-    await query(
-      "UPDATE parcelle_images SET est_principale = 0 WHERE parcelle_id = ?",
-      [parcelleId]
-    );
+    await query("UPDATE parcelle_images SET est_principale = 0 WHERE parcelle_id = ?", [parcelleId]);
   }
 
+  const [parcelle] = await query("SELECT tenant_id FROM parcelles WHERE id = ?", [parcelleId]);
+  if (!parcelle) throw { status: 404, message: "Parcelle introuvable" };
+  const codeImage = await sequenceService.referenceParcelleImage(parcelle.tenant_id);
+
   const result = await query(
-    `INSERT INTO parcelle_images (parcelle_id, url_image, est_principale, ordre)
-     VALUES (?, ?, ?, ?)`,
-    [parcelleId, urlImage, estPrincipale ? 1 : 0, ordre]
+    `INSERT INTO parcelle_images (code_image, parcelle_id, url_image, est_principale, ordre)
+     VALUES (?, ?, ?, ?, ?)`,
+    [codeImage, parcelleId, urlImage, estPrincipale ? 1 : 0, ordre]
   );
 
   return result.insertId;
 };
 
-/**
- * Ajouter un document — le trigger génère code_document
- */
 const addDocument = async (parcelleId, data) => {
   const { type_document, nom_fichier, url_fichier, est_public } = data;
+  const [parcelle] = await query("SELECT tenant_id FROM parcelles WHERE id = ?", [parcelleId]);
+  if (!parcelle) throw { status: 404, message: "Parcelle introuvable" };
+  const codeDocument = await sequenceService.referenceParcelleDocument(parcelle.tenant_id);
 
   const result = await query(
-    `INSERT INTO parcelle_documents 
-     (parcelle_id, type_document, nom_fichier, url_fichier, est_public)
-     VALUES (?, ?, ?, ?, ?)`,
-    [parcelleId, type_document, nom_fichier, url_fichier, est_public ? 1 : 0]
+    `INSERT INTO parcelle_documents
+     (code_document, parcelle_id, type_document, nom_fichier, url_fichier, est_public)
+     VALUES (?, ?, ?, ?, ?, ?)`,
+    [codeDocument, parcelleId, type_document, nom_fichier, url_fichier, est_public ? 1 : 0]
   );
 
   return result.insertId;
 };
 
-/**
- * Suppression logique (soft delete)
- */
 const deleteParcelle = async (tenantId, parcelleId) => {
   await query(
     "UPDATE parcelles SET deleted_at = NOW(), statut = 'ARCHIVEE' WHERE id = ? AND tenant_id = ?",
@@ -229,12 +200,9 @@ const deleteParcelle = async (tenantId, parcelleId) => {
   );
 };
 
-/**
- * Parcelles populaires — utilise la VUE v_parcelles_populaires
- */
 const getPopulaires = async (tenantId, limit = 10) => {
   return query(
-    `SELECT * FROM v_parcelles_populaires 
+    `SELECT * FROM v_parcelles_populaires
      WHERE id IN (
        SELECT id FROM parcelles WHERE tenant_id = ? AND deleted_at IS NULL
      )
@@ -243,24 +211,17 @@ const getPopulaires = async (tenantId, limit = 10) => {
   );
 };
 
-/**
- * Recherche avancée — utilise la PROCÉDURE sp_recherche_parcelles
- */
 const rechercheAvancee = async (tenantId, filters) => {
-  const { callProcedure } = require("../../config/database");
-  const results = await callProcedure(
-    "CALL sp_recherche_parcelles(?, ?, ?, ?, ?, ?)",
-    [
-      tenantId,
-      filters.ville || null,
-      filters.commune || null,
-      filters.superficie_min || null,
-      filters.superficie_max || null,
-      filters.type_parcelle || null,
-    ]
-  );
-  // La procédure retourne un tableau de résultats
-  return Array.isArray(results[0]) ? results[0] : results;
+  let where = "WHERE tenant_id = ? AND statut = 'DISPONIBLE' AND deleted_at IS NULL";
+  const params = [tenantId];
+
+  if (filters.ville) { where += " AND ville LIKE ?"; params.push(`%${filters.ville}%`); }
+  if (filters.commune) { where += " AND commune LIKE ?"; params.push(`%${filters.commune}%`); }
+  if (filters.superficie_min) { where += " AND superficie >= ?"; params.push(filters.superficie_min); }
+  if (filters.superficie_max) { where += " AND superficie <= ?"; params.push(filters.superficie_max); }
+  if (filters.type_parcelle) { where += " AND type_parcelle = ?"; params.push(filters.type_parcelle); }
+
+  return query(`SELECT * FROM parcelles ${where} ORDER BY est_vedette DESC, created_at DESC`, params);
 };
 
 module.exports = {

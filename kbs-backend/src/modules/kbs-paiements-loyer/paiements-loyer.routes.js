@@ -7,6 +7,7 @@ const { enforceTenant } = require("../../middleware/tenant.middleware");
 const { logActivity } = require("../../middleware/activityLog.middleware");
 const { paginate, buildPagination } = require("../../utils/pagination.util");
 const { notificationService } = require("../../services/notification.service");
+const sequenceService = require("../../services/sequence.service");
 
 router.post(
   "/",
@@ -71,12 +72,14 @@ router.post(
     }
     if (!mode_paiement) return R.badRequest(res, "Le mode de paiement est obligatoire");
 
+    const reference = await sequenceService.referencePaiementLoyer(req.tenantId);
     const result = await query(
       `INSERT INTO kbs_paiements_loyer
-       (tenant_id, locataire_id, facture_id, montant_paye, devise,
+       (reference, tenant_id, locataire_id, facture_id, montant_paye, devise,
         mode_paiement, reference_paiement, preuve_url, notes)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
+        reference,
         req.tenantId, locataireId, factureId || null,
         amount, factureDevise, mode_paiement,
         reference_paiement, preuve_url, notes,

@@ -1,6 +1,7 @@
 const { query } = require("../config/database");
 const { logger } = require("../utils/logger.util");
 const emailService = require("./email.service");
+const sequenceService = require("./sequence.service");
 const EmailTemplates = require("./email.templates");
 
 const generateEmailTemplate = (title, content, buttonText, buttonUrl) => {
@@ -32,11 +33,13 @@ const createNotification = async (tenantId, userId, data) => {
         );
       }
     }
+    const reference = await sequenceService.referenceNotification(tenantId);
     await query(
       `INSERT INTO notifications
-       (tenant_id, user_id, titre, message, module, type, canal, donnees_supplementaires)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+       (reference, tenant_id, user_id, titre, message, module, type, canal, donnees_supplementaires)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
+        reference,
         tenantId,
         userId,
         titre,
@@ -61,11 +64,12 @@ const logEmail = async (
   statut = "EN_ATTENTE"
 ) => {
   try {
+    const reference = await sequenceService.referenceEmail(tenantId);
     await query(
       `INSERT INTO email_logs
-       (tenant_id, user_id, destinataire_email, sujet, template_utilise, statut, date_envoi)
-       VALUES (?, ?, ?, ?, ?, ?, NOW())`,
-      [tenantId, userId, destinataire, sujet, template, statut]
+       (reference, tenant_id, user_id, destinataire_email, sujet, template_utilise, statut, date_envoi)
+       VALUES (?, ?, ?, ?, ?, ?, ?, NOW())`,
+      [reference, tenantId, userId, destinataire, sujet, template, statut]
     );
   } catch (err) {
     logger.error("Erreur log email:", err.message);

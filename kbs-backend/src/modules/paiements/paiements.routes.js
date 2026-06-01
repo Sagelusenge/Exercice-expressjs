@@ -7,6 +7,7 @@ const { enforceTenant } = require("../../middleware/tenant.middleware");
 const { logActivity } = require("../../middleware/activityLog.middleware");
 const { paginate, buildPagination } = require("../../utils/pagination.util");
 const { notificationService } = require("../../services/notification.service");
+const sequenceService = require("../../services/sequence.service");
 
 router.post(
   "/",
@@ -20,13 +21,15 @@ router.post(
       reference_transaction, preuve_paiement_url, notes,
     } = req.body;
 
+    const reference = await sequenceService.referencePaiement(req.tenantId);
     const result = await query(
       `INSERT INTO paiements
-       (tenant_id, user_id, parcelle_id, reservation_id, vente_id,
+       (reference, tenant_id, user_id, parcelle_id, reservation_id, vente_id,
         montant, devise, mode_paiement, reference_transaction,
         preuve_paiement_url, notes)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
+        reference,
         req.tenantId, req.user.id, parcelle_id || null,
         reservation_id || null, vente_id || null,
         montant, devise || "USD", mode_paiement,

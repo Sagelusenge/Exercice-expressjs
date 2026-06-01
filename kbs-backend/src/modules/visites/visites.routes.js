@@ -6,6 +6,7 @@ const { requireRole } = require("../../middleware/role.middleware");
 const { logActivity } = require("../../middleware/activityLog.middleware");
 const { paginate, buildPagination } = require("../../utils/pagination.util");
 const { notificationService } = require("../../services/notification.service");
+const sequenceService = require("../../services/sequence.service");
 const emailService = require("../../services/email.service");
 const EmailTemplates = require("../../services/email.templates");
 
@@ -16,11 +17,12 @@ router.post(
   logActivity("PARCELLES", "VISITE_DEMANDEE"),
   async (req, res) => {
     const { parcelle_id, date_souhaitee, heure_souhaitee, notes_client } = req.body;
+    const reference = await sequenceService.referenceVisite(req.tenantId);
     const result = await query(
       `INSERT INTO visites_demandes
-       (tenant_id, user_id, parcelle_id, date_souhaitee, heure_souhaitee, notes_client)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [req.tenantId, req.user.id, parcelle_id, date_souhaitee, heure_souhaitee, notes_client]
+       (reference, tenant_id, user_id, parcelle_id, date_souhaitee, heure_souhaitee, notes_client)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [reference, req.tenantId, req.user.id, parcelle_id, date_souhaitee, heure_souhaitee, notes_client]
     );
     const [visite] = await query("SELECT * FROM visites_demandes WHERE id = ?", [result.insertId]);
     

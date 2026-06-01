@@ -8,6 +8,7 @@ const { startExpirerReservationsJob } = require("./src/jobs/expirer-reservations
 const { startVerifierRetardsJob } = require("./src/jobs/verifier-retards-loyer.job");
 const { startRappelEcheanceJob } = require("./src/jobs/rappel-echeance.job");
 const { logger } = require("./src/utils/logger.util");
+const sequenceService = require("./src/services/sequence.service");
 const fs = require("fs");
 
 const PORT = process.env.PORT || 3000;
@@ -20,10 +21,12 @@ if (!fs.existsSync("logs")) {
 async function checkTenants() {
   const tenants = await query("SELECT id, slug FROM tenants");
   if (tenants.length === 0) {
-    console.log("⚠️ Aucun tenant trouvé. Création du tenant par défaut...");
+    console.log("Aucun tenant trouve. Creation du tenant par defaut...");
+    const codeTenant = await sequenceService.codeTenant();
     await query(
-      `INSERT INTO tenants (nom_organisation, slug, email_organisation, telephone, adresse)
-       VALUES ('KBS Real Estate', 'kbs-immobilier', 'contact@kbs.com', '+243000000', 'Goma, RDC')`
+      `INSERT INTO tenants (code_tenant, nom_organisation, slug, email_organisation, telephone, adresse)
+       VALUES (?, 'KBS Real Estate', 'kbs-immobilier', 'contact@kbs.com', '+243000000', 'Goma, RDC')`,
+      [codeTenant]
     );
   }
 }

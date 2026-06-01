@@ -2,6 +2,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { query } = require("../../config/database");
 const { notificationService } = require("../../services/notification.service");
+const sequenceService = require("../../services/sequence.service");
 
 const generateVerificationCode = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -33,8 +34,10 @@ const register = async (tenantId, data) => {
 
   let userId;
   if (existing.length) {
+    const codeUser = await sequenceService.codeUser({ tenantId, nom, prenom, role: "CLIENT" });
     await query(
       `UPDATE users SET
+       code_user = COALESCE(code_user, ?),
        nom = ?, prenom = ?, telephone = ?, mot_de_passe = ?,
        role = 'CLIENT', statut = 'EN_ATTENTE_VERIFICATION',
        email_verifie = 0, code_verification_email = ?,
@@ -42,18 +45,19 @@ const register = async (tenantId, data) => {
        deleted_at = NULL, bloque_jusqu_a = NULL,
        tentatives_connexion_echouees = 0
        WHERE id = ? AND tenant_id = ?`,
-      [nom, prenom, telephone || null, hashedPassword, code, expireAt, adresse || null, existing[0].id, tenantId]
+      [codeUser, nom, prenom, telephone || null, hashedPassword, code, expireAt, adresse || null, existing[0].id, tenantId]
     );
     userId = existing[0].id;
   } else {
+    const codeUser = await sequenceService.codeUser({ tenantId, nom, prenom, role: "CLIENT" });
     const result = await query(
       `INSERT INTO users
-       (tenant_id, nom, prenom, email, telephone, mot_de_passe, role,
+       (tenant_id, code_user, nom, prenom, email, telephone, mot_de_passe, role,
         statut, email_verifie, code_verification_email,
         code_verification_expire_at, adresse)
-       VALUES (?, ?, ?, ?, ?, ?, 'CLIENT',
+       VALUES (?, ?, ?, ?, ?, ?, ?, 'CLIENT',
                'EN_ATTENTE_VERIFICATION', 0, ?, ?, ?)`,
-      [tenantId, nom, prenom, email, telephone || null, hashedPassword, code, expireAt, adresse || null]
+      [tenantId, codeUser, nom, prenom, email, telephone || null, hashedPassword, code, expireAt, adresse || null]
     );
     userId = result.insertId;
   }

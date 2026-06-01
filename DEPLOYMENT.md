@@ -12,8 +12,9 @@
 3. Importe le schema:
    - Ouvre phpMyAdmin / Adminer / MySQL Workbench.
    - Connecte-toi avec les identifiants Clever Cloud.
-   - Si Clever Cloud refuse les triggers avec `#1419`, importe `Kbsbd-clever-basic.sql`.
+   - Importe de preference `Kbsbd-clever-basic.sql`.
    - Ce fichier est adapte au MySQL mutualise Clever Cloud: pas de `CREATE DATABASE`, pas de `USE ...`, pas de fonctions, pas de triggers, pas de procedures, pas d'events.
+   - La logique qui etait dans les triggers/procedures/events est maintenant faite par le backend Node: generation des references/codes, validation/rejet des factures, confirmation des ventes, expiration des reservations et rappels.
 
 ## 2. Backend Render
 
