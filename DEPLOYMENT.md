@@ -42,10 +42,19 @@ DB_PASSWORD=MYSQL_ADDON_PASSWORD
 DB_NAME=MYSQL_ADDON_DB
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
+SMTP_SECURE=false
 SMTP_USER=ton_email
-SMTP_PASS=ton_mot_de_passe_application
+SMTP_PASS=ton_mot_de_passe_application_gmail
 SMTP_FROM=KBS Buildings <ton_email>
 ```
+
+Pour Gmail, `SMTP_PASS` doit etre un mot de passe d'application Google:
+
+1. Active la validation en deux etapes sur le compte Gmail.
+2. Va dans `Compte Google > Securite > Mots de passe des applications`.
+3. Cree un mot de passe pour `Mail`.
+4. Mets ce code de 16 caracteres dans `SMTP_PASS` sur Render, sans guillemets.
+5. Redeploie le backend apres modification des variables.
 
 Apres deploy, teste:
 

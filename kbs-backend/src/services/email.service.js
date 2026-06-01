@@ -3,35 +3,61 @@ const { logger } = require("../utils/logger.util");
 
 class EmailService {
   constructor() {
+    this.transporter = null;
+  }
+
+  isConfigured() {
+    return Boolean(
+      process.env.SMTP_HOST &&
+      process.env.SMTP_PORT &&
+      process.env.SMTP_USER &&
+      process.env.SMTP_PASS
+    );
+  }
+
+  getTransporter() {
+    if (this.transporter) return this.transporter;
+
+    const port = Number(process.env.SMTP_PORT || 587);
     this.transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
-      port: process.env.SMTP_PORT,
-      secure: process.env.SMTP_SECURE === "true",
+      port,
+      secure: process.env.SMTP_SECURE === "true" || port === 465,
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
       },
     });
+
+    return this.transporter;
   }
 
   async sendEmail(to, subject, body) {
-    try {
-      if (!process.env.SMTP_HOST) {
-        logger.warn(`SMTP non configuré. Email pour ${to} non envoyé : ${subject}`);
-        return;
-      }
+    if (!this.isConfigured()) {
+      logger.warn(`SMTP non configure. Email pour ${to} non envoye : ${subject}`);
+      return false;
+    }
 
-      await this.transporter.sendMail({
-        from: `"${process.env.APP_NAME || "KBS Real Estate"}" <${process.env.SMTP_USER}>`,
+    try {
+      await this.getTransporter().sendMail({
+        from:
+          process.env.SMTP_FROM ||
+          `"${process.env.APP_NAME || "KBS Real Estate"}" <${process.env.SMTP_USER}>`,
         to,
         subject,
         html: body,
       });
 
-      logger.info(`Email envoyé avec succès à ${to}`);
+      logger.info(`Email envoye avec succes a ${to}`);
+      return true;
     } catch (error) {
-      logger.error(`Erreur d'envoi d'email à ${to}:`, error.message);
-      // On ne bloque pas le flux principal pour une erreur d'email
+      logger.error(`Erreur d'envoi d'email a ${to}:`, {
+        message: error.message,
+        code: error.code,
+        command: error.command,
+        response: error.response,
+      });
+      return false;
     }
   }
 }

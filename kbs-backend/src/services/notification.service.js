@@ -232,10 +232,11 @@ const sendActionNotification = async (tenantId, userId, data) => {
   );
 
   try {
+    let sent = false;
     if (process.env.SMTP_HOST) {
-      await emailService.sendEmail(user.email, emailSubject, htmlBody);
+      sent = await emailService.sendEmail(user.email, emailSubject, htmlBody);
     }
-    await logEmail(tenantId, userId, user.email, emailSubject, emailTemplate, process.env.SMTP_HOST ? "ENVOYE" : "EN_ATTENTE");
+    await logEmail(tenantId, userId, user.email, emailSubject, emailTemplate, sent ? "ENVOYE" : "ECHOUE");
   } catch (err) {
     logger.error("Erreur notification email action:", err.message);
     await logEmail(tenantId, userId, user.email, emailSubject, emailTemplate, "ECHOUE");
