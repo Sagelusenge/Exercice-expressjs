@@ -12,8 +12,8 @@
 3. Importe le schema:
    - Ouvre phpMyAdmin / Adminer / MySQL Workbench.
    - Connecte-toi avec les identifiants Clever Cloud.
-   - Importe `Kbsbd-clever-final.sql`.
-   - Ce fichier est adapte a Clever Cloud: il ne contient pas `CREATE DATABASE`, pas `USE ...`, pas d'events MySQL, et pas de fonction MySQL bloquee par le privilege `SUPER`.
+   - Si Clever Cloud refuse les triggers avec `#1419`, importe `Kbsbd-clever-basic.sql`.
+   - Ce fichier est adapte au MySQL mutualise Clever Cloud: pas de `CREATE DATABASE`, pas de `USE ...`, pas de fonctions, pas de triggers, pas de procedures, pas d'events.
 
 ## 2. Backend Render
 
