@@ -20,10 +20,10 @@ export default function LoginPage() {
     setError("");
     try {
       const res = await login(form).unwrap();
-      dispatch(setCredentials(res.data));
+      dispatch(setCredentials(res));
       toast.success("Heureux de vous revoir !");
       
-      const role = res.data.user.role;
+      const role = res.user.role;
       if (role === "SUPER_ADMIN" || role === "ADMIN" || role === "BOSS" || role === "GERANT") navigate("/admin");
       else if (role === "LOCATAIRE") navigate("/locataire");
       else navigate("/client");
