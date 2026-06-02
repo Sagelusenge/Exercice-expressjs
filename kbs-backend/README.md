@@ -102,7 +102,7 @@ npm run migrate
 ## Démarrage
 
 ### Mode développement
-```bash
+```bash...
 npm run dev
 ```
 
