@@ -1,5 +1,5 @@
 # Documentation API Loyers - KBS Buildings
-
+## Dans ce fichier vous avez tous les endspoint concerant le loyer
 ## Overview
 Ce document décrit les endpoints API pour la gestion des locataires et des paiements de loyer dans le système KBS Buildings.
 
