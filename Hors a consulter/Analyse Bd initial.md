@@ -1,11 +1,13 @@
-﻿-- ============================================================
--- BASE DE DONNÃ‰ES COMPLÃˆTE â€” SYSTÃˆME KBS
+```sql
+-- ============================================================
+-- BASE DE DONNÉES COMPLÈTE — SYSTÈME KBS
 -- KITUMAINI BALEZI Serge
 -- MODULE 1 : Plateforme de Vente de Parcelles en Ligne
 -- MODULE 2 : Gestion de Loyer KBS
--- Version : 1.0.0De Gang
+-- Version : 1.0.0
 -- Date    : 2024
 -- ============================================================
+
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
 START TRANSACTION;
@@ -44,7 +46,7 @@ DROP TABLE IF EXISTS tenants;
 DROP TABLE IF EXISTS sequences_references;
 
 -- ============================================================
--- TABLE SEQUENCES â€” Gestion des auto-incrÃ©ments personnalisÃ©s
+-- TABLE SEQUENCES — Gestion des auto-incréments personnalisés
 -- ============================================================
 
 CREATE TABLE sequences_references (
@@ -55,7 +57,7 @@ CREATE TABLE sequences_references (
     derniere_valeur INT UNSIGNED NOT NULL DEFAULT 0,
     UNIQUE KEY unique_seq (table_cible, tenant_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-COMMENT='Gestion centralisÃ©e des rÃ©fÃ©rences personnalisÃ©es KBS';
+COMMENT='Gestion centralisée des références personnalisées KBS';
 
 -- ============================================================
 -- 1. TABLE TENANTS
@@ -64,7 +66,7 @@ COMMENT='Gestion centralisÃ©e des rÃ©fÃ©rences personnalisÃ©es KBS';
 CREATE TABLE tenants (
     id                        BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     code_tenant               VARCHAR(20)  NOT NULL UNIQUE
-        COMMENT 'Ex: KBS-001 gÃ©nÃ©rÃ© automatiquement',
+        COMMENT 'Ex: KBS-001 généré automatiquement',
     nom_organisation          VARCHAR(255) NOT NULL,
     slug                      VARCHAR(255) NOT NULL UNIQUE,
     email_organisation        VARCHAR(255) NOT NULL,
@@ -101,7 +103,7 @@ CREATE TABLE parametres_systeme (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
--- 3. TABLE USERS (5 rÃ´les uniquement)
+-- 3. TABLE USERS (5 rôles uniquement)
 -- ============================================================
 
 CREATE TABLE users (
@@ -132,17 +134,17 @@ CREATE TABLE users (
                                   ) DEFAULT 'EN_ATTENTE_VERIFICATION',
     photo_url                     VARCHAR(500),
     adresse                       TEXT,
-    -- VÃ©rification email
+    -- Vérification email
     email_verifie                 TINYINT(1)   DEFAULT 0,
     code_verification_email       VARCHAR(10),
     code_verification_expire_at   TIMESTAMP    NULL,
-    -- SÃ©curitÃ© connexion
+    -- Sécurité connexion
     derniere_connexion            TIMESTAMP    NULL,
     tentatives_connexion_echouees INT          DEFAULT 0,
     bloque_jusqu_a                TIMESTAMP    NULL,
-    -- TraÃ§abilitÃ© crÃ©ation
+    -- Traçabilité création
     cree_par                      BIGINT UNSIGNED NULL
-        COMMENT 'NULL si auto-inscription CLIENT, sinon admin crÃ©ateur',
+        COMMENT 'NULL si auto-inscription CLIENT, sinon admin créateur',
     created_at                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                                             ON UPDATE CURRENT_TIMESTAMP,
@@ -153,7 +155,7 @@ CREATE TABLE users (
         FOREIGN KEY (cree_par) REFERENCES users(id) ON DELETE SET NULL,
     UNIQUE KEY unique_email_par_tenant (tenant_id, email)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-COMMENT='Tous les acteurs du systÃ¨me KBS';
+COMMENT='Tous les acteurs du système KBS';
 
 -- ============================================================
 -- 4. TABLE PARCELLES
@@ -162,7 +164,7 @@ COMMENT='Tous les acteurs du systÃ¨me KBS';
 CREATE TABLE parcelles (
     id              BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     reference       VARCHAR(50)  NOT NULL
-        COMMENT 'Ex: KBS-PARC-001 gÃ©nÃ©rÃ© automatiquement',
+        COMMENT 'Ex: KBS-PARC-001 généré automatiquement',
     tenant_id       BIGINT UNSIGNED NOT NULL,
     titre           VARCHAR(255) NOT NULL,
     description     LONGTEXT,
@@ -170,13 +172,12 @@ CREATE TABLE parcelles (
     ville           VARCHAR(100),
     commune         VARCHAR(100),
     quartier        VARCHAR(100),
-    superficie      DECIMAL(10,2) COMMENT 'En mÂ²',
+    superficie      DECIMAL(10,2) COMMENT 'En m²',
     devise          ENUM('USD','CDF') DEFAULT 'USD',
     statut          ENUM(
                         'DISPONIBLE',
                         'RESERVEE',
                         'VENDUE',
-                        'MAINTENANCE',
                         'MASQUEE',
                         'ARCHIVEE'
                     ) DEFAULT 'DISPONIBLE',
@@ -191,10 +192,8 @@ CREATE TABLE parcelles (
                     ) DEFAULT 'RESIDENTIELLE',
     est_vedette     TINYINT(1)   DEFAULT 0,
     nombre_vues     INT UNSIGNED DEFAULT 0,
-    prix_vente_confidentiel DECIMAL(15,2) NULL
-        COMMENT 'Prix renseigne par l admin pour le chat et les espaces internes',
-    -- PRIX JAMAIS AFFICHÃ‰ PUBLIQUEMENT
-    -- gÃ©rÃ© uniquement dans la table ventes
+    -- PRIX JAMAIS AFFICHÉ PUBLIQUEMENT
+    -- géré uniquement dans la table ventes
     publie_par      BIGINT UNSIGNED NOT NULL,
     vendu_a         BIGINT UNSIGNED NULL,
     date_vente      TIMESTAMP    NULL,
@@ -209,7 +208,7 @@ CREATE TABLE parcelles (
         FOREIGN KEY (vendu_a)    REFERENCES users(id),
     UNIQUE KEY unique_reference_parcelle (tenant_id, reference)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-COMMENT='Parcelles Ã  vendre - PRIX CONFIDENTIEL';
+COMMENT='Parcelles à vendre - PRIX CONFIDENTIEL';
 
 -- ============================================================
 -- 5. TABLE PARCELLE_IMAGES
@@ -267,7 +266,6 @@ CREATE TABLE reservations (
     devise              ENUM('USD','CDF') DEFAULT 'USD',
     statut              ENUM(
                             'EN_ATTENTE',
-                            'EN_COURS',
                             'CONFIRMEE',
                             'EXPIREE',
                             'ANNULEE',
@@ -302,7 +300,7 @@ CREATE TABLE ventes (
     user_id           BIGINT UNSIGNED NOT NULL COMMENT 'CLIENT acheteur',
     parcelle_id       BIGINT UNSIGNED NOT NULL,
     reservation_id    BIGINT UNSIGNED NULL,
-    -- PRIX CONFIDENTIEL â€” jamais exposÃ© publiquement
+    -- PRIX CONFIDENTIEL — jamais exposé publiquement
     montant_total     DECIMAL(15,2) NOT NULL,
     montant_paye      DECIMAL(15,2) DEFAULT 0.00,
     montant_restant   DECIMAL(15,2) AS (montant_total - montant_paye) STORED,
@@ -328,7 +326,7 @@ CREATE TABLE ventes (
     CONSTRAINT fk_vte_valide
         FOREIGN KEY (valide_par)     REFERENCES users(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-COMMENT='Ventes confirmÃ©es - montant confidentiel';
+COMMENT='Ventes confirmées - montant confidentiel';
 
 -- ============================================================
 -- 9. TABLE PAIEMENTS
@@ -545,9 +543,9 @@ CREATE TABLE kbs_factures (
     rejete_par       BIGINT UNSIGNED NULL,
     motif_rejet      TEXT,
     pdf_url          VARCHAR(500)
-        COMMENT 'GÃ©nÃ©rÃ© uniquement aprÃ¨s validation',
+        COMMENT 'Généré uniquement après validation',
     peut_telecharger TINYINT(1)   DEFAULT 0
-        COMMENT 'TRUE uniquement aprÃ¨s validation admin',
+        COMMENT 'TRUE uniquement après validation admin',
     signature_url    VARCHAR(500),
     cachet_url       VARCHAR(500),
     notes_admin      TEXT,
@@ -593,7 +591,7 @@ CREATE TABLE kbs_facture_historique (
     CONSTRAINT fk_fhist_user
         FOREIGN KEY (effectue_par) REFERENCES users(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-COMMENT='TraÃ§abilitÃ© complÃ¨te des actions sur les factures';
+COMMENT='Traçabilité complète des actions sur les factures';
 
 -- ============================================================
 -- 16. TABLE KBS_PAIEMENTS_LOYER
@@ -895,9 +893,34 @@ CREATE TABLE activity_logs (
 DELIMITER $$
 
 -- ============================================================
--- TRIGGER : TENANT â€” GÃ©nÃ©ration code_tenant
+-- FONCTION UTILITAIRE : Générer la prochaine référence
 -- ============================================================
-DELIMITER $$
+
+CREATE FUNCTION fn_next_reference(
+    p_table   VARCHAR(100),
+    p_tenant  BIGINT UNSIGNED,
+    p_prefix  VARCHAR(20)
+)
+RETURNS VARCHAR(30)
+DETERMINISTIC
+BEGIN
+    DECLARE v_next INT DEFAULT 1;
+
+    -- Insérer ou mettre à jour la séquence
+    INSERT INTO sequences_references (table_cible, tenant_id, prefix, derniere_valeur)
+    VALUES (p_table, p_tenant, p_prefix, 1)
+    ON DUPLICATE KEY UPDATE derniere_valeur = derniere_valeur + 1;
+
+    SELECT derniere_valeur INTO v_next
+    FROM sequences_references
+    WHERE table_cible = p_table AND tenant_id = p_tenant;
+
+    RETURN CONCAT(p_prefix, LPAD(v_next, 3, '0'));
+END$$
+
+-- ============================================================
+-- TRIGGER : TENANT — Génération code_tenant
+-- ============================================================
 
 CREATE TRIGGER trg_tenant_before_insert
 BEFORE INSERT ON tenants
@@ -917,11 +940,10 @@ BEGIN
 END$$
 
 -- ============================================================
--- TRIGGER : USER â€” GÃ©nÃ©ration code_user selon rÃ´le
+-- TRIGGER : USER — Génération code_user selon rôle
 -- Format : KBS-[INITIALES NOM]-[ROLE ABREV]-[NUM]
 -- Ex: KBS-BS-SADM-001 (Balezi Serge, SUPER_ADMIN)
 -- ============================================================
-DELIMITER $$
 
 CREATE TRIGGER trg_user_before_insert
 BEFORE INSERT ON users
@@ -932,7 +954,7 @@ BEGIN
     DECLARE v_initiales VARCHAR(6);
     DECLARE v_next      INT DEFAULT 1;
 
-    -- AbrÃ©viation du rÃ´le
+    -- Abréviation du rôle
     SET v_role_abr = CASE NEW.role
         WHEN 'SUPER_ADMIN' THEN 'SADM'
         WHEN 'BOSS'        THEN 'BOSS'
@@ -942,7 +964,7 @@ BEGIN
         ELSE 'USR'
     END;
 
-    -- Initiales : 1Ã¨re lettre nom + 1Ã¨re lettre prÃ©nom
+    -- Initiales : 1ère lettre nom + 1ère lettre prénom
     SET v_initiales = CONCAT(
         UPPER(LEFT(TRIM(NEW.nom),    1)),
         UPPER(LEFT(TRIM(NEW.prenom), 1))
@@ -961,7 +983,7 @@ BEGIN
 
     SET NEW.code_user = CONCAT(v_prefix, LPAD(v_next, 3, '0'));
 
-    -- DÃ©finir module_accessible selon le rÃ´le
+    -- Définir module_accessible selon le rôle
     SET NEW.module_accessible = CASE NEW.role
         WHEN 'SUPER_ADMIN' THEN 'LES_DEUX'
         WHEN 'BOSS'        THEN 'LES_DEUX'
@@ -973,9 +995,8 @@ BEGIN
 END$$
 
 -- ============================================================
--- TRIGGER : USER â€” VÃ©rification LOCATAIRE auto-inscription
+-- TRIGGER : USER — Vérification LOCATAIRE auto-inscription
 -- ============================================================
-DELIMITER $$
 
 CREATE TRIGGER trg_user_check_locataire
 BEFORE INSERT ON users
@@ -984,16 +1005,15 @@ BEGIN
     IF NEW.role = 'LOCATAIRE' AND NEW.cree_par IS NULL THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT =
-            'ERREUR KBS: Un locataire ne peut pas s''auto-inscrire. Un admin doit crÃ©er son compte.';
+            'ERREUR KBS: Un locataire ne peut pas s''auto-inscrire. Un admin doit créer son compte.';
     END IF;
 END$$
 
 -- ============================================================
--- TRIGGER : PARCELLE â€” GÃ©nÃ©ration rÃ©fÃ©rence
+-- TRIGGER : PARCELLE — Génération référence
 -- Format : KBS-PARC-[TYPE_ABREV]-[NUM]
 -- Ex: KBS-PARC-RES-001
 -- ============================================================
-DELIMITER $$
 
 CREATE TRIGGER trg_parcelle_before_insert
 BEFORE INSERT ON parcelles
@@ -1029,26 +1049,26 @@ BEGIN
 END$$
 
 -- ============================================================
--- TRIGGER : PARCELLE â€” VÃ©rification statut aprÃ¨s UPDATE
--- Si VENDUE â†’ met Ã  jour vendu_a et date_vente automatiquement
+-- TRIGGER : PARCELLE — Vérification statut après UPDATE
+-- Si VENDUE → met à jour vendu_a et date_vente automatiquement
 -- ============================================================
-DELIMITER $$
 
 CREATE TRIGGER trg_parcelle_after_update
 AFTER UPDATE ON parcelles
 FOR EACH ROW
 BEGIN
-    -- Si la parcelle vient d'Ãªtre vendue
+    -- Si la parcelle vient d'être vendue
     IF NEW.statut = 'VENDUE' AND OLD.statut != 'VENDUE' THEN
         -- Enregistrer dans activity_logs
         INSERT INTO activity_logs
-            (tenant_id, module, action, description,
+            (reference, tenant_id, module, action, description,
              entite_type, entite_id, anciennes_valeurs, nouvelles_valeurs)
         VALUES (
+            fn_next_reference('activity_logs', NEW.tenant_id, 'KBS-LOG-'),
             NEW.tenant_id,
             'PARCELLES',
             'PARCELLE_VENDUE',
-            CONCAT('Parcelle ', NEW.reference, ' marquÃ©e comme VENDUE'),
+            CONCAT('Parcelle ', NEW.reference, ' marquée comme VENDUE'),
             'Parcelle',
             NEW.id,
             JSON_OBJECT('statut', OLD.statut),
@@ -1056,13 +1076,12 @@ BEGIN
         );
     END IF;
 
-    -- Si rÃ©servation annulÃ©e â†’ remettre disponible (gÃ©rÃ© par trigger rÃ©servation)
+    -- Si réservation annulée → remettre disponible (géré par trigger réservation)
 END$$
 
 -- ============================================================
--- TRIGGER : RESERVATION â€” GÃ©nÃ©ration rÃ©fÃ©rence
+-- TRIGGER : RESERVATION — Génération référence
 -- ============================================================
-DELIMITER $$
 
 CREATE TRIGGER trg_reservation_before_insert
 BEFORE INSERT ON reservations
@@ -1072,68 +1091,67 @@ BEGIN
 
     INSERT INTO sequences_references
         (table_cible, tenant_id, prefix, derniere_valeur)
-    VALUES (_utf8mb4'reservations' COLLATE utf8mb4_unicode_ci, NEW.tenant_id, _utf8mb4'KBS-RES-' COLLATE utf8mb4_unicode_ci, 1)
+    VALUES ('reservations', NEW.tenant_id, 'KBS-RES-', 1)
     ON DUPLICATE KEY UPDATE derniere_valeur = derniere_valeur + 1;
 
     SELECT derniere_valeur INTO v_next
     FROM sequences_references
-    WHERE table_cible = _utf8mb4'reservations' COLLATE utf8mb4_unicode_ci AND tenant_id = NEW.tenant_id;
+    WHERE table_cible = 'reservations' AND tenant_id = NEW.tenant_id;
 
-    SET NEW.reference = CONCAT(_utf8mb4'KBS-RES-' COLLATE utf8mb4_unicode_ci, LPAD(v_next, 3, '0'));
+    SET NEW.reference = CONCAT('KBS-RES-', LPAD(v_next, 3, '0'));
 
-    -- DÃ©finir date_expiration selon paramÃ¨tre systÃ¨me
+    -- Définir date_expiration selon paramètre système
     IF NEW.date_expiration IS NULL THEN
         SET NEW.date_expiration = DATE_ADD(NOW(), INTERVAL 7 DAY);
     END IF;
 END$$
 
 -- ============================================================
--- TRIGGER : RESERVATION â€” VÃ©rification parcelle disponible
+-- TRIGGER : RESERVATION — Vérification parcelle disponible
 -- ============================================================
 
 CREATE TRIGGER trg_reservation_check_disponible
 BEFORE INSERT ON reservations
 FOR EACH ROW
 BEGIN
-    DECLARE v_statut_parcelle VARCHAR(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    DECLARE v_statut_parcelle VARCHAR(20);
     DECLARE v_module_res_actif TINYINT;
 
-    -- VÃ©rifier si module rÃ©servation est actif
+    -- Vérifier si module réservation est actif
     SELECT module_reservation_actif INTO v_module_res_actif
     FROM tenants WHERE id = NEW.tenant_id;
 
     IF v_module_res_actif = 0 THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT =
-            'ERREUR KBS: Le module de rÃ©servation est actuellement dÃ©sactivÃ©.';
+            'ERREUR KBS: Le module de réservation est actuellement désactivé.';
     END IF;
 
-    -- VÃ©rifier statut de la parcelle
+    -- Vérifier statut de la parcelle
     SELECT statut INTO v_statut_parcelle
     FROM parcelles WHERE id = NEW.parcelle_id;
 
-    IF v_statut_parcelle != _utf8mb4'DISPONIBLE' COLLATE utf8mb4_unicode_ci THEN
+    IF v_statut_parcelle != 'DISPONIBLE' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT =
-            'ERREUR KBS: Cette parcelle n''est pas disponible Ã  la rÃ©servation.';
+            'ERREUR KBS: Cette parcelle n''est pas disponible à la réservation.';
     END IF;
 
-    -- VÃ©rifier qu'aucune rÃ©servation active n'existe
+    -- Vérifier qu'aucune réservation active n'existe
     IF EXISTS (
         SELECT 1 FROM reservations
         WHERE parcelle_id = NEW.parcelle_id
-          AND statut IN (_utf8mb4'EN_ATTENTE' COLLATE utf8mb4_unicode_ci, _utf8mb4'CONFIRMEE' COLLATE utf8mb4_unicode_ci)
+          AND statut IN ('EN_ATTENTE','CONFIRMEE')
     ) THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT =
-            'ERREUR KBS: Cette parcelle a dÃ©jÃ  une rÃ©servation active.';
+            'ERREUR KBS: Cette parcelle a déjà une réservation active.';
     END IF;
 END$$
 
 -- ============================================================
--- TRIGGER : RESERVATION â€” Mise Ã  jour statut parcelle
+-- TRIGGER : RESERVATION — Mise à jour statut parcelle
 -- ============================================================
-DELIMITER $$
 
 CREATE TRIGGER trg_reservation_after_insert
 AFTER INSERT ON reservations
@@ -1141,19 +1159,20 @@ FOR EACH ROW
 BEGIN
     -- Passer la parcelle en RESERVEE
     UPDATE parcelles
-    SET statut = _utf8mb4'RESERVEE' COLLATE utf8mb4_unicode_ci, updated_at = NOW()
+    SET statut = 'RESERVEE', updated_at = NOW()
     WHERE id = NEW.parcelle_id;
 
-    -- Log activitÃ©
+    -- Log activité
     INSERT INTO activity_logs
-        (tenant_id, user_id, module, action,
+        (reference, tenant_id, user_id, module, action,
          description, entite_type, entite_id)
     VALUES (
+        fn_next_reference('activity_logs', NEW.tenant_id, 'KBS-LOG-'),
         NEW.tenant_id,
         NEW.user_id,
         'PARCELLES',
         'RESERVATION_EFFECTUEE',
-        CONCAT('Nouvelle rÃ©servation ', NEW.reference,
+        CONCAT('Nouvelle réservation ', NEW.reference,
                ' sur parcelle ID ', NEW.parcelle_id),
         'Reservation',
         NEW.id
@@ -1161,14 +1180,14 @@ BEGIN
 END$$
 
 -- ============================================================
--- TRIGGER : RESERVATION UPDATE â€” Gestion expiration/annulation
+-- TRIGGER : RESERVATION UPDATE — Gestion expiration/annulation
 -- ============================================================
 
 CREATE TRIGGER trg_reservation_after_update
 AFTER UPDATE ON reservations
 FOR EACH ROW
 BEGIN
-    -- Si rÃ©servation expirÃ©e ou annulÃ©e â†’ remettre parcelle DISPONIBLE
+    -- Si réservation expirée ou annulée → remettre parcelle DISPONIBLE
     IF NEW.statut IN ('EXPIREE','ANNULEE')
        AND OLD.statut NOT IN ('EXPIREE','ANNULEE') THEN
         UPDATE parcelles
@@ -1176,7 +1195,7 @@ BEGIN
         WHERE id = NEW.parcelle_id;
     END IF;
 
-    -- Si rÃ©servation transformÃ©e en vente
+    -- Si réservation transformée en vente
     IF NEW.statut = 'TRANSFORMEE_EN_VENTE'
        AND OLD.statut != 'TRANSFORMEE_EN_VENTE' THEN
         UPDATE parcelles
@@ -1186,14 +1205,15 @@ BEGIN
 
     -- Log
     INSERT INTO activity_logs
-        (tenant_id, module, action,
+        (reference, tenant_id, module, action,
          description, entite_type, entite_id,
          anciennes_valeurs, nouvelles_valeurs)
     VALUES (
+        fn_next_reference('activity_logs', NEW.tenant_id, 'KBS-LOG-'),
         NEW.tenant_id,
         'PARCELLES',
         CONCAT('RESERVATION_', NEW.statut),
-        CONCAT('RÃ©servation ', NEW.reference, ' â†’ ', NEW.statut),
+        CONCAT('Réservation ', NEW.reference, ' → ', NEW.statut),
         'Reservation',
         NEW.id,
         JSON_OBJECT('statut', OLD.statut),
@@ -1202,7 +1222,7 @@ BEGIN
 END$$
 
 -- ============================================================
--- TRIGGER : VENTE â€” GÃ©nÃ©ration rÃ©fÃ©rence
+-- TRIGGER : VENTE — Génération référence
 -- ============================================================
 
 CREATE TRIGGER trg_vente_before_insert
@@ -1224,7 +1244,7 @@ BEGIN
 END$$
 
 -- ============================================================
--- TRIGGER : VENTE UPDATE â€” Confirmation vente â†’ parcelle VENDUE
+-- TRIGGER : VENTE UPDATE — Confirmation vente → parcelle VENDUE
 -- ============================================================
 
 CREATE TRIGGER trg_vente_after_update
@@ -1232,7 +1252,7 @@ AFTER UPDATE ON ventes
 FOR EACH ROW
 BEGIN
     IF NEW.statut = 'COMPLETE' AND OLD.statut != 'COMPLETE' THEN
-        -- Parcelle â†’ VENDUE
+        -- Parcelle → VENDUE
         UPDATE parcelles
         SET statut   = 'VENDUE',
             vendu_a  = NEW.user_id,
@@ -1242,14 +1262,15 @@ BEGIN
 
         -- Log
         INSERT INTO activity_logs
-        (tenant_id, user_id, module, action,
-         description, entite_type, entite_id)
-    VALUES (
-        NEW.tenant_id,
+            (reference, tenant_id, user_id, module, action,
+             description, entite_type, entite_id)
+        VALUES (
+            fn_next_reference('activity_logs', NEW.tenant_id, 'KBS-LOG-'),
+            NEW.tenant_id,
             NEW.valide_par,
             'PARCELLES',
             'VENTE_CONFIRMEE',
-            CONCAT('Vente ', NEW.reference, ' confirmÃ©e et complÃ¨te'),
+            CONCAT('Vente ', NEW.reference, ' confirmée et complète'),
             'Vente',
             NEW.id
         );
@@ -1257,7 +1278,7 @@ BEGIN
 END$$
 
 -- ============================================================
--- TRIGGER : PAIEMENT â€” GÃ©nÃ©ration rÃ©fÃ©rence
+-- TRIGGER : PAIEMENT — Génération référence
 -- ============================================================
 
 CREATE TRIGGER trg_paiement_before_insert
@@ -1279,14 +1300,14 @@ BEGIN
 END$$
 
 -- ============================================================
--- TRIGGER : PAIEMENT UPDATE â€” Mise Ã  jour montant vente
+-- TRIGGER : PAIEMENT UPDATE — Mise à jour montant vente
 -- ============================================================
 
 CREATE TRIGGER trg_paiement_after_update
 AFTER UPDATE ON paiements
 FOR EACH ROW
 BEGIN
-    -- Paiement validÃ© et liÃ© Ã  une vente
+    -- Paiement validé et lié à une vente
     IF NEW.statut = 'PAYE'
        AND OLD.statut != 'PAYE'
        AND NEW.vente_id IS NOT NULL THEN
@@ -1296,7 +1317,7 @@ BEGIN
             updated_at   = NOW()
         WHERE id = NEW.vente_id;
 
-        -- VÃ©rifier si la vente est complÃ¨te
+        -- Vérifier si la vente est complète
         UPDATE ventes
         SET statut     = 'COMPLETE',
             valide_par = NEW.valide_par,
@@ -1307,7 +1328,7 @@ BEGIN
 END$$
 
 -- ============================================================
--- TRIGGER : VISITE â€” GÃ©nÃ©ration rÃ©fÃ©rence
+-- TRIGGER : VISITE — Génération référence
 -- ============================================================
 
 CREATE TRIGGER trg_visite_before_insert
@@ -1329,7 +1350,7 @@ BEGIN
 END$$
 
 -- ============================================================
--- TRIGGER : PARCELLE IMAGE â€” GÃ©nÃ©ration code_image
+-- TRIGGER : PARCELLE IMAGE — Génération code_image
 -- ============================================================
 
 CREATE TRIGGER trg_parcelle_image_before_insert
@@ -1354,7 +1375,7 @@ BEGIN
 END$$
 
 -- ============================================================
--- TRIGGER : PARCELLE DOCUMENT â€” GÃ©nÃ©ration code_document
+-- TRIGGER : PARCELLE DOCUMENT — Génération code_document
 -- ============================================================
 
 CREATE TRIGGER trg_parcelle_doc_before_insert
@@ -1379,7 +1400,7 @@ BEGIN
 END$$
 
 -- ============================================================
--- TRIGGER : VENTE DOCUMENT â€” GÃ©nÃ©ration code_doc
+-- TRIGGER : VENTE DOCUMENT — Génération code_doc
 -- ============================================================
 
 CREATE TRIGGER trg_vente_doc_before_insert
@@ -1404,7 +1425,7 @@ BEGIN
 END$$
 
 -- ============================================================
--- TRIGGER : KBS_LOCATAIRE â€” GÃ©nÃ©ration code_locataire
+-- TRIGGER : KBS_LOCATAIRE — Génération code_locataire
 -- Format : KBS-LOC-[CAT]-[NUM]
 -- Ex: KBS-LOC-SMP-001 / KBS-LOC-ENT-001
 -- ============================================================
@@ -1440,7 +1461,7 @@ BEGIN
 END$$
 
 -- ============================================================
--- TRIGGER : KBS_FACTURE â€” GÃ©nÃ©ration rÃ©fÃ©rence
+-- TRIGGER : KBS_FACTURE — Génération référence
 -- Format : KBS-FAC-[ANNEE]-[NUM]
 -- Ex: KBS-FAC-2024-001
 -- ============================================================
@@ -1471,7 +1492,7 @@ BEGIN
 END$$
 
 -- ============================================================
--- TRIGGER : KBS_FACTURE â€” Historique automatique Ã  la crÃ©ation
+-- TRIGGER : KBS_FACTURE — Historique automatique à la création
 -- ============================================================
 
 CREATE TRIGGER trg_facture_after_insert
@@ -1487,13 +1508,13 @@ BEGIN
         NEW.cree_par,
         NULL,
         'EN_ATTENTE',
-        CONCAT('Facture ', NEW.reference, ' crÃ©Ã©e pour la pÃ©riode ',
+        CONCAT('Facture ', NEW.reference, ' créée pour la période ',
                NEW.periode_debut, ' au ', NEW.periode_fin)
     );
 END$$
 
 -- ============================================================
--- TRIGGER : KBS_FACTURE UPDATE â€” Historique + contrÃ´le tÃ©lÃ©chargement
+-- TRIGGER : KBS_FACTURE UPDATE — Historique + contrôle téléchargement
 -- ============================================================
 
 CREATE TRIGGER trg_facture_after_update
@@ -1503,17 +1524,17 @@ BEGIN
     DECLARE v_action VARCHAR(30);
     DECLARE v_effectue BIGINT UNSIGNED;
 
-    -- DÃ©terminer l'action et l'acteur
+    -- Déterminer l'action et l'acteur
     IF NEW.statut = 'VALIDEE' AND OLD.statut != 'VALIDEE' THEN
         SET v_action   = 'VALIDATION';
         SET v_effectue = NEW.valide_par;
 
-        -- Activer le tÃ©lÃ©chargement
+        -- Activer le téléchargement
         UPDATE kbs_factures
         SET peut_telecharger = 1
         WHERE id = NEW.id;
 
-        -- Mettre Ã  jour statut paiement locataire
+        -- Mettre à jour statut paiement locataire
         UPDATE kbs_locataires
         SET statut_paiement = 'A_JOUR', updated_at = NOW()
         WHERE id = NEW.locataire_id;
@@ -1526,7 +1547,7 @@ BEGIN
         SET v_effectue = NEW.cree_par;
     END IF;
 
-    -- InsÃ©rer dans historique
+    -- Insérer dans historique
     INSERT INTO kbs_facture_historique
         (facture_id, action, effectue_par, ancien_statut,
          nouveau_statut, commentaire)
@@ -1536,12 +1557,12 @@ BEGIN
         v_effectue,
         OLD.statut,
         NEW.statut,
-        CONCAT('Statut changÃ© de ', OLD.statut, ' vers ', NEW.statut)
+        CONCAT('Statut changé de ', OLD.statut, ' vers ', NEW.statut)
     );
 END$$
 
 -- ============================================================
--- TRIGGER : KBS_PAIEMENT_LOYER â€” GÃ©nÃ©ration rÃ©fÃ©rence
+-- TRIGGER : KBS_PAIEMENT_LOYER — Génération référence
 -- ============================================================
 
 CREATE TRIGGER trg_paiement_loyer_before_insert
@@ -1563,7 +1584,7 @@ BEGIN
 END$$
 
 -- ============================================================
--- TRIGGER : KBS_PAIEMENT_LOYER â€” Mise Ã  jour statut locataire
+-- TRIGGER : KBS_PAIEMENT_LOYER — Mise à jour statut locataire
 -- ============================================================
 
 CREATE TRIGGER trg_paiement_loyer_after_update
@@ -1578,7 +1599,7 @@ BEGIN
 END$$
 
 -- ============================================================
--- TRIGGER : NOTIFICATION â€” GÃ©nÃ©ration rÃ©fÃ©rence
+-- TRIGGER : NOTIFICATION — Génération référence
 -- ============================================================
 
 CREATE TRIGGER trg_notification_before_insert
@@ -1600,7 +1621,7 @@ BEGIN
 END$$
 
 -- ============================================================
--- TRIGGER : EMAIL_LOG â€” GÃ©nÃ©ration rÃ©fÃ©rence
+-- TRIGGER : EMAIL_LOG — Génération référence
 -- ============================================================
 
 CREATE TRIGGER trg_email_log_before_insert
@@ -1622,7 +1643,7 @@ BEGIN
 END$$
 
 -- ============================================================
--- TRIGGER : CHAT_CONVERSATION â€” GÃ©nÃ©ration rÃ©fÃ©rence
+-- TRIGGER : CHAT_CONVERSATION — Génération référence
 -- ============================================================
 
 CREATE TRIGGER trg_conversation_before_insert
@@ -1644,7 +1665,7 @@ BEGIN
 END$$
 
 -- ============================================================
--- TRIGGER : CHAT_MESSAGE â€” GÃ©nÃ©ration rÃ©fÃ©rence
+-- TRIGGER : CHAT_MESSAGE — Génération référence
 -- ============================================================
 
 CREATE TRIGGER trg_message_before_insert
@@ -1670,7 +1691,7 @@ BEGIN
 END$$
 
 -- ============================================================
--- TRIGGER : ACTIVITY_LOG â€” GÃ©nÃ©ration rÃ©fÃ©rence
+-- TRIGGER : ACTIVITY_LOG — Génération référence
 -- ============================================================
 
 CREATE TRIGGER trg_activity_log_before_insert
@@ -1692,7 +1713,7 @@ BEGIN
 END$$
 
 -- ============================================================
--- TRIGGER : KBS_RAPPORT â€” GÃ©nÃ©ration rÃ©fÃ©rence
+-- TRIGGER : KBS_RAPPORT — Génération référence
 -- ============================================================
 
 CREATE TRIGGER trg_rapport_before_insert
@@ -1718,15 +1739,15 @@ DELIMITER ;
 
 -- ============================================================
 -- ============================================================
---                      PROCÃ‰DURES STOCKÃ‰ES
+--                      PROCÉDURES STOCKÉES
 -- ============================================================
 -- ============================================================
 
 DELIMITER $$
 
 -- ============================================================
--- PROCÃ‰DURE : VÃ©rifier et expirer les rÃ©servations
--- Ã€ appeler via un EVENT planifiÃ© chaque heure
+-- PROCÉDURE : Vérifier et expirer les réservations
+-- À appeler via un EVENT planifié chaque heure
 -- ============================================================
 
 CREATE PROCEDURE sp_expirer_reservations()
@@ -1739,7 +1760,7 @@ BEGIN
 
     START TRANSACTION;
 
-    -- Mettre Ã  jour les rÃ©servations expirÃ©es
+    -- Mettre à jour les réservations expirées
     UPDATE reservations
     SET statut     = 'EXPIREE',
         updated_at = NOW()
@@ -1752,8 +1773,8 @@ BEGIN
 END$$
 
 -- ============================================================
--- PROCÃ‰DURE : VÃ©rifier les locataires en retard
--- Ã€ appeler chaque jour via EVENT
+-- PROCÉDURE : Vérifier les locataires en retard
+-- À appeler chaque jour via EVENT
 -- ============================================================
 
 CREATE PROCEDURE sp_verifier_locataires_retard(IN p_tenant_id BIGINT UNSIGNED)
@@ -1766,8 +1787,8 @@ BEGIN
 
     START TRANSACTION;
 
-    -- Marquer EN_RETARD les locataires dont la date_fin est dÃ©passÃ©e
-    -- et qui n'ont pas de paiement validÃ© pour la pÃ©riode en cours
+    -- Marquer EN_RETARD les locataires dont la date_fin est dépassée
+    -- et qui n'ont pas de paiement validé pour la période en cours
     UPDATE kbs_locataires kl
     SET kl.statut_paiement = 'EN_RETARD',
         kl.updated_at      = NOW()
@@ -1783,7 +1804,7 @@ BEGIN
             AND YEAR(kp.date_paiement)  = YEAR(CURDATE())
       );
 
-    -- CrÃ©er des notifications pour les locataires en retard
+    -- Créer des notifications pour les locataires en retard
     INSERT INTO notifications
         (tenant_id, user_id, titre, message, module, type, canal, donnees_supplementaires)
     SELECT
@@ -1791,7 +1812,7 @@ BEGIN
         kl.user_id,
         'Retard de paiement de loyer',
         CONCAT('Bonjour ', COALESCE(kl.nom, kl.nom_representant),
-               ', votre loyer est en retard. Veuillez rÃ©gulariser. â€” KBS Buildings'),
+               ', votre loyer est en retard. Veuillez régulariser. — KBS Buildings'),
         'KBS',
         'LOCATAIRE_EN_RETARD',
         'PUSH',
@@ -1805,28 +1826,28 @@ BEGIN
 END$$
 
 -- ============================================================
--- PROCÃ‰DURE : Envoyer rappel Ã©chÃ©ance J-7 locataires
--- Ã€ appeler chaque jour via EVENT
+-- PROCÉDURE : Envoyer rappel échéance J-7 locataires
+-- À appeler chaque jour via EVENT
 -- ============================================================
 
 CREATE PROCEDURE sp_rappel_echeance_j7(IN p_tenant_id BIGINT UNSIGNED)
 BEGIN
     DECLARE v_message TEXT;
 
-    -- Locataires simples dont l'Ã©chÃ©ance est dans 7 jours
+    -- Locataires simples dont l'échéance est dans 7 jours
     INSERT INTO notifications
         (tenant_id, user_id, titre, message, module, type, canal, donnees_supplementaires)
     SELECT
         kl.tenant_id,
         kl.user_id,
-        'Rappel : Ã‰chÃ©ance de loyer dans 7 jours',
+        'Rappel : Échéance de loyer dans 7 jours',
         CONCAT(
             'Bonjour ', kl.nom, ' ', kl.prenom,
-            ', votre Ã©chÃ©ance de loyer arrive dans 7 jours (',
+            ', votre échéance de loyer arrive dans 7 jours (',
             kl.date_fin_loyer,
-            '). Veuillez procÃ©der au paiement de ',
+            '). Veuillez procéder au paiement de ',
             kl.montant_mensuel_loyer, ' ', kl.devise,
-            ' avant la date limite. â€” KBS Buildings'
+            ' avant la date limite. — KBS Buildings'
         ),
         'KBS',
         'ECHEANCE_LOYER_J7',
@@ -1848,15 +1869,15 @@ BEGIN
     SELECT
         kl.tenant_id,
         kl.user_id,
-        'Rappel : Ã‰chÃ©ance de loyer dans 7 jours',
+        'Rappel : Échéance de loyer dans 7 jours',
         CONCAT(
             'Bonjour ', kl.nom_representant,
             ' (', kl.nom_entreprise, ')',
-            ', votre Ã©chÃ©ance de loyer arrive dans 7 jours (',
+            ', votre échéance de loyer arrive dans 7 jours (',
             kl.date_fin_loyer,
-            '). Veuillez procÃ©der au paiement de ',
+            '). Veuillez procéder au paiement de ',
             kl.montant_mensuel_loyer, ' ', kl.devise,
-            ' avant la date limite. â€” KBS Buildings'
+            ' avant la date limite. — KBS Buildings'
         ),
         'KBS',
         'ECHEANCE_LOYER_J7',
@@ -1880,7 +1901,7 @@ BEGIN
         kl.tenant_id,
         kl.user_id,
         kl.email_entreprise,
-        'Rappel : Ã‰chÃ©ance de loyer dans 7 jours â€” KBS Buildings',
+        'Rappel : Échéance de loyer dans 7 jours — KBS Buildings',
         'PUSH_ECHEANCE_J7',
         'EN_ATTENTE'
     FROM kbs_locataires kl
@@ -1892,7 +1913,7 @@ BEGIN
 END$$
 
 -- ============================================================
--- PROCÃ‰DURE : Valider une facture KBS
+-- PROCÉDURE : Valider une facture KBS
 -- ============================================================
 
 CREATE PROCEDURE sp_valider_facture(
@@ -1912,18 +1933,18 @@ BEGIN
 
     START TRANSACTION;
 
-    -- VÃ©rifier que l'admin a le droit
+    -- Vérifier que l'admin a le droit
     SELECT role INTO v_role_admin FROM users WHERE id = p_admin_id;
     IF v_role_admin NOT IN ('SUPER_ADMIN','BOSS','GERANT') THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'ERREUR KBS: Seul un admin peut valider une facture.';
     END IF;
 
-    -- VÃ©rifier statut actuel
+    -- Vérifier statut actuel
     SELECT statut INTO v_statut_actuel FROM kbs_factures WHERE id = p_facture_id;
     IF v_statut_actuel != 'EN_ATTENTE' THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'ERREUR KBS: Cette facture ne peut pas Ãªtre validÃ©e dans son Ã©tat actuel.';
+        SET MESSAGE_TEXT = 'ERREUR KBS: Cette facture ne peut pas être validée dans son état actuel.';
     END IF;
 
     -- Valider la facture
@@ -1942,10 +1963,10 @@ BEGIN
     SELECT
         kf.tenant_id,
         kl.user_id,
-        'Votre facture a Ã©tÃ© validÃ©e',
+        'Votre facture a été validée',
         CONCAT('Votre facture ', kf.reference,
-               ' pour la pÃ©riode ', kf.periode_debut, ' au ', kf.periode_fin,
-               ' a Ã©tÃ© validÃ©e. Vous pouvez maintenant la tÃ©lÃ©charger.'),
+               ' pour la période ', kf.periode_debut, ' au ', kf.periode_fin,
+               ' a été validée. Vous pouvez maintenant la télécharger.'),
         'KBS',
         'FACTURE_VALIDEE',
         'APP',
@@ -1958,7 +1979,7 @@ BEGIN
 END$$
 
 -- ============================================================
--- PROCÃ‰DURE : Rejeter une facture KBS
+-- PROCÉDURE : Rejeter une facture KBS
 -- ============================================================
 
 CREATE PROCEDURE sp_rejeter_facture(
@@ -1998,9 +2019,9 @@ BEGIN
     SELECT
         kf.tenant_id,
         kl.user_id,
-        'Votre facture a Ã©tÃ© rejetÃ©e',
-        CONCAT('Votre facture ', kf.reference, ' a Ã©tÃ© rejetÃ©e. Motif : ',
-               COALESCE(p_motif, 'Non spÃ©cifiÃ©')),
+        'Votre facture a été rejetée',
+        CONCAT('Votre facture ', kf.reference, ' a été rejetée. Motif : ',
+               COALESCE(p_motif, 'Non spécifié')),
         'KBS',
         'FACTURE_REJETEE',
         'APP',
@@ -2013,7 +2034,7 @@ BEGIN
 END$$
 
 -- ============================================================
--- PROCÃ‰DURE : Confirmer une vente de parcelle
+-- PROCÉDURE : Confirmer une vente de parcelle
 -- ============================================================
 
 CREATE PROCEDURE sp_confirmer_vente(
@@ -2034,26 +2055,26 @@ BEGIN
 
     START TRANSACTION;
 
-    -- VÃ©rifier rÃ´le admin
+    -- Vérifier rôle admin
     SELECT role INTO v_role_admin FROM users WHERE id = p_admin_id;
     IF v_role_admin NOT IN ('SUPER_ADMIN','BOSS','GERANT') THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'ERREUR KBS: Seul un admin peut confirmer une vente.';
     END IF;
 
-    -- VÃ©rifier vente
+    -- Vérifier vente
     SELECT statut, montant_total, montant_paye
     INTO v_statut_vente, v_montant_total, v_montant_paye
     FROM ventes WHERE id = p_vente_id;
 
     IF v_statut_vente != 'EN_COURS' THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'ERREUR KBS: Cette vente ne peut pas Ãªtre confirmÃ©e dans son Ã©tat actuel.';
+        SET MESSAGE_TEXT = 'ERREUR KBS: Cette vente ne peut pas être confirmée dans son état actuel.';
     END IF;
 
     IF v_montant_paye < v_montant_total THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'ERREUR KBS: Le paiement total n''a pas encore Ã©tÃ© effectuÃ©.';
+        SET MESSAGE_TEXT = 'ERREUR KBS: Le paiement total n''a pas encore été effectué.';
     END IF;
 
     -- Confirmer la vente
@@ -2063,13 +2084,13 @@ BEGIN
         updated_at = NOW()
     WHERE id = p_vente_id;
 
-    -- Les triggers gÃ¨rent le reste (parcelle â†’ VENDUE, notifications)
+    -- Les triggers gèrent le reste (parcelle → VENDUE, notifications)
 
     COMMIT;
 END$$
 
 -- ============================================================
--- PROCÃ‰DURE : Statistiques dashboard Admin
+-- PROCÉDURE : Statistiques dashboard Admin
 -- ============================================================
 
 CREATE PROCEDURE sp_dashboard_admin(IN p_tenant_id BIGINT UNSIGNED)
@@ -2150,7 +2171,7 @@ BEGIN
 END$$
 
 -- ============================================================
--- PROCÃ‰DURE : Rapport mensuel locataires KBS
+-- PROCÉDURE : Rapport mensuel locataires KBS
 -- ============================================================
 
 CREATE PROCEDURE sp_rapport_mensuel_kbs(
@@ -2173,10 +2194,10 @@ BEGIN
         COALESCE(SUM(kp.montant_paye), 0) AS montant_paye_mois,
         CASE
             WHEN COALESCE(SUM(kp.montant_paye),0) >= kl.montant_mensuel_loyer
-            THEN 'PAYÃ‰'
+            THEN 'PAYÉ'
             WHEN COALESCE(SUM(kp.montant_paye),0) > 0
             THEN 'PARTIEL'
-            ELSE 'NON PAYÃ‰'
+            ELSE 'NON PAYÉ'
         END AS statut_mois
     FROM kbs_locataires kl
     LEFT JOIN kbs_paiements_loyer kp
@@ -2196,7 +2217,7 @@ BEGIN
 END$$
 
 -- ============================================================
--- PROCÃ‰DURE : Recherche avancÃ©e de parcelles
+-- PROCÉDURE : Recherche avancée de parcelles
 -- ============================================================
 
 CREATE PROCEDURE sp_recherche_parcelles(
@@ -2248,7 +2269,7 @@ DELIMITER ;
 -- ============================================================
 
 -- ============================================================
--- VUE 1 : Parcelles disponibles (site public â€” SANS PRIX)
+-- VUE 1 : Parcelles disponibles (site public — SANS PRIX)
 -- ============================================================
 
 CREATE OR REPLACE VIEW v_parcelles_publiques AS
@@ -2279,7 +2300,7 @@ WHERE p.statut    = 'DISPONIBLE'
   AND p.deleted_at IS NULL;
 
 -- ============================================================
--- VUE 2 : Parcelles avec dÃ©tail complet (admin â€” AVEC PRIX)
+-- VUE 2 : Parcelles avec détail complet (admin — AVEC PRIX)
 -- ============================================================
 
 CREATE OR REPLACE VIEW v_parcelles_admin AS
@@ -2308,7 +2329,7 @@ SELECT
     u_ach.code_user                    AS code_acheteur,
     p.date_vente,
     v.reference                        AS reference_vente,
-    COALESCE(p.prix_vente_confidentiel, v.montant_total) AS prix_vente,
+    v.montant_total                    AS prix_vente,
     v.montant_paye,
     v.montant_restant,
     v.devise,
@@ -2321,7 +2342,7 @@ LEFT JOIN ventes v    ON v.parcelle_id = p.id AND v.statut = 'COMPLETE'
 WHERE p.deleted_at IS NULL;
 
 -- ============================================================
--- VUE 3 : Dashboard Admin â€” RÃ©sumÃ© parcelles par statut
+-- VUE 3 : Dashboard Admin — Résumé parcelles par statut
 -- ============================================================
 
 CREATE OR REPLACE VIEW v_dashboard_parcelles AS
@@ -2339,7 +2360,7 @@ LEFT JOIN parcelles p ON p.tenant_id = t.id AND p.deleted_at IS NULL
 GROUP BY t.id, t.nom_organisation;
 
 -- ============================================================
--- VUE 4 : Dashboard Admin â€” RÃ©sumÃ© utilisateurs
+-- VUE 4 : Dashboard Admin — Résumé utilisateurs
 -- ============================================================
 
 CREATE OR REPLACE VIEW v_dashboard_users AS
@@ -2360,7 +2381,7 @@ LEFT JOIN users u ON u.tenant_id = t.id AND u.deleted_at IS NULL
 GROUP BY t.id, t.nom_organisation;
 
 -- ============================================================
--- VUE 5 : Ventes complÃ¨tes avec dÃ©tails
+-- VUE 5 : Ventes complètes avec détails
 -- ============================================================
 
 CREATE OR REPLACE VIEW v_ventes_detail AS
@@ -2390,7 +2411,7 @@ SELECT
     p.type_parcelle,
     -- Admin validateur
     CONCAT(u_val.nom,' ',u_val.prenom) AS valide_par,
-    -- RÃ©servation liÃ©e
+    -- Réservation liée
     r.reference                        AS reference_reservation
 FROM ventes v
 JOIN users u_ach    ON u_ach.id   = v.user_id
@@ -2399,7 +2420,7 @@ LEFT JOIN users u_val ON u_val.id = v.valide_par
 LEFT JOIN reservations r ON r.id  = v.reservation_id;
 
 -- ============================================================
--- VUE 6 : RÃ©servations actives
+-- VUE 6 : Réservations actives
 -- ============================================================
 
 CREATE OR REPLACE VIEW v_reservations_actives AS
@@ -2427,7 +2448,7 @@ SELECT
 FROM reservations r
 JOIN users     u ON u.id = r.user_id
 JOIN parcelles p ON p.id = r.parcelle_id
-WHERE r.statut IN ('EN_ATTENTE','EN_COURS','CONFIRMEE');
+WHERE r.statut IN ('EN_ATTENTE','CONFIRMEE');
 
 -- ============================================================
 -- VUE 7 : Locataires KBS complet (admin)
@@ -2440,7 +2461,7 @@ SELECT
     kl.tenant_id,
     kl.categorie,
     kl.statut_paiement,
-    -- Nom selon catÃ©gorie
+    -- Nom selon catégorie
     CASE kl.categorie
         WHEN 'SIMPLE'     THEN CONCAT(kl.nom,' ',kl.prenom)
         WHEN 'ENTREPRISE' THEN kl.nom_entreprise
@@ -2497,7 +2518,7 @@ LEFT JOIN kbs_locataires kl
 GROUP BY t.id, t.nom_organisation;
 
 -- ============================================================
--- VUE 9 : Factures KBS avec dÃ©tails
+-- VUE 9 : Factures KBS avec détails
 -- ============================================================
 
 CREATE OR REPLACE VIEW v_factures_kbs AS
@@ -2505,7 +2526,6 @@ SELECT
     kf.id,
     kf.reference,
     kf.tenant_id,
-    kf.locataire_id,
     kf.statut,
     kf.periode_debut,
     kf.periode_fin,
@@ -2527,23 +2547,18 @@ SELECT
         WHEN 'SIMPLE'     THEN kl.telephone_personnel
         WHEN 'ENTREPRISE' THEN kl.telephone_entreprise
     END AS telephone,
-    -- Admin crÃ©ateur
+    -- Admin créateur
     CONCAT(u_cree.nom,' ',u_cree.prenom)  AS cree_par,
     u_cree.code_user                       AS code_createur,
     -- Admin validateur
     CONCAT(u_val.nom,' ',u_val.prenom)    AS valide_par,
     -- Admin rejeteur
-    CONCAT(u_rej.nom,' ',u_rej.prenom)    AS rejete_par,
-    -- Paiements
-    COALESCE(SUM(kp.montant_paye), 0)     AS montant_paye,
-    kf.montant_loyer - COALESCE(SUM(kp.montant_paye), 0) AS montant_restant
+    CONCAT(u_rej.nom,' ',u_rej.prenom)    AS rejete_par
 FROM kbs_factures kf
 JOIN kbs_locataires kl ON kl.id  = kf.locataire_id
 JOIN users u_cree       ON u_cree.id = kf.cree_par
 LEFT JOIN users u_val   ON u_val.id  = kf.valide_par
-LEFT JOIN users u_rej   ON u_rej.id  = kf.rejete_par
-LEFT JOIN kbs_paiements_loyer kp ON kp.facture_id = kf.id AND kp.statut <> 'REJETE'
-GROUP BY kf.id, kf.reference, kf.tenant_id, kf.locataire_id, kf.statut, kf.periode_debut, kf.periode_fin, kf.montant_loyer, kf.devise, kf.peut_telecharger, kf.date_validation, kf.date_rejet, kf.motif_rejet, kf.created_at, kl.code_locataire, kl.categorie, nom_locataire, telephone, cree_par, code_createur, valide_par, rejete_par;
+LEFT JOIN users u_rej   ON u_rej.id  = kf.rejete_par;
 
 -- ============================================================
 -- VUE 10 : Rapport financier ventes (admin)
@@ -2620,7 +2635,7 @@ GROUP BY
     u_ass.nom, u_ass.prenom;
 
 -- ============================================================
--- VUE 13 : Historique activitÃ©s rÃ©centes
+-- VUE 13 : Historique activités récentes
 -- ============================================================
 
 CREATE OR REPLACE VIEW v_activites_recentes AS
@@ -2666,7 +2681,7 @@ WHERE n.est_lu = 0
 ORDER BY n.created_at DESC;
 
 -- ============================================================
--- VUE 15 : Parcelles les plus consultÃ©es
+-- VUE 15 : Parcelles les plus consultées
 -- ============================================================
 
 CREATE OR REPLACE VIEW v_parcelles_populaires AS
@@ -2696,4 +2711,171 @@ ORDER BY p.nombre_vues DESC, nombre_favoris DESC;
 
 -- ============================================================
 -- ============================================================
--- Events planifies retires pour Clever Cloud: les jobs Node.js du backend les remplacent.
+--                   EVENTS PLANIFIÉS
+-- ============================================================
+-- ============================================================
+
+SET GLOBAL event_scheduler = ON;
+
+DELIMITER $$
+
+-- Expiration des réservations — toutes les heures
+CREATE EVENT evt_expirer_reservations
+ON SCHEDULE EVERY 1 HOUR
+STARTS CURRENT_TIMESTAMP
+DO
+BEGIN
+    CALL sp_expirer_reservations();
+END$$
+
+-- Vérification retards loyer — chaque jour à 08h00
+CREATE EVENT evt_verifier_retards_loyer
+ON SCHEDULE EVERY 1 DAY
+STARTS (TIMESTAMP(CURRENT_DATE) + INTERVAL 8 HOUR)
+DO
+BEGIN
+    CALL sp_verifier_locataires_retard(1);
+END$$
+
+-- Rappel échéance J-7 — chaque jour à 09h00
+CREATE EVENT evt_rappel_echeance_j7
+ON SCHEDULE EVERY 1 DAY
+STARTS (TIMESTAMP(CURRENT_DATE) + INTERVAL 9 HOUR)
+DO
+BEGIN
+    CALL sp_rappel_echeance_j7(1);
+END$$
+
+DELIMITER ;
+
+
+-- ============================================================
+-- ============================================================
+--                 DONNÉES INITIALES (SEED)
+-- ============================================================
+-- ============================================================
+
+-- Tenant principal : KBS
+INSERT INTO tenants (
+    nom_organisation,
+    slug,
+    email_organisation,
+    telephone,
+    adresse,
+    statut,
+    module_parcelles_actif,
+    module_kbs_actif,
+    module_chat_actif,
+    module_reservation_actif
+) VALUES (
+    'KITUMAINI BALEZI Serge',
+    'kbs-immobilier',
+    'contact@kbs-immobilier.com',
+    '+243000000000',
+    'Goma, Nord-Kivu, RDC',
+    'ACTIF',
+    1,
+    1,
+    1,
+    0
+);
+
+-- Paramètres système initiaux
+INSERT INTO parametres_systeme (tenant_id, cle, valeur, type_valeur, description) VALUES
+(1, 'RESERVATION_ACTIVE',            'false', 'BOOLEAN', 'Activer/désactiver les réservations en ligne'),
+(1, 'DUREE_RESERVATION_JOURS',       '7',     'INTEGER', 'Durée de validité d''une réservation en jours'),
+(1, 'EMAIL_ADMIN_PRINCIPAL',         'contact@kbs-immobilier.com', 'STRING', 'Email principal admin'),
+(1, 'DELAI_RAPPEL_ECHEANCE_JOURS',   '7',     'INTEGER', 'Jours avant échéance pour rappel'),
+(1, 'DEVISE_PRINCIPALE',             'USD',   'STRING',  'Devise par défaut du système'),
+(1, 'NOM_ENTREPRISE',                'KITUMAINI BALEZI Serge', 'STRING', 'Nom officiel entreprise'),
+(1, 'VILLE_PRINCIPALE',              'Goma',  'STRING',  'Ville principale des parcelles'),
+(1, 'MAX_TENTATIVES_CONNEXION',      '5',     'INTEGER', 'Tentatives de connexion avant blocage'),
+(1, 'DUREE_BLOCAGE_MINUTES',         '30',    'INTEGER', 'Durée de blocage compte en minutes');
+
+-- Initialisation séquences pour tables sans tenant spécifique
+INSERT INTO sequences_references (table_cible, tenant_id, prefix, derniere_valeur)
+VALUES ('tenants', 0, 'KBS-ORG-', 0);
+
+-- Super Admin initial KBS
+-- (Le trigger générera le code_user automatiquement)
+INSERT INTO users (
+    tenant_id,
+    nom,
+    prenom,
+    email,
+    telephone,
+    mot_de_passe,
+    role,
+    statut,
+    email_verifie,
+    cree_par
+) VALUES (
+    1,
+    'Balezi',
+    'Serge',
+    'serge.balezi@kbs-immobilier.com',
+    '+243000000001',
+    -- Mot de passe haché (à remplacer par le vrai hash bcrypt en production)
+    '$2y$12$examplehashedpasswordKBSAdmin001',
+    'SUPER_ADMIN',
+    'ACTIF',
+    1,
+    NULL
+);
+
+-- Templates de notifications
+INSERT INTO notification_templates
+    (tenant_id, code, module, sujet_email, corps_push, variables_disponibles)
+VALUES
+(1, 'EMAIL_CODE_VERIFICATION', 'PARCELLES',
+ 'Vérification de votre compte KBS — Code {{code}}',
+ 'Votre code de vérification KBS est : {{code}}. Valable {{expire_dans}}.',
+ '["nom","code","expire_dans"]'),
+
+(1, 'EMAIL_BIENVENUE', 'PARCELLES',
+ 'Bienvenue chez KITUMAINI BALEZI Serge',
+ 'Bienvenue {{nom}} {{prenom}} ! Votre compte KBS est activé.',
+ '["nom","prenom"]'),
+
+(1, 'EMAIL_RESERVATION_CLIENT', 'PARCELLES',
+ 'Votre réservation {{reference}} — KBS Immobilier',
+ 'Réservation {{reference}} confirmée pour la parcelle {{parcelle}}.',
+ '["nom","parcelle","date","reference"]'),
+
+(1, 'EMAIL_RESERVATION_ADMIN', 'PARCELLES',
+ 'Nouvelle réservation reçue — {{reference}}',
+ 'Nouvelle réservation {{reference}} de {{client}} sur {{parcelle}}.',
+ '["client","parcelle","date","reference"]'),
+
+(1, 'EMAIL_VENTE_CONFIRMEE', 'PARCELLES',
+ 'Vente confirmée — {{reference}} — KBS Immobilier',
+ 'Félicitations {{nom}} ! Votre achat {{reference}} est confirmé.',
+ '["nom","parcelle","reference","date"]'),
+
+(1, 'EMAIL_COMPTE_LOCATAIRE', 'KBS',
+ 'Votre espace locataire KBS Buildings',
+ 'Bonjour {{nom}}, votre compte locataire KBS a été créé.',
+ '["nom","email","mot_de_passe_temp"]'),
+
+(1, 'PUSH_ECHEANCE_J7', 'KBS',
+ 'Rappel : Échéance de loyer dans 7 jours — KBS Buildings',
+ 'Bonjour {{nom}}, votre échéance de loyer arrive dans 7 jours ({{date_fin}}). Montant : {{montant}} {{devise}}. — KBS Buildings',
+ '["nom","date_fin","montant","devise"]'),
+
+(1, 'EMAIL_FACTURE_VALIDEE', 'KBS',
+ 'Votre facture {{reference}} est disponible — KBS Buildings',
+ 'Votre facture {{reference}} ({{periode}}) est validée et disponible au téléchargement.',
+ '["nom","reference","periode","montant"]'),
+
+(1, 'EMAIL_FACTURE_REJETEE', 'KBS',
+ 'Votre facture {{reference}} a été rejetée — KBS Buildings',
+ 'Votre facture {{reference}} a été rejetée. Motif : {{motif}}.',
+ '["nom","reference","motif"]');
+
+-- ============================================================
+-- FIN DE LA BASE DE DONNÉES KBS
+-- KITUMAINI BALEZI Serge
+-- ============================================================
+
+COMMIT;
+```

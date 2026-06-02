@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>KBS Real Estate | Premium Land Parcels</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-bright": "#f7f9fb",
+                    "on-secondary-container": "#796048",
+                    "on-tertiary": "#ffffff",
+                    "primary-fixed-dim": "#bec6e0",
+                    "on-secondary": "#ffffff",
+                    "on-primary-fixed-variant": "#3f465c",
+                    "primary-container": "#131b2e",
+                    "surface-tint": "#565e74",
+                    "outline-variant": "#c6c6cd",
+                    "tertiary": "#000000",
+                    "on-background": "#191c1e",
+                    "error-container": "#ffdad6",
+                    "tertiary-container": "#0b1c30",
+                    "surface-dim": "#d8dadc",
+                    "on-tertiary-fixed": "#0b1c30",
+                    "surface-variant": "#e0e3e5",
+                    "error": "#ba1a1a",
+                    "surface": "#f7f9fb",
+                    "surface-container-high": "#e6e8ea",
+                    "inverse-primary": "#bec6e0",
+                    "inverse-on-surface": "#eff1f3",
+                    "on-primary-fixed": "#131b2e",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-container": "#7c839b",
+                    "on-surface": "#191c1e",
+                    "surface-container-low": "#f2f4f6",
+                    "outline": "#76777d",
+                    "inverse-surface": "#2d3133",
+                    "surface-container-highest": "#e0e3e5",
+                    "on-tertiary-container": "#75859d",
+                    "primary": "#000000",
+                    "secondary": "#725a42",
+                    "background": "#f7f9fb",
+                    "on-surface-variant": "#45464d",
+                    "on-error-container": "#93000a",
+                    "secondary-fixed": "#fedcbe",
+                    "on-tertiary-fixed-variant": "#38485d",
+                    "secondary-fixed-dim": "#e1c1a4",
+                    "secondary-container": "#fedcbe",
+                    "on-secondary-fixed-variant": "#59422c",
+                    "surface-container": "#eceef0",
+                    "on-secondary-fixed": "#291806",
+                    "tertiary-fixed": "#d3e4fe",
+                    "on-primary": "#ffffff",
+                    "on-error": "#ffffff",
+                    "primary-fixed": "#dae2fd",
+                    "tertiary-fixed-dim": "#b7c8e1"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "24px",
+                    "margin-tablet": "32px",
+                    "container-max": "1280px",
+                    "margin-desktop": "64px",
+                    "base": "8px",
+                    "margin-mobile": "16px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Montserrat"],
+                    "label-sm": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "title-lg": ["Inter"],
+                    "headline-md": ["Montserrat"],
+                    "label-md": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-lg-mobile": ["Montserrat"],
+                    "headline-lg": ["Montserrat"]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "title-lg": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .bento-item {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .bento-item:hover {
+            transform: translateY(-4px);
+        }
+    </style>
+</head>
+<body class="bg-surface-bright text-on-surface font-body-md selection:bg-secondary-fixed selection:text-on-secondary-fixed">
+<!-- TopNavBar -->
+<nav class="bg-surface-container-lowest dark:bg-surface-container-highest border-b border-outline-variant dark:border-outline shadow-sm docked full-width top-0 sticky z-50 h-20">
+<div class="flex justify-between items-center w-full px-gutter max-w-container-max mx-auto h-full">
+<div class="flex items-center gap-8">
+<span class="font-display-lg text-headline-md text-primary dark:text-on-primary-fixed tracking-tight">KBS Real Estate</span>
+<div class="hidden md:flex items-center gap-6">
+<a class="text-primary dark:text-on-primary-fixed font-bold border-b-2 border-primary dark:border-primary-fixed-dim pb-1 font-label-md text-label-md" href="#">Parcels</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors font-label-md text-label-md" href="#">About</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors font-label-md text-label-md" href="#">Contact</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden lg:flex items-center gap-2 px-4 py-2 bg-surface-container-low rounded-full">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-label-md w-48" placeholder="Search parcels..." type="text"/>
+</div>
+<div class="flex items-center gap-2">
+<button class="hidden sm:flex text-on-surface-variant hover:bg-surface-container-low p-2 rounded-full transition-all">
+<span class="material-symbols-outlined" data-icon="support_agent">support_agent</span>
+</button>
+<button class="hidden sm:flex text-on-surface-variant hover:bg-surface-container-low p-2 rounded-full transition-all">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-on-surface-variant font-label-md text-label-md px-4 py-2 hover:bg-surface-container-low rounded-lg transition-all">My Favorites</button>
+<button class="bg-primary text-on-primary px-6 py-2 rounded-lg font-label-md text-label-md hover:opacity-90 active:scale-95 transition-all">Login</button>
+</div>
+</div>
+</div>
+</nav>
+<!-- Hero Section -->
+<section class="relative h-[870px] flex items-center overflow-hidden">
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover brightness-[0.7]" data-alt="A breathtaking wide-angle landscape shot of lush green rolling hills and fertile plains under a dramatic golden hour sky. The lighting is warm and cinematic, emphasizing the vast potential of the undeveloped land. The composition is modern and professional, reflecting a high-end real estate brand's authority and stability. Deep greens and earthy browns dominate the palette, with vibrant orange highlights from the setting sun." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBweQnfipMXYObjkNBNAbAbjmeopLnIb2F6tJv_wPIh3v-ke-OUO2ygiw_kp-I4FOQ3v5Eiq03oJFrr46pty2u0d44cx7usjxSRo4hOH5S2LKIqq6C_LgyGIb7ZKOGo-sfhOY3DvzZhkxBAbgabexKVCHnp6HjvdZqR9VKF-dtb3dFl75aCMZoMCBSmn3PKuWp8T-M0Gl150slRUYO4izIJPQf51XmP0lPQomYwJuJYlMwcZMTly2Q08Cty9FLgTNtpmQqPBdh34f0"/>
+<div class="absolute inset-0 bg-gradient-to-r from-primary/60 to-transparent"></div>
+</div>
+<div class="relative z-10 w-full max-w-container-max mx-auto px-gutter">
+<div class="max-w-2xl">
+<h1 class="font-display-lg text-white text-6xl mb-6 leading-tight">Invest in your future with premium land parcels</h1>
+<p class="font-body-lg text-white/90 mb-10">Secure your legacy with professionally managed real estate across the region's most promising development zones.</p>
+<!-- Hero Search Bar -->
+<div class="bg-white p-4 rounded-xl shadow-2xl flex flex-col md:flex-row gap-4 items-center">
+<div class="flex-1 w-full space-y-1">
+<label class="font-label-md text-on-surface-variant px-1">City</label>
+<select class="w-full border-none bg-surface-container-low rounded-lg focus:ring-2 focus:ring-primary/20 font-body-md py-3">
+<option>Goma</option>
+<option>Kinshasa</option>
+<option>Lubumbashi</option>
+</select>
+</div>
+<div class="flex-1 w-full space-y-1">
+<label class="font-label-md text-on-surface-variant px-1">Commune</label>
+<select class="w-full border-none bg-surface-container-low rounded-lg focus:ring-2 focus:ring-primary/20 font-body-md py-3">
+<option>Goma</option>
+<option>Karisimbi</option>
+<option>Himbi</option>
+</select>
+</div>
+<div class="flex-1 w-full space-y-1">
+<label class="font-label-md text-on-surface-variant px-1">Min Size (sqm)</label>
+<input class="w-full border-none bg-surface-container-low rounded-lg focus:ring-2 focus:ring-primary/20 font-body-md py-3" placeholder="e.g. 500" type="number"/>
+</div>
+<button class="bg-secondary text-on-secondary px-8 h-full py-4 md:py-0 self-end rounded-lg font-bold flex items-center gap-2 hover:bg-on-secondary-container transition-colors">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+                        Search
+                    </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Why KBS Section -->
+<section class="py-24 bg-surface-container-lowest">
+<div class="max-w-container-max mx-auto px-gutter">
+<div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
+<div>
+<span class="text-secondary font-bold tracking-widest uppercase text-sm mb-4 block">Our Standard</span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Why KBS?</h2>
+</div>
+<p class="max-w-md text-on-surface-variant">We provide a seamless bridge between land ownership dreams and legal reality with verified documentation and strategic locations.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="p-8 border border-outline-variant rounded-2xl bg-white hover:shadow-xl transition-all group">
+<div class="w-14 h-14 bg-primary-fixed rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="verified_user">verified_user</span>
+</div>
+<h3 class="font-title-lg text-title-lg mb-4">Legal Certainty</h3>
+<p class="text-on-surface-variant">Every parcel in our catalog is pre-vetted by legal experts to ensure clean titles and zero disputes.</p>
+</div>
+<div class="p-8 border border-outline-variant rounded-2xl bg-white hover:shadow-xl transition-all group">
+<div class="w-14 h-14 bg-secondary-fixed rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-secondary text-3xl" data-icon="location_on">location_on</span>
+</div>
+<h3 class="font-title-lg text-title-lg mb-4">Strategic Locations</h3>
+<p class="text-on-surface-variant">We source land in high-growth corridors, ensuring your investment appreciates from day one.</p>
+</div>
+<div class="p-8 border border-outline-variant rounded-2xl bg-white hover:shadow-xl transition-all group">
+<div class="w-14 h-14 bg-tertiary-fixed rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-on-tertiary-container text-3xl" data-icon="handshake">handshake</span>
+</div>
+<h3 class="font-title-lg text-title-lg mb-4">Expert Guidance</h3>
+<p class="text-on-surface-variant">Our consultants provide end-to-end support, from initial search to final land registration.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Parcel Catalog: Featured Parcels -->
+<section class="py-24">
+<div class="max-w-container-max mx-auto px-gutter">
+<div class="flex items-center justify-between mb-12">
+<h2 class="font-headline-lg text-headline-lg">Featured Parcels</h2>
+<button class="text-primary font-bold flex items-center gap-2 hover:underline">
+                    View All Catalog 
+                    <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+<!-- Parcel Card 1 -->
+<div class="bg-white rounded-2xl overflow-hidden border border-outline-variant shadow-sm hover:shadow-lg transition-all flex flex-col">
+<div class="relative h-64">
+<img class="w-full h-full object-cover" data-alt="A clean, aerial shot of a surveyed land parcel marked with professional white boundary markers. The landscape is a mix of flat plains and gentle slopes, ideal for residential development. The lighting is bright midday sun, casting crisp shadows and highlighting the rich texture of the soil and grass. The color palette is natural greens, earthy browns, and a brilliant blue sky, projecting a sense of organization and high-end value." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCO10nN9oRHYdQfrA4dRjH9ONKtNmEZQiplLyL9voWQtcGOQLswA2LAnnSUSUUMVuVesWQqoO-OwuC82BUwQcm6rud8jAmoYluJkwUaYgIdsmNgFUml0pztXcO74siOFHwH7yG0npDC7ZIzi0bbfxeFnGiHhYV34ClCGo_AXD7jqW0RLFmG6G9vUWU2RO180pomprv1h7lFm6K8f6O1KvqfTVIFaRJ3KHXA-Cgqhy0ORg4ZUhKkL8VOZ-51Oxd9hS_sIvkhx3y4yaE"/>
+<span class="absolute top-4 left-4 bg-primary text-on-primary text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest">Premium</span>
+</div>
+<div class="p-6 flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-title-lg text-title-lg">Hillview Heights Phase 2</h3>
+<span class="font-label-sm text-on-surface-variant">Ref: KBS-GOM-001</span>
+</div>
+<div class="flex items-center text-on-surface-variant gap-1 mb-4">
+<span class="material-symbols-outlined text-sm" data-icon="location_on">location_on</span>
+<span class="text-sm">Goma, Karisimbi Commune</span>
+</div>
+<div class="flex items-center gap-4 mb-8">
+<div class="flex items-center gap-2 px-3 py-1.5 bg-surface-container-low rounded-lg">
+<span class="material-symbols-outlined text-on-secondary-container" data-icon="square_foot">square_foot</span>
+<span class="font-bold">600 sqm</span>
+</div>
+<div class="flex items-center gap-2 px-3 py-1.5 bg-surface-container-low rounded-lg">
+<span class="material-symbols-outlined text-on-secondary-container" data-icon="landscape">landscape</span>
+<span class="font-bold">Residential</span>
+</div>
+</div>
+<button class="w-full bg-secondary text-on-secondary py-3 rounded-xl font-bold hover:bg-on-secondary-container transition-colors mt-auto">View Details</button>
+</div>
+</div>
+<!-- Parcel Card 2 -->
+<div class="bg-white rounded-2xl overflow-hidden border border-outline-variant shadow-sm hover:shadow-lg transition-all flex flex-col">
+<div class="relative h-64">
+<img class="w-full h-full object-cover" data-alt="A panoramic view of a vast agricultural land parcel under a soft overcast morning sky. The soil appears dark and fertile, with neat rows of young green sprouts emerging. The atmosphere is quiet and professional, with a sense of growth and long-term stability. The color palette features muted earthy tones, deep forest greens, and soft greys, emphasizing the authority and seriousness of a professional real estate investment firm." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDShq9bgJtOGn8fwEBkAXA_j6533Ev4_TuES3rXFC3hqA0ZVoqtVLoAr3bl_UVAPkU46aUKdNZL-nTSTa7TQkFmRrZVIEwa_4vS5PikXBMbcvDLH87te7LEf79KpgA8nmTck95DjPBu5GAQVs--cKXhi22mHCbAmt3m531hwbgXyTGCWEP02w3o3aR5VFxNWbB3jvBPO054_o3LWhuhhgq2pTeiXm7Y8MDwDz5kHS_F987kALHDxx04zTgS0UO__wem8rAEM2wrtKM"/>
+<span class="absolute top-4 left-4 bg-tertiary text-on-tertiary text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest">New Arrival</span>
+</div>
+<div class="p-6 flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-title-lg text-title-lg">Lake View Commercial</h3>
+<span class="font-label-sm text-on-surface-variant">Ref: KBS-GOM-045</span>
+</div>
+<div class="flex items-center text-on-surface-variant gap-1 mb-4">
+<span class="material-symbols-outlined text-sm" data-icon="location_on">location_on</span>
+<span class="text-sm">Goma, Himbi Neighborhood</span>
+</div>
+<div class="flex items-center gap-4 mb-8">
+<div class="flex items-center gap-2 px-3 py-1.5 bg-surface-container-low rounded-lg">
+<span class="material-symbols-outlined text-on-secondary-container" data-icon="square_foot">square_foot</span>
+<span class="font-bold">1,200 sqm</span>
+</div>
+<div class="flex items-center gap-2 px-3 py-1.5 bg-surface-container-low rounded-lg">
+<span class="material-symbols-outlined text-on-secondary-container" data-icon="business">business</span>
+<span class="font-bold">Commercial</span>
+</div>
+</div>
+<button class="w-full bg-secondary text-on-secondary py-3 rounded-xl font-bold hover:bg-on-secondary-container transition-colors mt-auto">View Details</button>
+</div>
+</div>
+<!-- Parcel Card 3 -->
+<div class="bg-white rounded-2xl overflow-hidden border border-outline-variant shadow-sm hover:shadow-lg transition-all flex flex-col">
+<div class="relative h-64">
+<img class="w-full h-full object-cover" data-alt="Close-up of a high-quality property development site with a modern architectural rendering sign placed on the land. The sun is shining brightly, creating a high-contrast and vibrant scene. The surrounding area is clean and well-maintained, suggesting a premium development in progress. The color palette includes vibrant blues from the sky, natural greens from the landscape, and professional whites from the signage, conveying trust and future potential." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPOOVWihYfqkxM7pCAfEXC6wio9jLOlnti9cnqETD1c1BufHTOASwHeBS9tfi6V8808ownEqDjc8BDsBIM5rItRbb5QcF2n9-iCWarnbGYO64WXDtOG5ywmOvm2EIFsUAphS6xNaSgAOI4B_0KXDlFrUNpclezSF3OGBQbHyHwbY_s7BFebH3nPsqOHCq0s4DsUGDxyv9UhN4huEBmhG3fYofCEkoWtLwSiJzFFq4cCR1iXhtz-udFfuB7Q7BHiS-IUx_e_IRkNuI"/>
+<span class="absolute top-4 left-4 bg-secondary text-on-secondary text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest">Sold 80%</span>
+</div>
+<div class="p-6 flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-title-lg text-title-lg">Unity Square Plots</h3>
+<span class="font-label-sm text-on-surface-variant">Ref: KBS-KIN-089</span>
+</div>
+<div class="flex items-center text-on-surface-variant gap-1 mb-4">
+<span class="material-symbols-outlined text-sm" data-icon="location_on">location_on</span>
+<span class="text-sm">Kinshasa, Gombe Extension</span>
+</div>
+<div class="flex items-center gap-4 mb-8">
+<div class="flex items-center gap-2 px-3 py-1.5 bg-surface-container-low rounded-lg">
+<span class="material-symbols-outlined text-on-secondary-container" data-icon="square_foot">square_foot</span>
+<span class="font-bold">450 sqm</span>
+</div>
+<div class="flex items-center gap-2 px-3 py-1.5 bg-surface-container-low rounded-lg">
+<span class="material-symbols-outlined text-on-secondary-container" data-icon="home_work">home_work</span>
+<span class="font-bold">Mixed Use</span>
+</div>
+</div>
+<button class="w-full bg-secondary text-on-secondary py-3 rounded-xl font-bold hover:bg-on-secondary-container transition-colors mt-auto">View Details</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- How it Works Section -->
+<section class="py-24 bg-surface-container-low">
+<div class="max-w-container-max mx-auto px-gutter text-center">
+<h2 class="font-headline-lg text-headline-lg mb-16">Your Path to Ownership</h2>
+<div class="relative flex flex-col md:flex-row justify-between items-start gap-12">
+<!-- Progress Line (Desktop) -->
+<div class="hidden md:block absolute top-12 left-0 w-full h-1 bg-outline-variant/30 -z-0"></div>
+<!-- Step 1 -->
+<div class="relative z-10 flex flex-col items-center flex-1">
+<div class="w-24 h-24 bg-white border-4 border-primary rounded-full flex items-center justify-center mb-6 shadow-xl">
+<span class="material-symbols-outlined text-primary text-4xl" data-icon="search">search</span>
+</div>
+<h4 class="font-title-lg text-title-lg mb-3">Search</h4>
+<p class="text-on-surface-variant text-sm">Browse our curated catalog of verified land parcels.</p>
+</div>
+<!-- Step 2 -->
+<div class="relative z-10 flex flex-col items-center flex-1">
+<div class="w-24 h-24 bg-white border-4 border-primary rounded-full flex items-center justify-center mb-6 shadow-xl">
+<span class="material-symbols-outlined text-primary text-4xl" data-icon="visibility">visibility</span>
+</div>
+<h4 class="font-title-lg text-title-lg mb-3">Visit</h4>
+<p class="text-on-surface-variant text-sm">Schedule a guided site tour with our property experts.</p>
+</div>
+<!-- Step 3 -->
+<div class="relative z-10 flex flex-col items-center flex-1">
+<div class="w-24 h-24 bg-white border-4 border-primary rounded-full flex items-center justify-center mb-6 shadow-xl">
+<span class="material-symbols-outlined text-primary text-4xl" data-icon="event_available">event_available</span>
+</div>
+<h4 class="font-title-lg text-title-lg mb-3">Reserve</h4>
+<p class="text-on-surface-variant text-sm">Secure your choice with a formal reservation agreement.</p>
+</div>
+<!-- Step 4 -->
+<div class="relative z-10 flex flex-col items-center flex-1">
+<div class="w-24 h-24 bg-white border-4 border-primary rounded-full flex items-center justify-center mb-6 shadow-xl">
+<span class="material-symbols-outlined text-primary text-4xl" data-icon="key">key</span>
+</div>
+<h4 class="font-title-lg text-title-lg mb-3">Own</h4>
+<p class="text-on-surface-variant text-sm">Complete legal transfer and receive your title deeds.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="bg-surface-container dark:bg-tertiary-container border-t border-outline-variant dark:border-outline w-full py-12 px-gutter">
+<div class="max-w-container-max mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
+<div class="col-span-1 md:col-span-1">
+<span class="font-display-lg text-headline-md text-primary dark:text-inverse-primary block mb-6">KBS Real Estate</span>
+<p class="text-on-surface-variant font-body-md mb-6">Elevating land ownership standards in the DR Congo with transparency and professionalism.</p>
+<div class="flex gap-4">
+<a class="w-10 h-10 bg-white/10 flex items-center justify-center rounded-full hover:bg-primary transition-all" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="public">public</span>
+</a>
+<a class="w-10 h-10 bg-white/10 flex items-center justify-center rounded-full hover:bg-primary transition-all" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="share">share</span>
+</a>
+</div>
+</div>
+<div class="space-y-4">
+<h4 class="font-title-lg text-on-surface">Links</h4>
+<nav class="flex flex-col gap-2">
+<a class="text-on-surface-variant hover:text-primary transition-colors font-label-md text-label-md" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-label-md text-label-md" href="#">Terms of Service</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-label-md text-label-md" href="#">Land Registry</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-label-md text-label-md" href="#">Tenant Portal</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-label-md text-label-md" href="#">Investor Relations</a>
+</nav>
+</div>
+<div class="space-y-4">
+<h4 class="font-title-lg text-on-surface">Contact</h4>
+<ul class="text-on-surface-variant font-label-md text-label-md space-y-3">
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="mail">mail</span>
+                        contact@kbs-realestate.com
+                    </li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="phone">phone</span>
+                        +243 99 123 4567
+                    </li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="location_on">location_on</span>
+                        124 Avenue de la Paix, Goma, DRC
+                    </li>
+</ul>
+</div>
+<div class="space-y-4">
+<h4 class="font-title-lg text-on-surface">Newsletter</h4>
+<p class="text-on-surface-variant text-sm mb-4">Subscribe to receive new parcel listings directly.</p>
+<div class="flex gap-2">
+<input class="flex-1 bg-surface-container-low border-none rounded-lg focus:ring-2 focus:ring-primary/20 text-label-md py-2" placeholder="Email address" type="email"/>
+<button class="bg-primary text-on-primary px-4 py-2 rounded-lg font-bold hover:opacity-90 transition-all">
+<span class="material-symbols-outlined" data-icon="send">send</span>
+</button>
+</div>
+</div>
+</div>
+<div class="max-w-container-max mx-auto mt-12 pt-8 border-t border-outline-variant/30 text-center">
+<p class="text-on-surface-variant font-label-md text-label-md">© 2024 KBS Real Estate Management. All rights reserved.</p>
+</div>
+</footer>
+<script>
+        // Simple micro-interactions for the cards
+        document.querySelectorAll('.parcel-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.querySelector('img').style.transform = 'scale(1.05)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.querySelector('img').style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body></html>

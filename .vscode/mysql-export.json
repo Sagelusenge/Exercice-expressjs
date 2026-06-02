@@ -1,0 +1,8 @@
+{
+  "host": "localhost",
+  "user": "root",
+  "pass": "Bonsoirssage2@@6",
+  "db": "kbsw",
+  "destination": "backup.sql",
+  "exporter": "mysqldump-npm"
+}

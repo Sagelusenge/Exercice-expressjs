@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>KBS Client Space | Your Property Journey</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Shared Style & Theme Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "surface-bright": "#f7f9fb",
+                "on-secondary-container": "#796048",
+                "on-tertiary": "#ffffff",
+                "primary-fixed-dim": "#bec6e0",
+                "on-secondary": "#ffffff",
+                "on-primary-fixed-variant": "#3f465c",
+                "primary-container": "#131b2e",
+                "surface-tint": "#565e74",
+                "outline-variant": "#c6c6cd",
+                "tertiary": "#000000",
+                "on-background": "#191c1e",
+                "error-container": "#ffdad6",
+                "tertiary-container": "#0b1c30",
+                "surface-dim": "#d8dadc",
+                "on-tertiary-fixed": "#0b1c30",
+                "surface-variant": "#e0e3e5",
+                "error": "#ba1a1a",
+                "surface": "#f7f9fb",
+                "surface-container-high": "#e6e8ea",
+                "inverse-primary": "#bec6e0",
+                "inverse-on-surface": "#eff1f3",
+                "on-primary-fixed": "#131b2e",
+                "surface-container-lowest": "#ffffff",
+                "on-primary-container": "#7c839b",
+                "on-surface": "#191c1e",
+                "surface-container-low": "#f2f4f6",
+                "outline": "#76777d",
+                "inverse-surface": "#2d3133",
+                "surface-container-highest": "#e0e3e5",
+                "on-tertiary-container": "#75859d",
+                "primary": "#000000",
+                "secondary": "#725a42",
+                "background": "#f7f9fb",
+                "on-surface-variant": "#45464d",
+                "on-error-container": "#93000a",
+                "secondary-fixed": "#fedcbe",
+                "on-tertiary-fixed-variant": "#38485d",
+                "secondary-fixed-dim": "#e1c1a4",
+                "secondary-container": "#fedcbe",
+                "on-secondary-fixed-variant": "#59422c",
+                "surface-container": "#eceef0",
+                "on-secondary-fixed": "#291806",
+                "tertiary-fixed": "#d3e4fe",
+                "on-primary": "#ffffff",
+                "on-error": "#ffffff",
+                "primary-fixed": "#dae2fd",
+                "tertiary-fixed-dim": "#b7c8e1"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+            },
+            "spacing": {
+                "gutter": "24px",
+                "margin-tablet": "32px",
+                "container-max": "1280px",
+                "margin-desktop": "64px",
+                "base": "8px",
+                "margin-mobile": "16px"
+            },
+            "fontFamily": {
+                "display-lg": ["Montserrat"],
+                "label-sm": ["Inter"],
+                "body-lg": ["Inter"],
+                "title-lg": ["Inter"],
+                "headline-md": ["Montserrat"],
+                "label-md": ["Inter"],
+                "body-md": ["Inter"],
+                "headline-lg-mobile": ["Montserrat"],
+                "headline-lg": ["Montserrat"]
+            },
+            "fontSize": {
+                "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                "title-lg": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .glass-card {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(226, 232, 240, 0.5);
+      }
+      .blue-accent-glow {
+        box-shadow: 0 0 20px rgba(15, 23, 42, 0.08);
+      }
+    </style>
+</head>
+<body class="bg-surface-bright text-on-surface font-body-md">
+<!-- TopNavBar (Shared Component) -->
+<header class="bg-surface-container-lowest dark:bg-surface-container-highest docked full-width top-0 sticky z-50 border-b border-outline-variant dark:border-outline shadow-sm h-20">
+<nav class="flex justify-between items-center w-full px-gutter max-w-container-max mx-auto h-full">
+<div class="flex items-center gap-8">
+<span class="font-display-lg text-headline-md text-primary dark:text-on-primary-fixed tracking-tight">KBS Real Estate</span>
+<div class="hidden md:flex gap-6">
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Parcels</a>
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">About</a>
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Contact</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 mr-4">
+<button class="p-2 rounded-full hover:bg-surface-container-low transition-all">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="support_agent">support_agent</span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-container-low transition-all relative">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="notifications">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+</div>
+<button class="hidden md:flex items-center gap-2 font-label-md text-label-md text-primary dark:text-on-primary-fixed font-bold border-b-2 border-primary dark:border-primary-fixed-dim pb-1">
+                    My Favorites
+                </button>
+<div class="w-10 h-10 rounded-full bg-primary-fixed overflow-hidden border border-outline-variant">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="A professional headshot of a middle-aged client with a warm, confident expression. The background is a soft-focus modern architectural interior with high-key lighting. The style is clean and corporate, utilizing a bright and sophisticated color palette to reflect a high-end real estate environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDS807Tt7JTBZ-Zdw0shBczDW5lfJNfuXGublnpEjx2lLEgi1Yueh-bRQqzevR1UY_xlQb9NtkhZLG21Rrnx7xvL_Yl25iobHa_DEWKfToQwM_frSkVXGJXLKVCKQLCBrbtCHmSdSiJ4unoe1A9VVy6SaKP3S0y_i8OgVlAGPIkLK15e1D3PvM8Wt2c1zHOHkJXdYgdIOXc9J3BfGO27s19exOHxPumttyRTKxYv95qpBqik0lFiMueSIfsQVSSkH2FnpHGpJ3mGTI"/>
+</div>
+</div>
+</nav>
+</header>
+<main class="max-w-container-max mx-auto px-gutter py-margin-tablet md:py-margin-desktop">
+<!-- Welcome Section -->
+<section class="mb-12">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<h1 class="font-display-lg text-headline-lg md:text-display-lg text-primary mb-2">Hello Julian,</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Track your property journey and manage your investments with ease.</p>
+</div>
+<div class="flex gap-4">
+<div class="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant flex items-center gap-4 blue-accent-glow">
+<div class="p-3 bg-primary-fixed rounded-lg">
+<span class="material-symbols-outlined text-on-primary-fixed" data-icon="pending_actions">pending_actions</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Pending Reservations</p>
+<p class="font-title-lg text-title-lg text-primary">02</p>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant flex items-center gap-4 blue-accent-glow">
+<div class="p-3 bg-secondary-fixed rounded-lg">
+<span class="material-symbols-outlined text-on-secondary-fixed" data-icon="real_estate_agent">real_estate_agent</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Total Purchases</p>
+<p class="font-title-lg text-title-lg text-primary">04</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Main Content Bento Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Section 1: My Favorites (7 Cols) -->
+<section class="lg:col-span-7 space-y-6">
+<div class="flex items-center justify-between">
+<h2 class="font-headline-md text-headline-md text-primary flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="favorite" style="font-variation-settings: 'FILL' 1;">favorite</span>
+                        My Favorites
+                    </h2>
+<button class="font-label-md text-label-md text-primary hover:underline transition-all">View All</button>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+<!-- Property Card 1 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant group hover:shadow-lg transition-all duration-300">
+<div class="relative h-48">
+<img alt="Highland Meadows Plot" class="w-full h-full object-cover" data-alt="A wide-angle landscape shot of a vast green land parcel at sunset. The lighting is golden and warm, casting long shadows across the rolling hills. The sky is a mix of deep blues and vibrant oranges, creating a premium and aspirational atmosphere for property buyers." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBq8-UW9aC5vMOsWV8Behn12nshmujaGXV0xnKTXiNf99eykqS8xWjfZeWITjb1Il42KDcl92FC6jiicJ-nltg_bKmxQe9uWuZPlSF95-1xNnaM-QXBTYuLtKjEwIf5BBmbwdxvvJQ1szf_eVpgJ_tgrfpuLzUnvVhuLpiNE-p2X4is1N3GAWnVClP_ZzYydDgsIpGPy9IDCwQ3E40bVZEvbyvCbzQKYc8OSNrbNCHEkBWFJ_zD3fdR2eipGKTUx4458QcZ0NTY_oo"/>
+<div class="absolute top-4 right-4 bg-surface-container-lowest/90 backdrop-blur p-2 rounded-full">
+<span class="material-symbols-outlined text-error" data-icon="favorite" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+</div>
+<div class="p-6">
+<p class="font-label-sm text-label-sm text-secondary mb-1">Residential Plot</p>
+<h3 class="font-title-lg text-title-lg text-primary mb-2">Highland Meadows Plot 42</h3>
+<div class="flex items-center gap-4 text-on-surface-variant mb-4">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]" data-icon="square_foot">square_foot</span>
+<span class="font-label-md text-label-md">1,200 m²</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]" data-icon="location_on">location_on</span>
+<span class="font-label-md text-label-md">North Sector</span>
+</div>
+</div>
+<button class="w-full py-3 bg-primary text-on-primary font-label-md rounded-lg hover:bg-primary/90 transition-colors">View Plot Details</button>
+</div>
+</div>
+<!-- Property Card 2 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant group hover:shadow-lg transition-all duration-300">
+<div class="relative h-48">
+<img alt="Mountain View Estate" class="w-full h-full object-cover" data-alt="A scenic panoramic view of a mountain-side property with clear blue skies and lush vegetation. The lighting is crisp morning daylight, emphasizing the clarity and serenity of the environment. The aesthetic is clean and high-end, focusing on natural beauty and authoritative land management." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2VHsemX1BClUacOC6ufwmHaV8Li1VpYlTodstS9KVsarOQZIAz35tJXgcXxrc83Pf4Pi8rgSc7s0DWRhv9bFOQoBztUJn0d05ZvVLCwIv12PMM31q81xm5AhQlkuPCXHtrrVC-TEan5yf4WAnRwrqSMlVkmEoECsgmXqPBdRLwjyo1QxcL0o3IMk7U3GqnWffFFeqh2NgjNoWWkCpiiJodcCaiSuC34M6RqOgUvltZ3hj0yTCNB2q__hvRkKfICufS2ztbsklD3M"/>
+<div class="absolute top-4 right-4 bg-surface-container-lowest/90 backdrop-blur p-2 rounded-full">
+<span class="material-symbols-outlined text-error" data-icon="favorite" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+</div>
+<div class="p-6">
+<p class="font-label-sm text-label-sm text-secondary mb-1">Commercial Zone</p>
+<h3 class="font-title-lg text-title-lg text-primary mb-2">Mountain View Estate</h3>
+<div class="flex items-center gap-4 text-on-surface-variant mb-4">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]" data-icon="square_foot">square_foot</span>
+<span class="font-label-md text-label-md">2,500 m²</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]" data-icon="location_on">location_on</span>
+<span class="font-label-md text-label-md">East Hills</span>
+</div>
+</div>
+<button class="w-full py-3 bg-primary text-on-primary font-label-md rounded-lg hover:bg-primary/90 transition-colors">View Plot Details</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: My Reservations (5 Cols) -->
+<section class="lg:col-span-5 space-y-6">
+<h2 class="font-headline-md text-headline-md text-primary flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="schedule">schedule</span>
+                    My Reservations
+                </h2>
+<div class="space-y-4">
+<!-- Reservation Item 1 -->
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant relative overflow-hidden group">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
+<div class="flex justify-between items-start mb-4">
+<div>
+<h4 class="font-title-lg text-title-lg text-primary">Urban Core Plot B-12</h4>
+<p class="font-label-md text-label-md text-on-surface-variant">Reservation Ref: #RES-88210</p>
+</div>
+<div class="bg-primary-fixed px-3 py-1 rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-on-primary-fixed" data-icon="timer">timer</span>
+<span class="font-label-sm text-label-sm text-on-primary-fixed">03 Days Left</span>
+</div>
+</div>
+<div class="w-full bg-surface-container rounded-full h-2 mb-4">
+<div class="bg-primary h-2 rounded-full w-[85%]"></div>
+</div>
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-surface-variant italic">Expires on Dec 24, 2024</span>
+<button class="text-primary font-label-md hover:underline">Complete Payment</button>
+</div>
+</div>
+<!-- Reservation Item 2 -->
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-on-tertiary-container"></div>
+<div class="flex justify-between items-start mb-4">
+<div>
+<h4 class="font-title-lg text-title-lg text-primary">Riverside Villa Lot 09</h4>
+<p class="font-label-md text-label-md text-on-surface-variant">Reservation Ref: #RES-88245</p>
+</div>
+<div class="bg-surface-container px-3 py-1 rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant" data-icon="timer">timer</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">08 Days Left</span>
+</div>
+</div>
+<div class="w-full bg-surface-container rounded-full h-2 mb-4">
+<div class="bg-on-tertiary-container h-2 rounded-full w-[40%]"></div>
+</div>
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-surface-variant italic">Expires on Dec 29, 2024</span>
+<button class="text-primary font-label-md hover:underline">Complete Payment</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Section 3: My Purchases (Full Width) -->
+<section class="mt-12 space-y-6">
+<h2 class="font-headline-md text-headline-md text-primary flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+                My Purchases
+            </h2>
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low border-b border-outline-variant">
+<tr>
+<th class="p-6 font-label-md text-label-md text-on-surface">Property Description</th>
+<th class="p-6 font-label-md text-label-md text-on-surface">Purchase Date</th>
+<th class="p-6 font-label-md text-label-md text-on-surface text-right">Amount</th>
+<th class="p-6 font-label-md text-label-md text-on-surface">Status</th>
+<th class="p-6 font-label-md text-label-md text-on-surface text-right">Documents</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr class="hover:bg-surface-bright transition-colors">
+<td class="p-6">
+<p class="font-title-lg text-title-lg text-primary">Oak Ridge Estate - Plot 05</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">ID: PRCH-2024-001</p>
+</td>
+<td class="p-6 font-body-md text-body-md text-on-surface-variant">Oct 12, 2024</td>
+<td class="p-6 font-title-lg text-title-lg text-primary text-right">$145,000.00</td>
+<td class="p-6">
+<span class="px-3 py-1 rounded-full bg-green-100 text-green-800 text-[12px] font-bold uppercase tracking-wider">Completed</span>
+</td>
+<td class="p-6 text-right">
+<div class="flex justify-end gap-3">
+<button class="flex items-center gap-1 text-primary hover:text-primary/70 transition-colors" title="Download Contract">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span class="font-label-sm text-label-sm">Contract</span>
+</button>
+<button class="flex items-center gap-1 text-primary hover:text-primary/70 transition-colors" title="Download Receipt">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span class="font-label-sm text-label-sm">Receipt</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-bright transition-colors">
+<td class="p-6">
+<p class="font-title-lg text-title-lg text-primary">Sunset Terraces - Unit 4B</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">ID: PRCH-2024-002</p>
+</td>
+<td class="p-6 font-body-md text-body-md text-on-surface-variant">Nov 05, 2024</td>
+<td class="p-6 font-title-lg text-title-lg text-primary text-right">$280,000.00</td>
+<td class="p-6">
+<span class="px-3 py-1 rounded-full bg-green-100 text-green-800 text-[12px] font-bold uppercase tracking-wider">Completed</span>
+</td>
+<td class="p-6 text-right">
+<div class="flex justify-end gap-3">
+<button class="flex items-center gap-1 text-primary hover:text-primary/70 transition-colors">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span class="font-label-sm text-label-sm">Contract</span>
+</button>
+<button class="flex items-center gap-1 text-primary hover:text-primary/70 transition-colors">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span class="font-label-sm text-label-sm">Receipt</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer (Shared Component) -->
+<footer class="bg-surface-container dark:bg-tertiary-container w-full py-12 px-gutter border-t border-outline-variant dark:border-outline flat">
+<div class="max-w-container-max mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
+<div class="md:col-span-1">
+<span class="font-display-lg text-headline-md text-primary dark:text-inverse-primary">KBS Real Estate</span>
+<p class="mt-4 font-body-md text-body-md text-on-surface-variant dark:text-on-tertiary-container">Authority and stability in land management.</p>
+</div>
+<div>
+<h5 class="font-label-md text-label-md text-on-surface font-bold mb-4">Quick Links</h5>
+<ul class="space-y-2">
+<li><a class="font-label-md text-label-md text-on-surface-variant hover:text-primary hover:underline transition-colors" href="#">Land Registry</a></li>
+<li><a class="font-label-md text-label-md text-on-surface-variant hover:text-primary hover:underline transition-colors" href="#">Tenant Portal</a></li>
+<li><a class="font-label-md text-label-md text-on-surface-variant hover:text-primary hover:underline transition-colors" href="#">Investor Relations</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-label-md text-label-md text-on-surface font-bold mb-4">Legal</h5>
+<ul class="space-y-2">
+<li><a class="font-label-md text-label-md text-on-surface-variant hover:text-primary hover:underline transition-colors" href="#">Privacy Policy</a></li>
+<li><a class="font-label-md text-label-md text-on-surface-variant hover:text-primary hover:underline transition-colors" href="#">Terms of Service</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-label-md text-label-md text-on-surface font-bold mb-4">Newsletter</h5>
+<div class="flex gap-2">
+<input class="flex-1 bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary focus:outline-none" placeholder="Email" type="email"/>
+<button class="bg-primary text-on-primary p-2 rounded-lg"><span class="material-symbols-outlined" data-icon="send">send</span></button>
+</div>
+</div>
+</div>
+<div class="max-w-container-max mx-auto mt-12 pt-8 border-t border-outline-variant text-center">
+<p class="font-label-md text-label-md text-on-surface-variant">© 2024 KBS Real Estate Management. All rights reserved.</p>
+</div>
+</footer>
+<!-- Interactive Layer for micro-interactions -->
+<script>
+        document.querySelectorAll('button, a').forEach(elem => {
+            elem.addEventListener('mousedown', () => {
+                elem.classList.add('scale-95', 'opacity-80');
+            });
+            elem.addEventListener('mouseup', () => {
+                elem.classList.remove('scale-95', 'opacity-80');
+            });
+            elem.addEventListener('mouseleave', () => {
+                elem.classList.remove('scale-95', 'opacity-80');
+            });
+        });
+    </script>
+</body></html>
