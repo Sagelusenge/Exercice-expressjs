@@ -1,6 +1,5 @@
 const { query, withTransaction } = require("../../config/database");
 const { paginate, buildPagination } = require("../../utils/pagination.util");
-const sequenceService = require("../../services/sequence.service");
 
 /**
  * Créer une réservation
@@ -13,30 +12,13 @@ const createReservation = async (tenantId, userId, data) => {
   const { parcelle_id, montant_reservation, devise, notes_client, date_expiration } = data;
 
   try {
-    const [tenant] = await query("SELECT module_reservation_actif FROM tenants WHERE id = ?", [tenantId]);
-    if (!tenant?.module_reservation_actif) {
-      throw { status: 400, message: "Le module de réservation est actuellement désactivé." };
-    }
-    const [parcelle] = await query("SELECT statut FROM parcelles WHERE id = ? AND tenant_id = ? AND deleted_at IS NULL", [parcelle_id, tenantId]);
-    if (!parcelle) throw { status: 404, message: "Parcelle introuvable" };
-    if (parcelle.statut !== "DISPONIBLE") {
-      throw { status: 400, message: "Cette parcelle n'est pas disponible à la réservation." };
-    }
-    const active = await query(
-      "SELECT id FROM reservations WHERE parcelle_id = ? AND tenant_id = ? AND statut IN ('EN_ATTENTE','CONFIRMEE','EN_COURS') LIMIT 1",
-      [parcelle_id, tenantId]
-    );
-    if (active.length) throw { status: 400, message: "Cette parcelle a déjà une réservation active." };
-
-    const reference = await sequenceService.referenceReservation(tenantId);
     const result = await query(
       `INSERT INTO reservations
-       (reference, tenant_id, user_id, parcelle_id, montant_reservation, devise, notes_client, date_expiration)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [reference, tenantId, userId, parcelle_id, montant_reservation || 0, devise || "USD",
-       notes_client, date_expiration || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)]
+       (tenant_id, user_id, parcelle_id, montant_reservation, devise, notes_client, date_expiration)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [tenantId, userId, parcelle_id, montant_reservation || 0, devise || "USD",
+       notes_client, date_expiration || null]
     );
-    await query("UPDATE parcelles SET statut = 'RESERVEE', updated_at = NOW() WHERE id = ? AND tenant_id = ?", [parcelle_id, tenantId]);
 
     return getById(tenantId, result.insertId);
   } catch (err) {
@@ -131,15 +113,8 @@ const updateStatut = async (tenantId, id, statut, adminId, notes_admin = null) =
      WHERE id = ? AND tenant_id = ?`,
     [statut, adminId, notes_admin, id, tenantId]
   );
-  const reservation = await getById(tenantId, id);
-  if (["EXPIREE", "ANNULEE"].includes(statut)) {
-    await query("UPDATE parcelles SET statut = 'DISPONIBLE', updated_at = NOW() WHERE id = ? AND tenant_id = ?", [reservation.parcelle_id, tenantId]);
-  }
-  if (statut === "TRANSFORMEE_EN_VENTE") {
-    await query("UPDATE parcelles SET statut = 'VENDUE', updated_at = NOW() WHERE id = ? AND tenant_id = ?", [reservation.parcelle_id, tenantId]);
-  }
 
-  return reservation;
+  return getById(tenantId, id);
 };
 
 /**
@@ -160,7 +135,6 @@ const annulerParClient = async (tenantId, id, userId) => {
     "UPDATE reservations SET statut = 'ANNULEE' WHERE id = ? AND tenant_id = ?",
     [id, tenantId]
   );
-  await query("UPDATE parcelles SET statut = 'DISPONIBLE', updated_at = NOW() WHERE id = ? AND tenant_id = ?", [res.parcelle_id, tenantId]);
 
   return getById(tenantId, id);
 };

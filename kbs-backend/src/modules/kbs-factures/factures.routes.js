@@ -7,7 +7,13 @@ const { enforceTenant } = require("../../middleware/tenant.middleware");
 const { logActivity } = require("../../middleware/activityLog.middleware");
 const { paginate, buildPagination } = require("../../utils/pagination.util");
 const { notificationService } = require("../../services/notification.service");
-const sequenceService = require("../../services/sequence.service");
+
+const buildFallbackReference = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const stamp = `${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}${String(now.getHours()).padStart(2, "0")}${String(now.getMinutes()).padStart(2, "0")}${String(now.getSeconds()).padStart(2, "0")}`;
+  return `KBS-FAC-${year}-${stamp}`;
+};
 
 router.post(
   "/",
@@ -42,20 +48,13 @@ router.post(
     );
     if (!locs.length) return R.notFound(res, "Locataire introuvable");
 
-    const reference = await sequenceService.referenceFacture(tenantId);
     const result = await query(
       `INSERT INTO kbs_factures
        (reference, tenant_id, locataire_id, periode_debut, periode_fin,
         montant_loyer, devise, notes_admin, cree_par)
        VALUES (?, CAST(? AS SIGNED), CAST(? AS SIGNED), ?, ?, ?, ?, ?, CAST(? AS SIGNED))`,
-      [reference, tenantId, locataireId, periode_debut, periode_fin,
+      [buildFallbackReference(), tenantId, locataireId, periode_debut, periode_fin,
        amount, devise || "USD", notes_admin || null, creePar]
-    );
-    await query(
-      `INSERT INTO kbs_facture_historique
-       (facture_id, action, effectue_par, ancien_statut, nouveau_statut, commentaire)
-       VALUES (?, 'CREATION', ?, NULL, 'EN_ATTENTE', 'Facture creee')`,
-      [result.insertId, creePar]
     );
 
     const [facture] = await query(

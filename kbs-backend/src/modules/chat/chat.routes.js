@@ -6,7 +6,6 @@ const { requireRole } = require("../../middleware/role.middleware");
 const { enforceTenant } = require("../../middleware/tenant.middleware");
 const { logActivity } = require("../../middleware/activityLog.middleware");
 const emailService = require("../../services/email.service");
-const sequenceService = require("../../services/sequence.service");
 
 const ADMIN_ROLES = ["SUPER_ADMIN", "BOSS", "GERANT"];
 
@@ -44,9 +43,9 @@ const sendAutoReply = async ({ conversationId, sender, contenu }) => {
 
   await query(
     `INSERT INTO chat_messages
-     (reference, conversation_id, sender_id, contenu, type_message)
-     VALUES (?, ?, ?, ?, 'SYSTEME')`,
-    [await sequenceService.referenceMessage(sender.tenant_id || 1), conversationId, admin.id, reply]
+     (conversation_id, sender_id, contenu, type_message)
+     VALUES (?, ?, ?, 'SYSTEME')`,
+    [conversationId, admin.id, reply]
   );
 };
 
@@ -96,9 +95,9 @@ const createDirectConversation = async ({ tenantId, creatorId, clientUser, admin
   const sujet = `Discussion avec ${clientUser.prenom} ${clientUser.nom}`;
   const result = await query(
     `INSERT INTO chat_conversations
-     (reference, tenant_id, sujet, module, type_conversation, cree_par, assigne_a)
-     VALUES (?, ?, ?, 'GENERAL', 'SUPPORT', ?, ?)`,
-    [await sequenceService.referenceConversation(tenantId), tenantId, sujet, creatorId, adminUser.id]
+     (tenant_id, sujet, module, type_conversation, cree_par, assigne_a)
+     VALUES (?, ?, 'GENERAL', 'SUPPORT', ?, ?)`,
+    [tenantId, sujet, creatorId, adminUser.id]
   );
 
   await query(
@@ -127,16 +126,16 @@ const notifyMessageRecipients = async ({ tenantId, conversationId, sender, conte
 
     await query(
       `INSERT INTO notifications
-       (reference, tenant_id, user_id, titre, message, module, type, canal, donnees_supplementaires)
-       VALUES (?, ?, ?, ?, ?, 'SYSTEME', 'ALERTE_SYSTEME', 'APP', ?)`,
-      [await sequenceService.referenceNotification(tenantId), tenantId, recipient.id, titre, message, JSON.stringify({ conversation_id: Number(conversationId) })]
+       (tenant_id, user_id, titre, message, module, type, canal, donnees_supplementaires)
+       VALUES (?, ?, ?, ?, 'SYSTEME', 'ALERTE_SYSTEME', 'APP', ?)`,
+      [tenantId, recipient.id, titre, message, JSON.stringify({ conversation_id: Number(conversationId) })]
     );
 
     await query(
       `INSERT INTO email_logs
-       (reference, tenant_id, user_id, destinataire_email, sujet, template_utilise, statut)
-       VALUES (?, ?, ?, ?, ?, 'CHAT_NOUVEAU_MESSAGE', 'EN_ATTENTE')`,
-      [await sequenceService.referenceEmail(tenantId), tenantId, recipient.id, recipient.email, titre]
+       (tenant_id, user_id, destinataire_email, sujet, template_utilise, statut)
+       VALUES (?, ?, ?, ?, 'CHAT_NOUVEAU_MESSAGE', 'EN_ATTENTE')`,
+      [tenantId, recipient.id, recipient.email, titre]
     );
 
     await emailService.sendEmail(
@@ -152,9 +151,9 @@ router.post("/conversations", authenticate, enforceTenant, logActivity("CHAT", "
 
   const result = await query(
     `INSERT INTO chat_conversations
-     (reference, tenant_id, sujet, module, type_conversation, reference_id, cree_par)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    [await sequenceService.referenceConversation(req.tenantId), req.tenantId, sujet || "Support KBS", module || "GENERAL", type_conversation || "GENERAL", reference_id || null, req.user.id]
+     (tenant_id, sujet, module, type_conversation, reference_id, cree_par)
+     VALUES (?, ?, ?, ?, ?, ?)`,
+    [req.tenantId, sujet || "Support KBS", module || "GENERAL", type_conversation || "GENERAL", reference_id || null, req.user.id]
   );
 
   await query(
@@ -335,9 +334,9 @@ router.post("/conversations/:id/messages", authenticate, enforceTenant, logActiv
 
   const result = await query(
     `INSERT INTO chat_messages
-     (reference, conversation_id, sender_id, contenu, type_message, fichier_url, fichier_nom)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    [await sequenceService.referenceMessage(req.tenantId), req.params.id, req.user.id, contenu, type_message || "TEXTE", fichier_url || null, fichier_nom || null]
+     (conversation_id, sender_id, contenu, type_message, fichier_url, fichier_nom)
+     VALUES (?, ?, ?, ?, ?, ?)`,
+    [req.params.id, req.user.id, contenu, type_message || "TEXTE", fichier_url || null, fichier_nom || null]
   );
 
   await query(
@@ -345,7 +344,7 @@ router.post("/conversations/:id/messages", authenticate, enforceTenant, logActiv
     [req.params.id]
   );
 
-  await sendAutoReply({ conversationId: req.params.id, sender: { ...req.user, tenant_id: req.tenantId }, contenu });
+  await sendAutoReply({ conversationId: req.params.id, sender: req.user, contenu });
   await query(
     "UPDATE chat_conversations SET updated_at = NOW() WHERE id = ?",
     [req.params.id]

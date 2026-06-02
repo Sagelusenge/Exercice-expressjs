@@ -2,7 +2,6 @@ const bcrypt = require("bcryptjs");
 const { query, withTransaction } = require("../../config/database");
 const { paginate, buildPagination } = require("../../utils/pagination.util");
 const { notificationService } = require("../../services/notification.service");
-const sequenceService = require("../../services/sequence.service");
 
 /**
  * Créer un utilisateur (par un admin)
@@ -23,19 +22,13 @@ const createUser = async (tenantId, creatorId, data) => {
   }
 
   const hashedPassword = await bcrypt.hash(mot_de_passe || "KbsTemp@2024", 12);
-  const codeUser = await sequenceService.codeUser({ tenantId, nom, prenom, role });
-  const moduleAccessible = ["SUPER_ADMIN", "BOSS", "GERANT"].includes(role)
-    ? "LES_DEUX"
-    : role === "LOCATAIRE"
-      ? "KBS"
-      : "PARCELLES";
 
   const result = await query(
-    `INSERT INTO users
-     (tenant_id, code_user, module_accessible, nom, prenom, email, telephone, mot_de_passe,
+    `INSERT INTO users 
+     (tenant_id, nom, prenom, email, telephone, mot_de_passe,
       role, statut, email_verifie, adresse, cree_par)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'ACTIF', 1, ?, ?)`,
-    [tenantId, codeUser, moduleAccessible, nom, prenom, email, telephone, hashedPassword, role, adresse, creatorId]
+     VALUES (?, ?, ?, ?, ?, ?, ?, 'ACTIF', 1, ?, ?)`,
+    [tenantId, nom, prenom, email, telephone, hashedPassword, role, adresse, creatorId]
   );
 
   const [user] = await query(

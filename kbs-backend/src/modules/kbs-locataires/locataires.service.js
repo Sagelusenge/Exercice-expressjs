@@ -1,7 +1,6 @@
 const { query } = require("../../config/database");
 const { paginate, buildPagination } = require("../../utils/pagination.util");
 const bcrypt = require("bcryptjs");
-const sequenceService = require("../../services/sequence.service");
 
 /**
  * Créer un locataire
@@ -23,25 +22,16 @@ const createLocataire = async (tenantId, adminId, data) => {
       data.categorie === "SIMPLE"
         ? data.email || `${data.nom.toLowerCase()}.${tenantId}@kbs.local`
         : data.email_entreprise;
-    const nomUser = data.categorie === "SIMPLE" ? data.nom : data.nom_representant;
-    const prenomUser = data.categorie === "SIMPLE" ? data.prenom : "";
-    const codeUser = await sequenceService.codeUser({
-      tenantId,
-      nom: nomUser,
-      prenom: prenomUser,
-      role: "LOCATAIRE",
-    });
 
     const [userResult] = await conn.execute(
       `INSERT INTO users
-       (tenant_id, code_user, module_accessible, nom, prenom, email, telephone, mot_de_passe,
+       (tenant_id, nom, prenom, email, telephone, mot_de_passe,
         role, statut, email_verifie, cree_par)
-       VALUES (?, ?, 'KBS', ?, ?, ?, ?, ?, 'LOCATAIRE', 'ACTIF', 1, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, 'LOCATAIRE', 'ACTIF', 1, ?)`,
       [
         tenantId,
-        codeUser,
-        nomUser,
-        prenomUser,
+        data.categorie === "SIMPLE" ? data.nom : data.nom_representant,
+        data.categorie === "SIMPLE" ? data.prenom : "",
         emailUser,
         data.categorie === "SIMPLE" ? data.telephone_personnel : data.telephone_entreprise,
         hash,
@@ -51,10 +41,10 @@ const createLocataire = async (tenantId, adminId, data) => {
 
     const userId = userResult.insertId;
 
-    const codeLocataire = await sequenceService.codeLocataire({ tenantId, categorie: data.categorie });
+    // 2. Créer le locataire (trigger génère code_locataire)
     const [locResult] = await conn.execute(
       `INSERT INTO kbs_locataires
-       (code_locataire, tenant_id, user_id, categorie,
+       (tenant_id, user_id, categorie,
         nom, prenom, date_naissance, telephone_personnel, adresse_personnelle,
         type_piece_identite, photo_identite_url, photo_piece_identite_url,
         nom_entreprise, secteur_activite, numero_rccm, numero_nif,
@@ -62,9 +52,9 @@ const createLocataire = async (tenantId, adminId, data) => {
         adresse_siege, numero_local, logo_entreprise_url,
         date_debut_loyer, date_fin_loyer, montant_mensuel_loyer, devise,
         cree_par)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
-        codeLocataire, tenantId, userId, data.categorie,
+        tenantId, userId, data.categorie,
         data.nom || null, data.prenom || null,
         data.date_naissance || null, data.telephone_personnel || null,
         data.adresse_personnelle || null, data.type_piece_identite || null,

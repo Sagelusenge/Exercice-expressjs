@@ -1,8 +1,10 @@
 # Deploiement KBS sur Render + Clever Cloud
 
-## 1. Base MySQL Clever Cloud
+## 1. Base MySQL
 
-1. Cree un add-on MySQL sur Clever Cloud.
+1. Cree une base MySQL qui accepte les triggers, procedures et events.
+   - Recommande: Aiven MySQL ou un MySQL/VPS avec droits suffisants.
+   - Clever Cloud mutualise peut refuser les triggers/functions avec `#1419`.
 2. Recupere les variables de connexion:
    - `MYSQL_ADDON_HOST`
    - `MYSQL_ADDON_PORT`
@@ -11,10 +13,9 @@
    - `MYSQL_ADDON_DB`
 3. Importe le schema:
    - Ouvre phpMyAdmin / Adminer / MySQL Workbench.
-   - Connecte-toi avec les identifiants Clever Cloud.
-   - Importe de preference `Kbsbd-clever-basic.sql`.
-   - Ce fichier est adapte au MySQL mutualise Clever Cloud: pas de `CREATE DATABASE`, pas de `USE ...`, pas de fonctions, pas de triggers, pas de procedures, pas d'events.
-   - La logique qui etait dans les triggers/procedures/events est maintenant faite par le backend Node: generation des references/codes, validation/rejet des factures, confirmation des ventes, expiration des reservations et rappels.
+   - Connecte-toi avec les identifiants de ta base.
+   - Importe `Kbsbd-aiven-full.sql` pour retrouver l'ancien fonctionnement avec triggers, procedures et events dans la BD.
+   - Ce fichier garde la logique BD complete, mais retire `CREATE DATABASE` et `USE` pour fonctionner dans une base deja creee comme `defaultdb`.
    - Apres l'import du schema, execute `Kbsbd-clever-seed-admin.sql` pour creer/rehabiliter le super admin initial.
    - Connexion admin initiale: `serge.balezi@kbs-immobilier.com` / `KbsAdmin@2026`.
 

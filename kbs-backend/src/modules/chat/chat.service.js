@@ -1,6 +1,5 @@
 const { query } = require("../../config/database");
 const { paginate, buildPagination } = require("../../utils/pagination.util");
-const sequenceService = require("../../services/sequence.service");
 
 /**
  * Créer une conversation
@@ -8,13 +7,12 @@ const sequenceService = require("../../services/sequence.service");
  */
 const createConversation = async (tenantId, userId, data) => {
   const { sujet, module, type_conversation, reference_id } = data;
-  const reference = await sequenceService.referenceConversation(tenantId);
 
   const result = await query(
     `INSERT INTO chat_conversations
-     (reference, tenant_id, sujet, module, type_conversation, reference_id, cree_par)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    [reference, tenantId, sujet, module || "GENERAL", type_conversation || "GENERAL",
+     (tenant_id, sujet, module, type_conversation, reference_id, cree_par)
+     VALUES (?, ?, ?, ?, ?, ?)`,
+    [tenantId, sujet, module || "GENERAL", type_conversation || "GENERAL",
      reference_id || null, userId]
   );
 
@@ -49,15 +47,12 @@ const getConversationById = async (id) => {
  */
 const sendMessage = async (conversationId, senderId, data) => {
   const { contenu, type_message, fichier_url, fichier_nom } = data;
-  const [conversation] = await query("SELECT tenant_id FROM chat_conversations WHERE id = ?", [conversationId]);
-  if (!conversation) throw { status: 404, message: "Conversation introuvable" };
-  const reference = await sequenceService.referenceMessage(conversation.tenant_id);
 
   const result = await query(
     `INSERT INTO chat_messages
-     (reference, conversation_id, sender_id, contenu, type_message, fichier_url, fichier_nom)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    [reference, conversationId, senderId, contenu, type_message || "TEXTE", fichier_url, fichier_nom]
+     (conversation_id, sender_id, contenu, type_message, fichier_url, fichier_nom)
+     VALUES (?, ?, ?, ?, ?, ?)`,
+    [conversationId, senderId, contenu, type_message || "TEXTE", fichier_url, fichier_nom]
   );
 
   // Mettre à jour updated_at de la conversation

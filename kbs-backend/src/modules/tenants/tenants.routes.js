@@ -3,7 +3,6 @@ const { query } = require("../../config/database");
 const R = require("../../utils/response.util");
 const { authenticate } = require("../../middleware/auth.middleware");
 const { requireRole } = require("../../middleware/role.middleware");
-const sequenceService = require("../../services/sequence.service");
 
 router.post(
   "/",
@@ -18,12 +17,11 @@ router.post(
 
     const result = await query(
       `INSERT INTO tenants
-       (code_tenant, nom_organisation, slug, email_organisation, telephone, adresse,
+       (nom_organisation, slug, email_organisation, telephone, adresse,
         module_parcelles_actif, module_kbs_actif,
         module_chat_actif, module_reservation_actif)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
-        await sequenceService.codeTenant(),
         nom_organisation, slug, email_organisation, telephone, adresse,
         module_parcelles_actif ?? 1, module_kbs_actif ?? 1,
         module_chat_actif ?? 1, module_reservation_actif ?? 0,

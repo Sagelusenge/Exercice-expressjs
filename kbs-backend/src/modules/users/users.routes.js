@@ -7,7 +7,6 @@ const { requireRole } = require("../../middleware/role.middleware");
 const { logActivity } = require("../../middleware/activityLog.middleware");
 const { paginate, buildPagination } = require("../../utils/pagination.util");
 const { notificationService } = require("../../services/notification.service");
-const sequenceService = require("../../services/sequence.service");
 
 const ADMIN_ROLES = ["SUPER_ADMIN", "BOSS", "GERANT"];
 const SELF_SERVICE_ROLES = ["CLIENT", "LOCATAIRE"];
@@ -78,11 +77,8 @@ router.post(
     let userId;
 
     if (existing.length) {
-      const codeUser = await sequenceService.codeUser({ tenantId: req.tenantId, nom, prenom, role });
       await query(
         `UPDATE users SET
-         code_user = COALESCE(code_user, ?),
-         module_accessible = ?,
          nom = ?, prenom = ?, telephone = ?, mot_de_passe = ?,
          role = ?, statut = ?, email_verifie = ?,
          code_verification_email = ?,
@@ -91,8 +87,6 @@ router.post(
          bloque_jusqu_a = NULL, tentatives_connexion_echouees = 0
          WHERE id = ? AND tenant_id = ?`,
         [
-          codeUser,
-          ["SUPER_ADMIN", "BOSS", "GERANT"].includes(role) ? "LES_DEUX" : role === "LOCATAIRE" ? "KBS" : "PARCELLES",
           nom,
           prenom,
           telephone || null,
@@ -110,17 +104,14 @@ router.post(
       );
       userId = existing[0].id;
     } else {
-      const codeUser = await sequenceService.codeUser({ tenantId: req.tenantId, nom, prenom, role });
       const result = await query(
       `INSERT INTO users
-       (tenant_id, code_user, module_accessible, nom, prenom, email, telephone, mot_de_passe,
+       (tenant_id, nom, prenom, email, telephone, mot_de_passe,
         role, statut, email_verifie, code_verification_email,
         code_verification_expire_at, adresse, cree_par)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         req.tenantId,
-        codeUser,
-        ["SUPER_ADMIN", "BOSS", "GERANT"].includes(role) ? "LES_DEUX" : role === "LOCATAIRE" ? "KBS" : "PARCELLES",
         nom,
         prenom,
         email,
