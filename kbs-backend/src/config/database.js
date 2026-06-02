@@ -54,7 +54,7 @@ async function query(sql, params = []) {
   try {
     await prepareConnection(conn);
     const safeParams = params.map((param) => param === undefined ? null : param);
-    const [rows] = await conn.execute(sql, safeParams);
+    const [rows] = await conn.query(sql, safeParams);
     return rows;
   } finally {
     conn.release();
