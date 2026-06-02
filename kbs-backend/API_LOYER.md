@@ -39,7 +39,7 @@ X-Tenant-Slug: <tenant_slug>
 }
 ```
 
-**Response:**
+**Response de la requete:**
 ```json
 {
   "success": true,
