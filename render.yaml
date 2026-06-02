@@ -11,6 +11,10 @@ services:
         value: production
       - key: JWT_EXPIRES_IN
         value: 7d
+      - key: BCRYPT_ROUNDS
+        value: 10
+      - key: AUTH_EXPOSE_VERIFICATION_CODE
+        value: true
       - key: LOG_LEVEL
         value: info
       - key: JWT_SECRET
@@ -29,6 +33,10 @@ services:
         sync: false
       - key: DB_NAME
         sync: false
+      - key: DB_SSL
+        value: true
+      - key: DB_SSL_REJECT_UNAUTHORIZED
+        value: false
       - key: SMTP_HOST
         sync: false
       - key: SMTP_PORT

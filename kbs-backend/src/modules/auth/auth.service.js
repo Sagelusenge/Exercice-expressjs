@@ -2,9 +2,19 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { query } = require("../../config/database");
 const { notificationService } = require("../../services/notification.service");
+const { logger } = require("../../utils/logger.util");
 
 const generateVerificationCode = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+const getBcryptRounds = () => {
+  const rounds = parseInt(process.env.BCRYPT_ROUNDS, 10);
+  return Number.isInteger(rounds) && rounds >= 8 ? rounds : 10;
+};
+
+const shouldExposeVerificationCode = () => {
+  return process.env.AUTH_EXPOSE_VERIFICATION_CODE === "true";
 };
 
 const generateToken = (userId, role, tenantId) => {
@@ -27,7 +37,7 @@ const register = async (tenantId, data) => {
     throw { status: 409, message: "Cette adresse email est déjà utilisée" };
   }
 
-  const hashedPassword = await bcrypt.hash(mot_de_passe, 12);
+  const hashedPassword = await bcrypt.hash(mot_de_passe, getBcryptRounds());
   const code = generateVerificationCode();
   const expireAt = new Date(Date.now() + 30 * 60 * 1000);
 
@@ -58,12 +68,22 @@ const register = async (tenantId, data) => {
     userId = result.insertId;
   }
 
-  const [user] = await query(
-    "SELECT id, code_user, nom, prenom, email, role FROM users WHERE id = ?",
-    [userId]
-  );
+  const user = {
+    id: userId,
+    code_user: null,
+    nom,
+    prenom,
+    email,
+    role: "CLIENT",
+  };
 
-  await notificationService.sendEmailVerification(tenantId, user, code);
+  notificationService.sendEmailVerification(tenantId, user, code).catch((error) => {
+    logger.error("Erreur notification verification email en arriere-plan:", error.message);
+  });
+
+  if (shouldExposeVerificationCode()) {
+    user.verification_code = code;
+  }
 
   return user;
 };
@@ -233,7 +253,7 @@ const login = async (tenantId, email, mot_de_passe) => {
 
 const resendVerificationCode = async (tenantId, email) => {
   const users = await query(
-    `SELECT id, nom, prenom, email_verifie, statut
+    `SELECT id, nom, prenom, email, email_verifie, statut
      FROM users WHERE tenant_id = ? AND email = ? AND deleted_at IS NULL`,
     [tenantId, email]
   );
@@ -257,9 +277,11 @@ const resendVerificationCode = async (tenantId, email) => {
     [code, expireAt, user.id]
   );
 
-  await notificationService.sendEmailVerification(tenantId, user, code);
+  notificationService.sendEmailVerification(tenantId, user, code).catch((error) => {
+    logger.error("Erreur renvoi verification email en arriere-plan:", error.message);
+  });
 
-  return true;
+  return shouldExposeVerificationCode() ? { verification_code: code } : true;
 };
 
 const changePassword = async (userId, ancienMdp, nouveauMdp) => {
@@ -275,7 +297,7 @@ const changePassword = async (userId, ancienMdp, nouveauMdp) => {
     throw { status: 400, message: "Ancien mot de passe incorrect" };
   }
 
-  const hashed = await bcrypt.hash(nouveauMdp, 12);
+  const hashed = await bcrypt.hash(nouveauMdp, getBcryptRounds());
   await query("UPDATE users SET mot_de_passe = ? WHERE id = ?", [hashed, userId]);
 
   return true;
@@ -338,7 +360,7 @@ const resetPassword = async (tenantId, email, code, nouveauMdp) => {
     throw { status: 400, message: "Code expiré" };
   }
 
-  const hashed = await bcrypt.hash(nouveauMdp, 12);
+  const hashed = await bcrypt.hash(nouveauMdp, getBcryptRounds());
   await query(
     `UPDATE users SET
      mot_de_passe = ?,

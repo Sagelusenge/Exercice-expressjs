@@ -18,7 +18,18 @@ if (!fs.existsSync("logs")) {
 }
 
 async function checkTenants() {
-  const tenants = await query("SELECT id, slug FROM tenants");
+  let tenants;
+  try {
+    tenants = await query("SELECT id, slug FROM tenants");
+  } catch (error) {
+    if (error.code === "ER_NO_SUCH_TABLE") {
+      logger.error(
+        "Schema MySQL absent: importez Kbsbd-aiven-full.sql dans la base configuree avant de redeployer Render."
+      );
+    }
+    throw error;
+  }
+
   if (tenants.length === 0) {
     console.log("⚠️ Aucun tenant trouvé. Création du tenant par défaut...");
     await query(

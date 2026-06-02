@@ -1,5 +1,20 @@
 const mysql = require("mysql2/promise");
+const fs = require("fs");
 const { logger } = require("../utils/logger.util");
+
+function getSslOptions() {
+  if (process.env.DB_SSL !== "true") return undefined;
+
+  const sslOptions = {
+    rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED !== "false",
+  };
+
+  if (process.env.DB_SSL_CA) {
+    sslOptions.ca = fs.readFileSync(process.env.DB_SSL_CA, "utf8");
+  }
+
+  return sslOptions;
+}
 
 const pool = mysql.createPool({
   host: process.env.DB_HOST || process.env.MYSQL_ADDON_HOST || "localhost",
@@ -13,6 +28,7 @@ const pool = mysql.createPool({
   charset: "utf8mb4_unicode_ci",
   timezone: "+00:00",
   multipleStatements: true,
+  ssl: getSslOptions(),
 });
 
 async function prepareConnection(conn) {

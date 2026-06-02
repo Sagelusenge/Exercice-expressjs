@@ -4,10 +4,13 @@ const { query } = require("../../config/database");
 
 const register = async (req, res) => {
   const user = await authService.register(req.tenantId, req.body);
+  const payload = { code_user: user.code_user, email: user.email };
+  if (user.verification_code) payload.verification_code = user.verification_code;
+
   return R.created(
     res,
-    { code_user: user.code_user, email: user.email },
-    "Compte créé. Veuillez vérifier votre email pour activer votre compte."
+    payload,
+    "Compte cree. Veuillez verifier votre email pour activer votre compte."
   );
 };
 
@@ -16,7 +19,7 @@ const verifyEmail = async (req, res) => {
   return R.success(
     res,
     { user, token },
-    "Email vérifié avec succès. Vous êtes maintenant connecté."
+    "Email verifie avec succes. Vous etes maintenant connecte."
   );
 };
 
@@ -25,19 +28,19 @@ const verifyCode = async (req, res) => {
   return R.success(res, { user }, "Code verifie avec succes");
 };
 
-
 const login = async (req, res) => {
   const { user, token } = await authService.login(
     req.tenantId,
     req.body.email,
     req.body.mot_de_passe
   );
-  return R.success(res, { user, token }, "Connexion réussie");
+  return R.success(res, { user, token }, "Connexion reussie");
 };
 
 const resendCode = async (req, res) => {
-  await authService.resendVerificationCode(req.tenantId, req.body.email);
-  return R.success(res, null, "Nouveau code envoyé à votre adresse email");
+  const result = await authService.resendVerificationCode(req.tenantId, req.body.email);
+  const payload = result && result.verification_code ? result : null;
+  return R.success(res, payload, "Nouveau code envoye a votre adresse email");
 };
 
 const getMe = async (req, res) => {
@@ -57,12 +60,12 @@ const changePassword = async (req, res) => {
     req.body.ancien_mot_de_passe,
     req.body.nouveau_mot_de_passe
   );
-  return R.success(res, null, "Mot de passe modifié avec succès");
+  return R.success(res, null, "Mot de passe modifie avec succes");
 };
 
 const forgotPassword = async (req, res) => {
   await authService.forgotPassword(req.tenantId, req.body.email);
-  return R.success(res, null, "Code de réinitialisation envoyé par email");
+  return R.success(res, null, "Code de reinitialisation envoye par email");
 };
 
 const resetPassword = async (req, res) => {
@@ -72,17 +75,17 @@ const resetPassword = async (req, res) => {
     req.body.code,
     req.body.nouveau_mot_de_passe
   );
-  return R.success(res, null, "Mot de passe réinitialisé avec succès");
+  return R.success(res, null, "Mot de passe reinitialise avec succes");
 };
 
-module.exports = { 
-  register, 
-  verifyEmail, 
+module.exports = {
+  register,
+  verifyEmail,
   verifyCode,
-  login, 
-  resendCode, 
-  getMe, 
+  login,
+  resendCode,
+  getMe,
   changePassword,
   forgotPassword,
-  resetPassword
+  resetPassword,
 };

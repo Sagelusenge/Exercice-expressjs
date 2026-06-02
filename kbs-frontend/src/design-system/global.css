@@ -195,6 +195,205 @@ input::-webkit-credentials-auto-fill-button {
     text-wrap: balance;
   }
 
+  .hero-grid {
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.16) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.16) 1px, transparent 1px);
+    background-size: 84px 84px;
+    mask-image: linear-gradient(90deg, rgba(0, 0, 0, 0.95), transparent 78%);
+  }
+
+  .hero-scanline {
+    animation: scanline 4.5s ease-in-out infinite;
+  }
+
+  .hero-video {
+    animation: slowZoom 18s ease-in-out infinite alternate;
+    filter: saturate(1.05) contrast(1.08);
+  }
+
+  .parcel-lines {
+    pointer-events: none;
+    opacity: 0.74;
+    mix-blend-mode: screen;
+  }
+
+  .parcel-line {
+    position: absolute;
+    display: block;
+    height: 2px;
+    width: 34vw;
+    background: linear-gradient(90deg, transparent, rgba(197, 160, 89, 0.95), transparent);
+    box-shadow: 0 0 22px rgba(197, 160, 89, 0.55);
+    transform-origin: center;
+    animation: parcelTrace 3.6s ease-in-out infinite;
+  }
+
+  .parcel-line-a {
+    left: 54%;
+    top: 26%;
+    transform: rotate(18deg);
+  }
+
+  .parcel-line-b {
+    left: 59%;
+    top: 41%;
+    transform: rotate(-11deg);
+    animation-delay: 0.45s;
+  }
+
+  .parcel-line-c {
+    left: 47%;
+    top: 58%;
+    width: 42vw;
+    transform: rotate(11deg);
+    animation-delay: 0.9s;
+  }
+
+  .parcel-line-d {
+    left: 63%;
+    top: 70%;
+    width: 28vw;
+    transform: rotate(-19deg);
+    animation-delay: 1.2s;
+  }
+
+  .reveal-motion {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: opacity, transform;
+  }
+
+  .reveal-left {
+    transform: translateX(-34px);
+  }
+
+  .reveal-right {
+    transform: translateX(34px);
+  }
+
+  .reveal-scale {
+    transform: scale(0.92);
+  }
+
+  .reveal-motion.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .reveal-left.is-visible,
+  .reveal-right.is-visible {
+    transform: translateX(0);
+  }
+
+  .reveal-scale.is-visible {
+    transform: scale(1);
+  }
+
+  .animate-hero-rise {
+    animation: heroRise 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .floating-card {
+    animation: floatPanel 6s ease-in-out infinite;
+  }
+
+  .floating-card-slow {
+    animation: floatPanel 7.5s ease-in-out infinite reverse;
+  }
+
+  .floating-orbit {
+    animation: orbitPulse 12s linear infinite;
+  }
+
+  @keyframes heroRise {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slowZoom {
+    from {
+      transform: scale(1);
+    }
+    to {
+      transform: scale(1.08);
+    }
+  }
+
+  @keyframes parcelTrace {
+    0%,
+    100% {
+      opacity: 0.16;
+      clip-path: inset(0 100% 0 0);
+    }
+    45% {
+      opacity: 1;
+      clip-path: inset(0 0 0 0);
+    }
+    70% {
+      opacity: 0.62;
+      clip-path: inset(0 0 0 100%);
+    }
+  }
+
+  @keyframes floatPanel {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+    50% {
+      transform: translate3d(0, -16px, 0);
+    }
+  }
+
+  @keyframes orbitPulse {
+    from {
+      transform: translateY(-50%) rotate(0deg);
+    }
+    to {
+      transform: translateY(-50%) rotate(360deg);
+    }
+  }
+
+  @keyframes scanline {
+    0%,
+    100% {
+      transform: translateY(0);
+      opacity: 0.25;
+    }
+    50% {
+      transform: translateY(74vh);
+      opacity: 0.75;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-scanline,
+    .animate-hero-rise,
+    .floating-card,
+    .floating-card-slow,
+    .floating-orbit,
+    .hero-video,
+    .parcel-line {
+      animation: none;
+    }
+
+    .reveal-motion {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+
   .dark .bg-white,
   .dark .bg-gray-50,
   .dark .bg-gray-100,

@@ -35,9 +35,14 @@ export default function RegisterPage() {
 
     try {
       const { confirm_password, ...registerData } = form;
-      await register(registerData).unwrap();
+      const result = await register(registerData).unwrap();
       toast.success("Compte créé ! Veuillez vérifier votre email.");
-      navigate("/verify-email", { state: { email: form.email } });
+      navigate("/verify-email", {
+        state: {
+          email: form.email,
+          verificationCode: result?.verification_code || "",
+        },
+      });
     } catch (err) {
       console.error("Register error:", err);
       setError(err.data?.message || "Une erreur est survenue lors de l'inscription");

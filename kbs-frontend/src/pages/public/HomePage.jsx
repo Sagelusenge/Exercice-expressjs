@@ -1,109 +1,213 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useInView } from "react-intersection-observer";
 import {
-  Search, Shield, MapPin, Users, ChevronRight,
-  ArrowRight, Phone, Mail, Eye, Maximize2, Home
+  ArrowRight,
+  Building2,
+  CheckCircle2,
+  ChevronRight,
+  Eye,
+  Home,
+  Landmark,
+  Mail,
+  MessageCircle,
+  MapPin,
+  Maximize2,
+  Phone,
+  Search,
+  Shield,
+  Sparkles,
+  Users,
 } from "lucide-react";
-import { useGetParcellesPubliquesQuery } from "../../store/api/parcellesApi";
-import { TYPE_PARCELLE_LABELS } from "../../design-system/tokens";
 import toast from "react-hot-toast";
+import { TYPE_PARCELLE_LABELS } from "../../design-system/tokens";
+import { useGetParcellesPubliquesQuery } from "../../store/api/parcellesApi";
 
-// Helper to get complete image URL
 const getImageUrl = (url) => {
   if (!url) return null;
-  if (url.startsWith('http')) return url;
-  return `http://localhost:5000${url}`;
+  if (url.startsWith("http")) return url;
+  const apiRoot = (import.meta.env.VITE_API_URL || "http://localhost:8080/api/v1").replace(/\/api\/v1\/?$/, "");
+  return `${apiRoot}${url}`;
 };
 
-// ── Mini-composants internes ──────────────────────────────
-const TypeBadge = ({ type }) => {
+const featuredFallbacks = [
+  "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1400&q=80",
+  "https://images.unsplash.com/photo-1518005020951-eccb494ad742?w=1400&q=80",
+  "https://images.unsplash.com/photo-1494526585095-c41746248156?w=1400&q=80",
+];
+
+const Reveal = ({ children, className = "", delay = 0, direction = "up" }) => {
+  const { ref, inView } = useInView({ threshold: 0.16, triggerOnce: true });
+
   return (
-    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-on-surface-variant bg-surface-container px-2 py-0.5 rounded-full">
-      <Home size={10} />
-      {TYPE_PARCELLE_LABELS[type] || type}
-    </span>
+    <div
+      ref={ref}
+      style={{ transitionDelay: `${delay}ms` }}
+      className={`reveal-motion reveal-${direction} ${inView ? "is-visible" : ""} ${className}`}
+    >
+      {children}
+    </div>
   );
 };
 
-const FeaturedParcelleCard = ({ parcelle }) => {
-  const completeImageUrl = getImageUrl(parcelle.image_principale || parcelle.photo_url);
+const TypeBadge = ({ type }) => (
+  <span className="inline-flex items-center gap-1 rounded-full bg-white/85 px-2 py-0.5 text-[11px] font-semibold text-on-surface shadow-sm backdrop-blur">
+    <Home size={10} />
+    {TYPE_PARCELLE_LABELS[type] || type}
+  </span>
+);
+
+const FeaturedParcelleCard = ({ parcelle, index }) => {
+  const completeImageUrl =
+    getImageUrl(parcelle.image_principale || parcelle.photo_url) ||
+    featuredFallbacks[index % featuredFallbacks.length];
+
   return (
-  <Link
-    to={`/parcelles/${parcelle.id}`}
-    className="group kbs-card kbs-card-hover overflow-hidden block"
-  >
-    {/* Badge */}
-    <div className="relative">
-      <div className="aspect-[4/3] overflow-hidden bg-surface-high">
-        {completeImageUrl ? (
+    <Reveal delay={index * 70}>
+      <Link
+        to={`/parcelles/${parcelle.id}`}
+        className="group block overflow-hidden rounded-lg border border-white/70 bg-white shadow-[0_18px_50px_rgba(19,27,46,0.08)] transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_28px_70px_rgba(19,27,46,0.18)]"
+      >
+        <div className="relative aspect-[4/3] overflow-hidden bg-surface-high">
           <img
             src={completeImageUrl}
             alt={parcelle.titre}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
-        ) : (
-          <div className="w-full h-full bg-surface-container flex items-center justify-center">
-            <MapPin size={32} className="text-on-surface-variant" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-80" />
+          <div className="absolute left-3 top-3 flex flex-wrap gap-2">
+            {parcelle.est_vedette === 1 && (
+              <span className="rounded-full bg-secondary px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-on-secondary shadow-lg">
+                Premium
+              </span>
+            )}
+            <TypeBadge type={parcelle.type_parcelle} />
           </div>
-        )}
-      </div>
-      {parcelle.est_vedette === 1 && (
-        <span className="absolute top-3 left-3 bg-secondary text-on-secondary text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
-          Premium
-        </span>
-      )}
-      {parcelle.statut === "VENDUE" && (
-        <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-          <span className="bg-white text-on-surface font-bold px-4 py-2 rounded-full text-label-sm">
-            VENDU {Math.floor(Math.random() * 30 + 60)}%
-          </span>
+          {parcelle.statut === "VENDUE" && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/45">
+              <span className="rounded-full bg-white px-4 py-2 text-label-sm font-bold text-on-surface">
+                Vendu
+              </span>
+            </div>
+          )}
+          <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between gap-3 text-white">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/75">
+                Ref: {parcelle.reference}
+              </p>
+              <h3 className="line-clamp-1 font-montserrat text-title-lg font-bold text-white">
+                {parcelle.titre}
+              </h3>
+            </div>
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white/18 backdrop-blur transition-transform duration-500 group-hover:translate-x-1">
+              <ArrowRight size={18} />
+            </span>
+          </div>
         </div>
-      )}
-    </div>
 
-    <div className="p-4">
-      <p className="text-label-sm text-on-surface-variant font-mono mb-1">
-        Ref: {parcelle.reference}
-      </p>
-      <h3 className="font-montserrat font-semibold text-body-md text-on-surface mb-1 line-clamp-1">
-        {parcelle.titre}
-      </h3>
-      <p className="flex items-center gap-1 text-label-sm text-on-surface-variant mb-3">
-        <MapPin size={11} />
-        {parcelle.ville}, {parcelle.commune}
-      </p>
-
-      <div className="flex items-center gap-2 mb-4">
-        <span className="flex items-center gap-1 text-label-sm text-on-surface-variant">
-          <Maximize2 size={11} />
-          {parcelle.superficie} m²
-        </span>
-        <TypeBadge type={parcelle.type_parcelle} />
-        <span className="flex items-center gap-1 text-label-sm text-on-surface-variant ml-auto">
-          <Eye size={11} />
-          {parcelle.nombre_vues}
-        </span>
-      </div>
-
-      <button className="w-full py-2.5 bg-secondary text-on-secondary text-label-md font-semibold rounded-lg hover:opacity-90 transition-all">
-        Voir Détails
-      </button>
-    </div>
-  </Link>
+        <div className="space-y-4 p-4">
+          <p className="flex items-center gap-1 text-label-sm text-on-surface-variant">
+            <MapPin size={12} />
+            {parcelle.ville}, {parcelle.commune}
+          </p>
+          <div className="flex items-center gap-3 text-label-sm text-on-surface-variant">
+            <span className="flex items-center gap-1">
+              <Maximize2 size={12} />
+              {parcelle.superficie} m2
+            </span>
+            <span className="ml-auto flex items-center gap-1">
+              <Eye size={12} />
+              {parcelle.nombre_vues}
+            </span>
+          </div>
+          <button className="w-full rounded-lg bg-primary px-4 py-2.5 text-label-md font-semibold text-on-primary transition-all duration-300 group-hover:bg-secondary">
+            Voir Details
+          </button>
+        </div>
+      </Link>
+    </Reveal>
   );
 };
 
-// ── Page principale ───────────────────────────────────────
+const trustItems = [
+  {
+    icon: Shield,
+    title: "Securite juridique",
+    desc: "Titres verifies, dossiers controles et suivi transparent avant chaque reservation.",
+  },
+  {
+    icon: MapPin,
+    title: "Zones strategiques",
+    desc: "Des emplacements choisis dans les axes de croissance a Goma et dans les grandes villes.",
+  },
+  {
+    icon: Users,
+    title: "Accompagnement expert",
+    desc: "Une equipe disponible du premier contact jusqu'a la remise des documents fonciers.",
+  },
+];
+
+const stats = [
+  { label: "Parcelles suivies", value: "120+" },
+  { label: "Clients accompagnes", value: "450+" },
+  { label: "Dossiers verifies", value: "98%" },
+  { label: "Zones couvertes", value: "12" },
+];
+
+const services = [
+  {
+    icon: Building2,
+    title: "Gestion immobiliere",
+    desc: "Centralisez vos parcelles, reservations, ventes et documents dans une experience claire.",
+  },
+  {
+    icon: Landmark,
+    title: "Expertise fonciere",
+    desc: "Controle des informations, suivi administratif et meilleure lecture du statut de chaque bien.",
+  },
+  {
+    icon: MessageCircle,
+    title: "Conseil & accompagnement",
+    desc: "Un parcours humain pour guider les clients de la recherche jusqu'a la finalisation.",
+  },
+];
+
+const testimonials = [
+  {
+    name: "Jean-Pierre Kalala",
+    role: "Acheteur",
+    text: "La reservation et le suivi de ma parcelle ont ete simples. L'equipe KBS m'a accompagne a chaque etape.",
+  },
+  {
+    name: "Marie-Louise Mwamba",
+    role: "Investisseuse",
+    text: "J'ai pu comparer les opportunites rapidement et comprendre les documents avant de m'engager.",
+  },
+  {
+    name: "David Tshimanga",
+    role: "Client",
+    text: "Le site rend les informations lisibles et donne une vraie impression de confiance.",
+  },
+];
+
+const steps = [
+  { num: "01", icon: Search, title: "Rechercher", desc: "Filtrez les parcelles selon la ville, la commune et la superficie." },
+  { num: "02", icon: Eye, title: "Visiter", desc: "Planifiez une visite guidee et confirmez le potentiel du terrain." },
+  { num: "03", icon: Shield, title: "Reserver", desc: "Bloquez la parcelle choisie avec un accord clair et suivi." },
+  { num: "04", icon: CheckCircle2, title: "Posseder", desc: "Finalisez le paiement et recevez vos documents de propriete." },
+];
+
 export default function HomePage() {
   const navigate = useNavigate();
   const [search, setSearch] = useState({ ville: "", commune: "", superficie_min: "" });
   const [newsletterEmail, setNewsletterEmail] = useState("");
 
   const { data: featuredRes, isLoading } = useGetParcellesPubliquesQuery({
-    page: 1, limit: 100,
+    page: 1,
+    limit: 10,
   });
 
-  const parcelles = featuredRes || [];
+  const parcelles = Array.isArray(featuredRes) ? featuredRes : [];
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -120,286 +224,371 @@ export default function HomePage() {
       toast.error("Veuillez saisir votre email");
       return;
     }
-    toast.success("Merci pour votre inscription à la newsletter !");
+    toast.success("Merci pour votre inscription a la newsletter !");
     setNewsletterEmail("");
   };
 
   return (
-    <div className="bg-surface">
-
-      {/* ═══════════════════════════════════════════════════
-          HERO
-      ═══════════════════════════════════════════════════ */}
-      <section className="relative min-h-[88vh] flex items-end pb-20 overflow-hidden">
-        {/* Background Video */}
-        <div className="absolute inset-0 z-0">
+    <div className="overflow-hidden bg-[#f4f7f9] text-on-surface">
+      <section className="relative min-h-[92vh] overflow-hidden bg-[#1a365d] pb-10 pt-24 text-white">
+        <div className="absolute inset-0">
           <video
             autoPlay
             loop
             muted
             playsInline
-            className="w-full h-full object-cover"
-            poster="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&q=80"
+            poster="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1800&q=80"
+            className="hero-video h-full w-full object-cover opacity-35"
           >
             <source src="https://assets.mixkit.co/videos/preview/mixkit-aerial-view-of-seashore-1154-large.mp4" type="video/mp4" />
           </video>
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(9,14,22,0.96),rgba(26,54,93,0.72),rgba(9,14,22,0.42))]" />
+          <div className="absolute inset-0 shadow-[inset_0_-180px_180px_rgba(0,0,0,0.72),inset_0_120px_160px_rgba(0,0,0,0.45)]" />
+          <div className="hero-grid absolute inset-0 opacity-35" />
+          <div className="parcel-lines absolute inset-0">
+            <span className="parcel-line parcel-line-a" />
+            <span className="parcel-line parcel-line-b" />
+            <span className="parcel-line parcel-line-c" />
+            <span className="parcel-line parcel-line-d" />
+          </div>
+          <div className="absolute -right-48 -top-48 h-96 w-96 rounded-full bg-[#c5a059]/20 blur-3xl" />
+          <div className="absolute -bottom-48 -left-48 h-96 w-96 rounded-full bg-white/10 blur-3xl" />
+          <div className="hero-scanline absolute inset-x-0 top-0 h-px bg-[#c5a059]/70" />
         </div>
 
-        {/* Grid architectural */}
-        <div
-          className="absolute inset-0 opacity-5 z-10"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px)",
-            backgroundSize: "80px 80px",
-          }}
-        />
-
-        <div className="kbs-container relative z-20 w-full">
+        <div className="kbs-container relative z-10 grid min-h-[calc(92vh-6rem)] items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
           <div className="max-w-3xl">
-            <p className="inline-block text-label-md text-secondary-container uppercase tracking-[0.2em] font-semibold mb-5">
-              Kitumaini Balezi Serge — Goma, RDC
-            </p>
+            <div className="animate-hero-rise inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-label-sm font-semibold uppercase tracking-[0.16em] text-white/85 backdrop-blur">
+              <Sparkles size={14} className="text-[#c5a059]" />
+              KBS Real Estate - Goma, RDC
+            </div>
 
-            <h1 className="font-montserrat font-bold text-display-lg text-white leading-[1.1] mb-6 text-balance">
-              Investissez dans votre avenir avec des parcelles premium
+            <h1
+              style={{ animationDelay: "0.12s" }}
+              className="animate-hero-rise mt-6 max-w-4xl font-montserrat text-[42px] font-bold leading-[1.04] text-white md:text-[64px] lg:text-[76px]"
+            >
+              Des parcelles verifiees, une experience plus fluide.
             </h1>
 
-            <p className="text-body-lg text-white/75 mb-12 max-w-xl">
-              Sécurisez votre héritage avec un patrimoine immobilier géré
-              professionnellement dans les zones de développement les plus
-              prometteuses de la région.
+            <p
+              style={{ animationDelay: "0.24s" }}
+              className="animate-hero-rise mt-6 max-w-2xl text-body-lg text-white/78"
+            >
+              Trouvez, visitez et reservez votre terrain avec un parcours clair,
+              moderne et accompagne par une equipe locale.
             </p>
 
-            {/* Formulaire recherche */}
             <form
               onSubmit={handleSearch}
-              className="bg-white rounded-xl p-4 shadow-modal flex flex-wrap gap-3 max-w-2xl"
+              style={{ animationDelay: "0.36s" }}
+              className="animate-hero-rise mt-10 grid gap-3 rounded-lg border border-white/20 bg-white/95 p-3 shadow-modal backdrop-blur md:grid-cols-[1fr_1fr_1fr_auto]"
             >
-              <div className="flex-1 min-w-[110px]">
-                <label className="text-label-sm text-on-surface-variant block mb-1 font-medium">
-                  Ville
-                </label>
+              <label className="block">
+                <span className="mb-1 block text-label-sm font-semibold text-on-surface-variant">Ville</span>
                 <select
                   value={search.ville}
                   onChange={(e) => setSearch({ ...search, ville: e.target.value })}
-                  className="kbs-input w-full text-label-md"
+                  className="kbs-input w-full rounded-lg text-label-md"
                 >
                   <option value="">Toutes</option>
                   {["Goma", "Kinshasa", "Bukavu", "Lubumbashi"].map((v) => (
                     <option key={v}>{v}</option>
                   ))}
                 </select>
-              </div>
+              </label>
 
-              <div className="flex-1 min-w-[110px]">
-                <label className="text-label-sm text-on-surface-variant block mb-1 font-medium">
-                  Commune
-                </label>
+              <label className="block">
+                <span className="mb-1 block text-label-sm font-semibold text-on-surface-variant">Commune</span>
                 <select
                   value={search.commune}
                   onChange={(e) => setSearch({ ...search, commune: e.target.value })}
-                  className="kbs-input w-full text-label-md"
+                  className="kbs-input w-full rounded-lg text-label-md"
                 >
                   <option value="">Toutes</option>
                   {["Goma", "Karisimbi", "Himbi", "Gombe"].map((c) => (
                     <option key={c}>{c}</option>
                   ))}
                 </select>
-              </div>
+              </label>
 
-              <div className="flex-1 min-w-[110px]">
-                <label className="text-label-sm font-medium text-on-surface-variant block mb-1">
-                  Surface min (m²)
-                </label>
+              <label className="block">
+                <span className="mb-1 block text-label-sm font-semibold text-on-surface-variant">Surface min</span>
                 <input
                   type="number"
                   value={search.superficie_min}
                   onChange={(e) => setSearch({ ...search, superficie_min: e.target.value })}
                   placeholder="ex: 500"
-                  className="kbs-input w-full text-label-md"
+                  className="kbs-input w-full rounded-lg text-label-md"
                 />
-              </div>
+              </label>
 
-              <div className="flex items-end">
-                <button
-                  type="submit"
-                  className="flex items-center gap-2 px-5 py-2.5 bg-primary text-on-primary rounded-lg font-semibold text-label-md hover:bg-primary-container transition-all"
-                >
-                  <Search size={16} />
-                  Rechercher
-                </button>
-              </div>
+              <button
+                type="submit"
+                className="mt-auto inline-flex h-[44px] items-center justify-center gap-2 rounded-lg bg-[#c5a059] px-5 text-label-md font-bold text-[#1a365d] shadow-lg shadow-[#c5a059]/30 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white"
+              >
+                <Search size={17} />
+                Rechercher
+              </button>
             </form>
+          </div>
+
+          <div className="relative hidden min-h-[560px] lg:block">
+            <div className="floating-card absolute right-8 top-12 w-72 rounded-lg border border-white/20 bg-white/12 p-4 text-white shadow-modal backdrop-blur-xl">
+              <div className="flex items-center gap-3">
+                <div className="grid h-11 w-11 place-items-center rounded-lg bg-[#c5a059] text-[#1a365d]">
+                  <Building2 size={22} />
+                </div>
+                <div>
+                  <p className="text-label-sm uppercase tracking-[0.14em] text-white/60">Catalogue actif</p>
+                  <p className="font-montserrat text-2xl font-bold">+120 biens</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="floating-card-slow absolute bottom-20 right-0 w-80 overflow-hidden rounded-lg border border-white/20 bg-white shadow-modal">
+              <img
+                src="https://images.unsplash.com/photo-1494526585095-c41746248156?w=900&q=80"
+                alt="Parcelle residentielle"
+                className="h-44 w-full object-cover"
+              />
+              <div className="p-4 text-on-surface">
+                <p className="text-label-sm font-semibold uppercase tracking-[0.14em] text-[#c5a059]">En vedette</p>
+                <h2 className="mt-1 font-montserrat text-title-lg">Terrain residentiel premium</h2>
+                <p className="mt-2 flex items-center gap-1 text-label-md text-on-surface-variant">
+                  <MapPin size={14} />
+                  Karisimbi, Goma
+                </p>
+              </div>
+            </div>
+
+            <div className="floating-orbit absolute left-12 top-1/2 h-52 w-52 -translate-y-1/2 rounded-full border border-white/25">
+              <span className="absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#c5a059]" />
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════
-          POURQUOI KBS
-      ═══════════════════════════════════════════════════ */}
-      <section className="py-24 bg-surface-lowest">
+      <section className="relative bg-white py-20">
         <div className="kbs-container">
-          <div className="grid lg:grid-cols-2 gap-16 items-start mb-16">
+          <Reveal className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-end" direction="left">
             <div>
-              <p className="text-label-sm text-on-surface-variant uppercase tracking-widest font-semibold mb-4">
-                NOTRE STANDARD
-              </p>
-              <h2 className="font-montserrat font-bold text-headline-lg text-on-surface">
-                Pourquoi KBS ?
-              </h2>
+              <p className="text-label-sm font-bold uppercase tracking-[0.18em] text-[#c5a059]">Notre standard</p>
+              <h2 className="mt-3 font-montserrat text-headline-lg text-[#1a365d]">Pourquoi KBS ?</h2>
             </div>
-            <p className="text-body-lg text-on-surface-variant leading-relaxed pt-2">
-              Nous créons un pont transparent entre la propriété foncière et la
-              réalité juridique avec une documentation vérifiée et des
-              emplacements stratégiques.
+            <p className="max-w-2xl text-body-lg leading-relaxed text-on-surface-variant">
+              Nous combinons verification fonciere, catalogue lisible et accompagnement humain pour rendre l'achat plus simple et plus fiable.
             </p>
-          </div>
+          </Reveal>
 
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              {
-                icon: Shield,
-                title: "Sécurité Juridique",
-                desc: "Chaque parcelle est pré-vérifiée par des experts juridiques pour garantir des titres propres et zéro litige.",
-              },
-              {
-                icon: MapPin,
-                title: "Emplacements Stratégiques",
-                desc: "Nous sourceons des terrains dans les couloirs à forte croissance, garantissant que votre investissement s'apprécie dès le premier jour.",
-              },
-              {
-                icon: Users,
-                title: "Accompagnement Expert",
-                desc: "Nos consultants fournissent un support de bout en bout, de la recherche initiale à l'enregistrement foncier final.",
-              },
-            ].map((item) => (
-              <div
-                key={item.title}
-                className="kbs-card kbs-card-hover p-7 border border-outline-variant"
-              >
-                <div className="w-11 h-11 bg-secondary-container rounded-xl flex items-center justify-center mb-5">
-                  <item.icon size={22} className="text-secondary" />
+          <div className="mt-12 grid gap-5 md:grid-cols-3">
+            {trustItems.map((item, index) => (
+              <Reveal key={item.title} delay={index * 110}>
+                <div className="group h-full rounded-lg border border-outline-variant bg-[#fbfaf7] p-7 shadow-card transition-all duration-500 hover:-translate-y-2 hover:border-secondary/40 hover:shadow-card-hover">
+                  <div className="mb-6 grid h-12 w-12 place-items-center rounded-lg bg-[#1a365d]/5 text-[#1a365d] transition-all duration-500 group-hover:rotate-3 group-hover:scale-110 group-hover:bg-[#1a365d] group-hover:text-white">
+                    <item.icon size={23} />
+                  </div>
+                  <h3 className="font-montserrat text-title-lg">{item.title}</h3>
+                  <p className="mt-3 text-body-md leading-relaxed text-on-surface-variant">{item.desc}</p>
                 </div>
-                <h3 className="font-montserrat font-semibold text-title-lg text-on-surface mb-3">
-                  {item.title}
-                </h3>
-                <p className="text-body-md text-on-surface-variant leading-relaxed">
-                  {item.desc}
-                </p>
-              </div>
+              </Reveal>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════
-          PARCELLES EN VEDETTE — TOUTES LES PARCELLES
-      ═══════════════════════════════════════════════════ */}
-      <section className="py-24 bg-surface">
+      <section className="bg-[#f4f7f9] py-20">
         <div className="kbs-container">
-          <div className="flex items-end justify-between mb-10">
+          <Reveal className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
-              <h2 className="font-montserrat font-bold text-headline-lg text-on-surface">
-                Parcelles en Vedette
-              </h2>
-              <p className="text-body-md text-on-surface-variant mt-2">
-                Notre sélection premium actuellement disponible
-              </p>
+              <p className="text-label-sm font-bold uppercase tracking-[0.18em] text-[#c5a059]">Selection premium</p>
+              <h2 className="mt-3 font-montserrat text-headline-lg text-[#1a365d]">Parcelles en vedette</h2>
+              <p className="mt-2 text-body-md text-on-surface-variant">Les opportunites les plus interessantes du moment.</p>
             </div>
             <Link
               to="/parcelles"
-              className="flex items-center gap-1 text-label-md font-semibold text-on-surface hover:text-secondary transition group"
+              className="inline-flex items-center gap-1 text-label-md font-bold text-on-surface transition hover:text-secondary"
             >
               Voir tout le catalogue
-              <ChevronRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
+              <ChevronRight size={17} />
             </Link>
-          </div>
+          </Reveal>
 
-          {/* Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
             {isLoading
               ? [...Array(10)].map((_, i) => (
-                  <div key={i} className="kbs-card animate-pulse overflow-hidden">
-                    <div className="aspect-[4/3] bg-surface-high" />
-                    <div className="p-4 space-y-3">
-                      <div className="h-3 bg-surface-high rounded w-1/2" />
-                      <div className="h-4 bg-surface-high rounded" />
-                      <div className="h-9 bg-surface-high rounded mt-2" />
+                  <div key={i} className="rounded-lg border border-white/70 bg-white shadow-card">
+                    <div className="aspect-[4/3] animate-pulse bg-surface-high" />
+                    <div className="space-y-3 p-4">
+                      <div className="h-3 w-1/2 animate-pulse rounded bg-surface-high" />
+                      <div className="h-4 animate-pulse rounded bg-surface-high" />
+                      <div className="h-10 animate-pulse rounded bg-surface-high" />
                     </div>
                   </div>
                 ))
-              : parcelles.map((p) => <FeaturedParcelleCard key={p.id} parcelle={p} />)}
+              : parcelles.map((p, index) => <FeaturedParcelleCard key={p.id} parcelle={p} index={index} />)}
           </div>
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════
-          CHEMIN VERS LA PROPRIÉTÉ
-      ═══════════════════════════════════════════════════ */}
-      <section className="py-24 bg-surface-lowest">
-        <div className="kbs-container">
-          <h2 className="font-montserrat font-bold text-headline-lg text-on-surface text-center mb-20">
-            Votre Chemin vers la Propriété
-          </h2>
-
-          <div className="relative grid grid-cols-2 md:grid-cols-4 gap-8">
-            {/* Ligne de connexion */}
-            <div className="absolute top-8 left-[12.5%] right-[12.5%] h-px bg-outline-variant hidden md:block" />
-
-            {[
-              { num: "01", icon: Search, title: "Rechercher", desc: "Parcourez notre catalogue de parcelles vérifiées." },
-              { num: "02", icon: Eye, title: "Visiter", desc: "Planifiez une visite guidée avec nos experts." },
-              { num: "03", icon: Shield, title: "Réserver", desc: "Sécurisez votre choix avec un accord formel." },
-              { num: "04", icon: Users, title: "Posséder", desc: "Finalisez le transfert et recevez vos titres." },
-            ].map((step) => (
-              <div key={step.num} className="text-center relative z-10">
-                <div className="w-16 h-16 rounded-full border-2 border-outline-variant bg-surface-lowest flex items-center justify-center mx-auto mb-5 shadow-card">
-                  <step.icon size={22} className="text-on-surface-variant" />
+      <section className="relative overflow-hidden bg-[#1a365d] py-20 text-white">
+        <div className="absolute -right-48 -top-48 h-96 w-96 rounded-full bg-[#c5a059]/10 blur-3xl" />
+        <div className="absolute -bottom-48 -left-48 h-96 w-96 rounded-full bg-[#c5a059]/5 blur-3xl" />
+        <div className="kbs-container relative z-10 grid grid-cols-2 gap-10 md:grid-cols-4">
+          {stats.map((item, index) => (
+            <Reveal key={item.label} delay={index * 100} direction="scale">
+              <div className="text-center">
+                <div className="mb-2 font-montserrat text-4xl font-extrabold text-[#c5a059] md:text-5xl">
+                  {item.value}
                 </div>
-                <h3 className="font-montserrat font-semibold text-title-lg text-on-surface mb-2">
-                  {step.title}
-                </h3>
-                <p className="text-label-md text-on-surface-variant">{step.desc}</p>
+                <div className="text-label-sm font-semibold uppercase tracking-wider text-slate-300">
+                  {item.label}
+                </div>
               </div>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
+      <section className="bg-white py-20">
+        <div className="kbs-container">
+          <Reveal className="mx-auto mb-14 max-w-3xl text-center">
+            <p className="text-label-sm font-bold uppercase tracking-[0.18em] text-[#c5a059]">Ce que nous offrons</p>
+            <h2 className="mt-3 font-montserrat text-headline-lg text-[#1a365d]">Nos services d'expertise</h2>
+            <p className="mt-4 text-body-md text-on-surface-variant">
+              Une experience immobiliere complete pour mieux vendre, acheter, louer et suivre vos biens.
+            </p>
+          </Reveal>
+
+          <div className="grid gap-8 md:grid-cols-3">
+            {services.map((service, index) => (
+              <Reveal key={service.title} delay={index * 140} direction="up">
+                <div className="group h-full rounded-lg border border-[#e2e8f0] bg-[#f4f7f9] p-8 transition-all duration-500 hover:-translate-y-2 hover:bg-white hover:shadow-[0_10px_25px_-5px_rgba(26,54,93,0.15)]">
+                  <div className="mb-8 grid h-16 w-16 place-items-center rounded-lg bg-[#1a365d]/5 text-[#1a365d] transition-all duration-500 group-hover:bg-[#1a365d] group-hover:text-white">
+                    <service.icon size={30} />
+                  </div>
+                  <h3 className="mb-4 font-montserrat text-2xl font-bold text-slate-900">{service.title}</h3>
+                  <p className="text-body-md leading-relaxed text-slate-500">{service.desc}</p>
+                </div>
+              </Reveal>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════
-          FOOTER
-      ═══════════════════════════════════════════════════ */}
+      <section className="bg-white py-20">
+        <div className="kbs-container">
+          <Reveal className="mx-auto max-w-2xl text-center">
+            <p className="text-label-sm font-bold uppercase tracking-[0.18em] text-[#c5a059]">Parcours client</p>
+            <h2 className="mt-3 font-montserrat text-headline-lg text-[#1a365d]">Votre chemin vers la propriete</h2>
+          </Reveal>
+
+          <div className="relative mt-14 grid gap-6 md:grid-cols-4">
+            <div className="absolute left-[12.5%] right-[12.5%] top-8 hidden h-px bg-outline-variant md:block" />
+            {steps.map((step, index) => (
+              <Reveal key={step.num} delay={index * 100}>
+                <div className="relative z-10 text-center">
+                  <div className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-[#1a365d] text-2xl font-bold text-[#c5a059] shadow-xl shadow-[#1a365d]/20 transition-all duration-500 hover:-translate-y-1 hover:shadow-card-hover">
+                    {step.num}
+                  </div>
+                  <step.icon size={22} className="mx-auto mt-5 text-[#c5a059]" />
+                  <h3 className="mt-2 font-montserrat text-title-lg">{step.title}</h3>
+                  <p className="mt-2 text-label-md text-on-surface-variant">{step.desc}</p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-[#f4f7f9] py-20">
+        <div className="kbs-container">
+          <Reveal className="mb-14 text-center">
+            <p className="text-label-sm font-bold uppercase tracking-[0.18em] text-[#c5a059]">Avis clients</p>
+            <h2 className="mt-3 font-montserrat text-headline-lg text-[#1a365d]">Ce que disent nos clients</h2>
+          </Reveal>
+
+          <div className="grid gap-8 md:grid-cols-3">
+            {testimonials.map((item, index) => (
+              <Reveal key={item.name} delay={index * 140} direction="scale">
+                <div className="h-full rounded-lg border border-[#e2e8f0] bg-white p-8 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_10px_25px_-5px_rgba(26,54,93,0.12)]">
+                  <div className="mb-4 flex gap-1">
+                    {[...Array(5)].map((_, star) => (
+                      <span key={star} className="h-4 w-4 rounded-full bg-[#c5a059]" />
+                    ))}
+                  </div>
+                  <p className="mb-6 text-slate-600 italic">"{item.text}"</p>
+                  <div className="flex items-center gap-3">
+                    <div className="grid h-10 w-10 place-items-center rounded-full bg-[#1a365d]/10 font-bold text-[#1a365d]">
+                      {item.name.charAt(0)}
+                    </div>
+                    <div>
+                      <h3 className="text-label-md font-bold text-slate-900">{item.name}</h3>
+                      <p className="text-xs text-slate-400">{item.role}</p>
+                    </div>
+                  </div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="relative overflow-hidden py-20">
+        <div className="absolute inset-0 bg-[#1a365d]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(197,160,89,0.28),transparent_55%)] opacity-80" />
+        <div className="kbs-container relative z-10 text-center">
+          <Reveal direction="up">
+            <h2 className="mx-auto max-w-3xl font-montserrat text-4xl font-extrabold text-white md:text-5xl">
+              Pret a realiser votre <span className="text-[#c5a059]">projet immobilier</span> ?
+            </h2>
+            <p className="mx-auto mt-6 max-w-2xl text-body-lg text-slate-300">
+              Nos experts peuvent vous guider vers une parcelle fiable, documentee et adaptee a votre budget.
+            </p>
+            <div className="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
+              <Link
+                to="/parcelles"
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#c5a059] px-8 py-4 font-montserrat text-label-md font-bold uppercase text-[#1a365d] shadow-md transition-all hover:bg-white"
+              >
+                Explorer les parcelles
+                <ArrowRight size={18} />
+              </Link>
+              <Link
+                to="/register"
+                className="inline-flex items-center justify-center rounded-lg border border-[#c5a059] px-8 py-4 font-montserrat text-label-md font-bold uppercase text-white transition-all hover:bg-[#c5a059]/10"
+              >
+                Creer un compte
+              </Link>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
       <footer className="bg-primary-container text-on-primary-container">
         <div className="kbs-container py-16">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
-            <div className="md:col-span-1">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 bg-secondary rounded flex items-center justify-center">
-                  <span className="font-montserrat font-bold text-on-secondary text-sm">K</span>
+          <div className="grid grid-cols-1 gap-12 md:grid-cols-4">
+            <div>
+              <div className="mb-4 flex items-center gap-2">
+                <div className="grid h-9 w-9 place-items-center rounded-lg bg-secondary text-on-secondary">
+                  <span className="font-montserrat font-bold">K</span>
                 </div>
-                <span className="font-montserrat font-bold text-lg">KBS Real Estate</span>
+                <span className="font-montserrat text-lg font-bold text-white">KBS Real Estate</span>
               </div>
-              <p className="text-label-md text-on-primary-container/75 leading-relaxed">
-                Élever les standards de propriété foncière en RDC avec transparence
-                et professionnalisme.
+              <p className="text-label-md leading-relaxed text-on-primary-container/75">
+                Des standards immobiliers plus clairs, plus rapides et plus fiables en RDC.
               </p>
             </div>
 
             <div>
-              <h4 className="font-semibold text-label-md mb-5 uppercase tracking-wider text-on-primary-container/90">
-                Liens Rapides
-              </h4>
+              <h4 className="mb-5 text-label-md font-semibold uppercase tracking-wider text-white/90">Liens rapides</h4>
               <ul className="space-y-3">
                 {[
                   { label: "Accueil", path: "/" },
                   { label: "Parcelles", path: "/parcelles" },
-                  { label: "À propos", path: "#" },
+                  { label: "A propos", path: "#" },
                   { label: "Contact", path: "#" },
                 ].map((link) => (
                   <li key={link.label}>
-                    <Link to={link.path} className="text-label-md text-on-primary-container hover:text-secondary transition">
+                    <Link to={link.path} className="text-label-md text-on-primary-container transition hover:text-secondary-container">
                       {link.label}
                     </Link>
                   </li>
@@ -408,14 +597,12 @@ export default function HomePage() {
             </div>
 
             <div>
-              <h4 className="font-semibold text-label-md mb-5 uppercase tracking-wider text-on-primary-container/90">
-                Légal
-              </h4>
+              <h4 className="mb-5 text-label-md font-semibold uppercase tracking-wider text-white/90">Legal</h4>
               <ul className="space-y-3">
-                {["Politique de Confidentialité", "Conditions d'Utilisation"].map((l) => (
-                  <li key={l}>
-                    <Link to="#" className="text-label-md text-on-primary-container hover:text-secondary transition">
-                      {l}
+                {["Politique de confidentialite", "Conditions d'utilisation"].map((label) => (
+                  <li key={label}>
+                    <Link to="#" className="text-label-md text-on-primary-container transition hover:text-secondary-container">
+                      {label}
                     </Link>
                   </li>
                 ))}
@@ -423,11 +610,9 @@ export default function HomePage() {
             </div>
 
             <div>
-              <h4 className="font-semibold text-label-md mb-5 uppercase tracking-wider text-on-primary-container/90">
-                Newsletter
-              </h4>
-              <p className="text-label-md text-on-primary-container/75 mb-4">
-                Abonnez-vous pour recevoir les nouvelles annonces de parcelles.
+              <h4 className="mb-5 text-label-md font-semibold uppercase tracking-wider text-white/90">Newsletter</h4>
+              <p className="mb-4 text-label-md text-on-primary-container/75">
+                Recevez les nouvelles annonces de parcelles.
               </p>
               <form onSubmit={handleNewsletter} className="flex gap-2">
                 <input
@@ -435,18 +620,18 @@ export default function HomePage() {
                   placeholder="Votre email"
                   value={newsletterEmail}
                   onChange={(e) => setNewsletterEmail(e.target.value)}
-                  className="flex-1 px-3 py-2 rounded-lg bg-white/10 border border-white/20 text-on-primary-container placeholder:text-on-primary-container/50 text-label-md focus:outline-none focus:border-secondary"
+                  className="min-w-0 flex-1 rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-label-md text-white outline-none placeholder:text-white/45 focus:border-secondary-container"
                 />
-                <button type="submit" className="p-2 bg-secondary text-on-secondary rounded-lg hover:opacity-90 transition">
-                  <ArrowRight size={16} />
+                <button type="submit" className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-secondary text-on-secondary transition hover:bg-secondary-container hover:text-on-secondary-container">
+                  <ArrowRight size={17} />
                 </button>
               </form>
             </div>
           </div>
 
-          <div className="border-t border-white/10 mt-12 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 sm:flex-row">
             <p className="text-label-sm text-on-primary-container/60">
-              © {new Date().getFullYear()} KBS Real Estate Management. Tous droits réservés.
+              Copyright {new Date().getFullYear()} KBS Real Estate Management. Tous droits reserves.
             </p>
             <div className="flex items-center gap-4 text-on-primary-container/70">
               <Mail size={16} />
@@ -455,6 +640,17 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
+
+      <a
+        href="tel:+243810000000"
+        className="group fixed bottom-8 right-8 z-50 flex items-center gap-2 overflow-hidden rounded-full bg-[#c5a059] p-4 text-[#1a365d] shadow-2xl shadow-[#c5a059]/40 transition-all duration-500 hover:scale-105"
+        aria-label="Nous appeler"
+      >
+        <Phone size={22} />
+        <span className="max-w-0 overflow-hidden whitespace-nowrap font-bold transition-all duration-500 group-hover:max-w-xs">
+          Nous appeler
+        </span>
+      </a>
     </div>
   );
 }
