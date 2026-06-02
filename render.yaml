@@ -14,7 +14,7 @@ services:
       - key: BCRYPT_ROUNDS
         value: 10
       - key: AUTH_EXPOSE_VERIFICATION_CODE
-        value: true
+        value: false
       - key: LOG_LEVEL
         value: info
       - key: JWT_SECRET
