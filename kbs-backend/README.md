@@ -249,3 +249,5 @@ EVENTS BD                            →  JOBS CRON NODE
 evt_expirer_reservations (1h)        →  cron.schedule("0 * * * *", ...)
 evt_verifier_retards_loyer (08h)     →  cron.schedule("0 8 * * *", ...)
 evt_rappel_echeance_j7 (09h)         →  cron.schedule("0 9 * * *", ...)
+
+dans ce fichier il y a la config initial
