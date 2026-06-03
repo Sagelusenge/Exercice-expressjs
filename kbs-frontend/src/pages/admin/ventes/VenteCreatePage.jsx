@@ -14,7 +14,7 @@ export default function VenteCreatePage() {
   const { data: parcellesData } = useGetParcellesAdminQuery({});
 
   const clients = usersData || [];
-  const parcelles = (parcellesData || []).filter((p) => !["VENDUE", "ARCHIVEE"].includes(p.statut));
+  const parcelles = (parcellesData?.data || []).filter((p) => !["VENDUE", "ARCHIVEE"].includes(p.statut));
 
   const [formData, setFormData] = useState({
     user_id: "",

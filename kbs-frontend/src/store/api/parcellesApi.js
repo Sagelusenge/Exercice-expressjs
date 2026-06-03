@@ -7,7 +7,10 @@ export const parcellesApi = baseApi.injectEndpoints({
     getParcellesPubliques: builder.query({
       query: (params) => ({ url: "/parcelles", params: { limit: 10, ...params } }),
       providesTags: ["Parcelles"],
-      transformResponse: (response) => response.data || []
+      transformResponse: (response) => ({
+        data: response.data || [],
+        pagination: response.pagination || null
+      })
     }),
 
     // GET /parcelles/populaires — v_parcelles_populaires
@@ -32,10 +35,14 @@ export const parcellesApi = baseApi.injectEndpoints({
 
     // ── Admin ──────────────────────────────────────────────
     // GET /parcelles/admin/liste — v_parcelles_admin (AVEC prix)
+// GET /parcelles/admin/liste
     getParcellesAdmin: builder.query({
       query: (params) => ({ url: "/parcelles/admin/liste", params: { limit: 10, ...params } }),
       providesTags: ["Parcelles"],
-      transformResponse: (response) => response.data || []
+      transformResponse: (response) => ({
+        data: response.data || [],
+        pagination: response.pagination || null
+      })
     }),
 
     // GET /parcelles/:id/admin — détail admin avec prix

@@ -130,7 +130,8 @@ const ParcellesAdminPage = () => {
     return <div className="p-6 text-error">Erreur: {error.message || 'Erreur de chargement'}</div>;
   }
 
-  const parcelles = data || [];
+  const parcelles = data?.data || [];
+  const pagination = data?.pagination || null;
 
   return (
     <div className="space-y-6 p-6">

@@ -22,12 +22,17 @@ import {
 import toast from "react-hot-toast";
 import { TYPE_PARCELLE_LABELS } from "../../design-system/tokens";
 import { useGetParcellesPubliquesQuery } from "../../store/api/parcellesApi";
+import Pagination from "../../components/ui/Pagination";
 
 const getImageUrl = (url) => {
   if (!url) return null;
   if (url.startsWith("http")) return url;
-  const apiRoot = (import.meta.env.VITE_API_URL || "http://localhost:8080/api/v1").replace(/\/api\/v1\/?$/, "");
-  return `${apiRoot}${url}`;
+  // Build proper URL for images from backend
+  const apiRoot = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const baseUrl = apiRoot.replace(/\/api\/v1\/?$/, "");
+  // Ensure path starts with /
+  const imagePath = url.startsWith("/") ? url : `/${url}`;
+  return `${baseUrl}${imagePath}`;
 };
 
 const featuredFallbacks = [
@@ -58,9 +63,10 @@ const TypeBadge = ({ type }) => (
 );
 
 const FeaturedParcelleCard = ({ parcelle, index }) => {
-  const completeImageUrl =
-    getImageUrl(parcelle.image_principale || parcelle.photo_url) ||
-    featuredFallbacks[index % featuredFallbacks.length];
+  const hasImage = parcelle.image_principale || parcelle.photo_url;
+  const completeImageUrl = hasImage
+    ? getImageUrl(parcelle.image_principale || parcelle.photo_url)
+    : featuredFallbacks[index % featuredFallbacks.length];
 
   return (
     <Reveal delay={index * 70}>
@@ -72,7 +78,9 @@ const FeaturedParcelleCard = ({ parcelle, index }) => {
           <img
             src={completeImageUrl}
             alt={parcelle.titre}
+            loading="lazy"
             className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+            onError={(e) => { e.target.src = featuredFallbacks[index % featuredFallbacks.length]; }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-80" />
           <div className="absolute left-3 top-3 flex flex-wrap gap-2">
@@ -201,13 +209,19 @@ export default function HomePage() {
   const navigate = useNavigate();
   const [search, setSearch] = useState({ ville: "", commune: "", superficie_min: "" });
   const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const { data: featuredRes, isLoading } = useGetParcellesPubliquesQuery({
-    page: 1,
-    limit: 10,
+    page: currentPage,
+    limit: itemsPerPage,
   });
 
-  const parcelles = Array.isArray(featuredRes) ? featuredRes : [];
+  const allParcelles = Array.isArray(featuredRes?.data) ? featuredRes.data : [];
+  const pagination = featuredRes?.pagination || null;
+  
+  // Filter only parcelles en vedette
+  const parcelles = allParcelles.filter(p => p.est_vedette === 1 || p.est_vedette === true);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -413,7 +427,7 @@ export default function HomePage() {
             </Link>
           </Reveal>
 
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             {isLoading
               ? [...Array(10)].map((_, i) => (
                   <div key={i} className="rounded-lg border border-white/70 bg-white shadow-card">
@@ -427,6 +441,19 @@ export default function HomePage() {
                 ))
               : parcelles.map((p, index) => <FeaturedParcelleCard key={p.id} parcelle={p} index={index} />)}
           </div>
+          
+          {pagination && (
+            <div className="mt-8 bg-white rounded-lg p-4 shadow-card">
+              <Pagination
+                pagination={pagination}
+                onPageChange={(page) => {
+                  setCurrentPage(page);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                entityName="parcelles en vedette"
+              />
+            </div>
+          )}
         </div>
       </section>
 

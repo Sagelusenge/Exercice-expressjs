@@ -27,7 +27,7 @@ const ParcelleGrid = ({
     return (
       <div>
         <div className={clsx(
-          "grid gap-4",
+          "grid gap-3",
           "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
         )}>
           {[...Array(10)].map((_, i) => (
@@ -94,7 +94,7 @@ const ParcelleGrid = ({
       {/* Grille : 5 colonnes desktop, 10 par page */}
       {viewMode === "grid" ? (
         <div className={clsx(
-          "grid gap-4",
+          "grid gap-3",
           "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
         )}>
           {parcelles.map((p) => (

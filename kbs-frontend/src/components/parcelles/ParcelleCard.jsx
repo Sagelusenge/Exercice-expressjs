@@ -8,7 +8,10 @@ import { TYPE_PARCELLE_LABELS } from "../../design-system/tokens";
 const getImageUrl = (url) => {
   if (!url) return null;
   if (url.startsWith('http')) return url;
-  return `http://localhost:5000${url}`;
+  const apiRoot = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const baseUrl = apiRoot.replace(/\/api\/v1\/?$/, "");
+  const imagePath = url.startsWith("/") ? url : `/${url}`;
+  return `${baseUrl}${imagePath}`;
 };
 
 /**
@@ -132,7 +135,9 @@ const ParcelleCard = ({
           <img
             src={completeImageUrl}
             alt={titre}
+            loading="lazy"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            onError={(e) => { e.target.style.display = 'none'; }}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-on-surface-variant bg-surface-container">

@@ -20,7 +20,10 @@ const LIMIT = 10; // 10 par page, 5 par ligne
 const getImageUrl = (url) => {
   if (!url) return null;
   if (url.startsWith('http')) return url;
-  return `http://localhost:5000${url}`;
+  const apiRoot = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const baseUrl = apiRoot.replace(/\/api\/v1\/?$/, "");
+  const imagePath = url.startsWith("/") ? url : `/${url}`;
+  return `${baseUrl}${imagePath}`;
 };
 
 const TYPE_OPTIONS = [
@@ -47,7 +50,9 @@ const CatalogCard = ({ parcelle, viewMode, isFavorite, onFavorite, onReserve, on
             <img
               src={completeImageUrl}
               alt={parcelle.titre}
+              loading="lazy"
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              onError={(e) => { e.target.style.display = 'none'; }}
             />
           ) : (
             <div className="w-full h-full bg-surface-container flex items-center justify-center min-h-[140px]">
@@ -182,7 +187,9 @@ const CatalogCard = ({ parcelle, viewMode, isFavorite, onFavorite, onReserve, on
           <img
             src={completeImageUrl}
             alt={parcelle.titre}
+            loading="lazy"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            onError={(e) => { e.target.style.display = 'none'; }}
           />
         ) : (
           <div className="w-full h-full bg-surface-container flex items-center justify-center">
@@ -301,7 +308,7 @@ export default function ParcelleCatalogPage() {
 
   const favorisIds = favorisData?.map((f) => f.id) || [];
 
-  const parcelles = data || [];
+  const parcelles = data?.data || [];
   const pagination = data?.pagination;
 
   const applyFilters = () => {

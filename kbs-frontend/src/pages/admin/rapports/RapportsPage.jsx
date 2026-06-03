@@ -69,6 +69,16 @@ const RapportsPage = () => {
   const kbs = dash.kbs_loyer || {};
   const ployer = dash.paiements_loyer || {};
 
+  // Update data variables to use the new { data, pagination } format
+  const parcelles = parcellesData?.data || [];
+  const ventes = ventesData?.data || [];
+  const reservations = reservationsData?.data || [];
+  const users = usersData?.data || [];
+  const factures = facturesData?.data || [];
+  const paiementsLoyer = paiementsLoyerData?.data || [];
+  const locataires = locatairesData?.data || [];
+  const paiements = paiementsData?.data || [];
+
   // CSV export function
   const exportToCSV = (data, filename, headers) => {
     if (!data || data.length === 0) return;
@@ -165,71 +175,71 @@ const RapportsPage = () => {
                     <p className="px-3 py-1 text-xs text-on-surface-variant uppercase tracking-wider font-semibold">CSV</p>
                     <button 
                       onClick={() => {
-                        exportToCSV(parcellesData, 'rapport_parcelles', ['Référence', 'Type', 'Statut', 'Prix', 'Ville', 'Surface']);
+                        exportToCSV(parcelles, 'rapport_parcelles', ['Référence', 'Type', 'Statut', 'Prix', 'Ville', 'Surface']);
                         setShowExportDropdown(false);
                       }}
                       className="w-full text-left px-3 py-2 rounded-md hover:bg-surface-low text-label-md"
-                      disabled={!parcellesData || parcellesData.length === 0}
+                      disabled={!parcelles || parcelles.length === 0}
                     >
                       Parcelles
                     </button>
                     <button 
                       onClick={() => {
-                        exportToCSV(ventesData, 'rapport_ventes', ['Référence', 'Client', 'Parcelle', 'Montant', 'Statut', 'Date']);
+                        exportToCSV(ventes, 'rapport_ventes', ['Référence', 'Client', 'Parcelle', 'Montant', 'Statut', 'Date']);
                         setShowExportDropdown(false);
                       }}
                       className="w-full text-left px-3 py-2 rounded-md hover:bg-surface-low text-label-md"
-                      disabled={!ventesData || ventesData.length === 0}
+                      disabled={!ventes || ventes.length === 0}
                     >
                       Ventes
                     </button>
                     <button 
                       onClick={() => {
-                        exportToCSV(reservationsData, 'rapport_reservations', ['Référence', 'Client', 'Parcelle', 'Statut', 'Date Début', 'Date Fin']);
+                        exportToCSV(reservations, 'rapport_reservations', ['Référence', 'Client', 'Parcelle', 'Statut', 'Date Début', 'Date Fin']);
                         setShowExportDropdown(false);
                       }}
                       className="w-full text-left px-3 py-2 rounded-md hover:bg-surface-low text-label-md"
-                      disabled={!reservationsData || reservationsData.length === 0}
+                      disabled={!reservations || reservations.length === 0}
                     >
                       Réservations
                     </button>
                     <button 
                       onClick={() => {
-                        exportToCSV(usersData, 'rapport_utilisateurs', ['Référence', 'Nom', 'Prénom', 'Email', 'Rôle', 'Statut']);
+                        exportToCSV(users, 'rapport_utilisateurs', ['Référence', 'Nom', 'Prénom', 'Email', 'Rôle', 'Statut']);
                         setShowExportDropdown(false);
                       }}
                       className="w-full text-left px-3 py-2 rounded-md hover:bg-surface-low text-label-md"
-                      disabled={!usersData || usersData.length === 0}
+                      disabled={!users || users.length === 0}
                     >
                       Utilisateurs
                     </button>
                     <button 
                       onClick={() => {
-                        exportToCSV(locatairesData, 'rapport_locataires', ['Référence', 'Nom', 'Prénom', 'Email', 'Statut', 'Logement']);
+                        exportToCSV(locataires, 'rapport_locataires', ['Référence', 'Nom', 'Prénom', 'Email', 'Statut', 'Logement']);
                         setShowExportDropdown(false);
                       }}
                       className="w-full text-left px-3 py-2 rounded-md hover:bg-surface-low text-label-md"
-                      disabled={!locatairesData || locatairesData.length === 0}
+                      disabled={!locataires || locataires.length === 0}
                     >
                       Locataires
                     </button>
                     <button 
                       onClick={() => {
-                        exportToCSV(facturesData, 'rapport_factures', ['Référence', 'Locataire', 'Montant', 'Statut', 'Date Période']);
+                        exportToCSV(factures, 'rapport_factures', ['Référence', 'Locataire', 'Montant', 'Statut', 'Date Période']);
                         setShowExportDropdown(false);
                       }}
                       className="w-full text-left px-3 py-2 rounded-md hover:bg-surface-low text-label-md"
-                      disabled={!facturesData || facturesData.length === 0}
+                      disabled={!factures || factures.length === 0}
                     >
                       Factures
                     </button>
                     <button 
                       onClick={() => {
-                        exportToCSV(paiementsLoyerData, 'rapport_paiements_loyer', ['Référence', 'Locataire', 'Montant', 'Statut', 'Date']);
+                        exportToCSV(paiementsLoyer, 'rapport_paiements_loyer', ['Référence', 'Locataire', 'Montant', 'Statut', 'Date']);
                         setShowExportDropdown(false);
                       }}
                       className="w-full text-left px-3 py-2 rounded-md hover:bg-surface-low text-label-md"
-                      disabled={!paiementsLoyerData || paiementsLoyerData.length === 0}
+                      disabled={!paiementsLoyer || paiementsLoyer.length === 0}
                     >
                       Paiements Loyer
                     </button>
@@ -239,71 +249,71 @@ const RapportsPage = () => {
                     <p className="px-3 py-1 text-xs text-on-surface-variant uppercase tracking-wider font-semibold">PDF</p>
                     <button 
                       onClick={() => {
-                        exportToPDF(parcellesData, 'Rapport Parcelles', 'rapport_parcelles', ['Référence', 'Type', 'Statut', 'Prix', 'Ville', 'Surface']);
+                        exportToPDF(parcelles, 'Rapport Parcelles', 'rapport_parcelles', ['Référence', 'Type', 'Statut', 'Prix', 'Ville', 'Surface']);
                         setShowExportDropdown(false);
                       }}
                       className="w-full text-left px-3 py-2 rounded-md hover:bg-surface-low text-label-md"
-                      disabled={!parcellesData || parcellesData.length === 0}
+                      disabled={!parcelles || parcelles.length === 0}
                     >
                       Parcelles
                     </button>
                     <button 
                       onClick={() => {
-                        exportToPDF(ventesData, 'Rapport Ventes', 'rapport_ventes', ['Référence', 'Client', 'Parcelle', 'Montant', 'Statut', 'Date']);
+                        exportToPDF(ventes, 'Rapport Ventes', 'rapport_ventes', ['Référence', 'Client', 'Parcelle', 'Montant', 'Statut', 'Date']);
                         setShowExportDropdown(false);
                       }}
                       className="w-full text-left px-3 py-2 rounded-md hover:bg-surface-low text-label-md"
-                      disabled={!ventesData || ventesData.length === 0}
+                      disabled={!ventes || ventes.length === 0}
                     >
                       Ventes
                     </button>
                     <button 
                       onClick={() => {
-                        exportToPDF(reservationsData, 'Rapport Réservations', 'rapport_reservations', ['Référence', 'Client', 'Parcelle', 'Statut', 'Date Début', 'Date Fin']);
+                        exportToPDF(reservations, 'Rapport Réservations', 'rapport_reservations', ['Référence', 'Client', 'Parcelle', 'Statut', 'Date Début', 'Date Fin']);
                         setShowExportDropdown(false);
                       }}
                       className="w-full text-left px-3 py-2 rounded-md hover:bg-surface-low text-label-md"
-                      disabled={!reservationsData || reservationsData.length === 0}
+                      disabled={!reservations || reservations.length === 0}
                     >
                       Réservations
                     </button>
                     <button 
                       onClick={() => {
-                        exportToPDF(usersData, 'Rapport Utilisateurs', 'rapport_utilisateurs', ['Référence', 'Nom', 'Prénom', 'Email', 'Rôle', 'Statut']);
+                        exportToPDF(users, 'Rapport Utilisateurs', 'rapport_utilisateurs', ['Référence', 'Nom', 'Prénom', 'Email', 'Rôle', 'Statut']);
                         setShowExportDropdown(false);
                       }}
                       className="w-full text-left px-3 py-2 rounded-md hover:bg-surface-low text-label-md"
-                      disabled={!usersData || usersData.length === 0}
+                      disabled={!users || users.length === 0}
                     >
                       Utilisateurs
                     </button>
                     <button 
                       onClick={() => {
-                        exportToPDF(locatairesData, 'Rapport Locataires', 'rapport_locataires', ['Référence', 'Nom', 'Prénom', 'Email', 'Statut', 'Logement']);
+                        exportToPDF(locataires, 'Rapport Locataires', 'rapport_locataires', ['Référence', 'Nom', 'Prénom', 'Email', 'Statut', 'Logement']);
                         setShowExportDropdown(false);
                       }}
                       className="w-full text-left px-3 py-2 rounded-md hover:bg-surface-low text-label-md"
-                      disabled={!locatairesData || locatairesData.length === 0}
+                      disabled={!locataires || locataires.length === 0}
                     >
                       Locataires
                     </button>
                     <button 
                       onClick={() => {
-                        exportToPDF(facturesData, 'Rapport Factures', 'rapport_factures', ['Référence', 'Locataire', 'Montant', 'Statut', 'Date Période']);
+                        exportToPDF(factures, 'Rapport Factures', 'rapport_factures', ['Référence', 'Locataire', 'Montant', 'Statut', 'Date Période']);
                         setShowExportDropdown(false);
                       }}
                       className="w-full text-left px-3 py-2 rounded-md hover:bg-surface-low text-label-md"
-                      disabled={!facturesData || facturesData.length === 0}
+                      disabled={!factures || factures.length === 0}
                     >
                       Factures
                     </button>
                     <button 
                       onClick={() => {
-                        exportToPDF(paiementsLoyerData, 'Rapport Paiements Loyer', 'rapport_paiements_loyer', ['Référence', 'Locataire', 'Montant', 'Statut', 'Date']);
+                        exportToPDF(paiementsLoyer, 'Rapport Paiements Loyer', 'rapport_paiements_loyer', ['Référence', 'Locataire', 'Montant', 'Statut', 'Date']);
                         setShowExportDropdown(false);
                       }}
                       className="w-full text-left px-3 py-2 rounded-md hover:bg-surface-low text-label-md"
-                      disabled={!paiementsLoyerData || paiementsLoyerData.length === 0}
+                      disabled={!paiementsLoyer || paiementsLoyer.length === 0}
                     >
                       Paiements Loyer
                     </button>
