@@ -16,12 +16,20 @@ function getSslOptions() {
   return sslOptions;
 }
 
-const pool = mysql.createPool({
+const dbInfo = {
   host: process.env.DB_HOST || process.env.MYSQL_ADDON_HOST || "localhost",
   port: process.env.DB_PORT || process.env.MYSQL_ADDON_PORT || 3306,
   user: process.env.DB_USER || process.env.MYSQL_ADDON_USER || "root",
-  password: process.env.DB_PASSWORD || process.env.MYSQL_ADDON_PASSWORD || "",
   database: process.env.DB_NAME || process.env.MYSQL_ADDON_DB || "KBSw",
+  ssl: process.env.DB_SSL === "true",
+};
+
+const pool = mysql.createPool({
+  host: dbInfo.host,
+  port: dbInfo.port,
+  user: dbInfo.user,
+  password: process.env.DB_PASSWORD || process.env.MYSQL_ADDON_PASSWORD || "",
+  database: dbInfo.database,
   waitForConnections: true,
   connectionLimit: 20,
   queueLimit: 0,
@@ -42,9 +50,16 @@ async function testConnection() {
     await prepareConnection(conn);
     await conn.query("SELECT 1");
     conn.release();
-    logger.info("✅ Connexion MySQL établie — Base KBSw");
+    logger.info("Connexion MySQL etablie", dbInfo);
   } catch (error) {
-    logger.error("❌ Erreur connexion MySQL:", error.message);
+    logger.error("Erreur connexion MySQL", {
+      ...dbInfo,
+      message: error.message,
+      code: error.code,
+      errno: error.errno,
+      sqlState: error.sqlState,
+      sqlMessage: error.sqlMessage,
+    });
     process.exit(1);
   }
 }
@@ -53,7 +68,7 @@ async function query(sql, params = []) {
   const conn = await pool.getConnection();
   try {
     await prepareConnection(conn);
-    const safeParams = params.map((param) => param === undefined ? null : param);
+    const safeParams = params.map((param) => (param === undefined ? null : param));
     const [rows] = await conn.query(sql, safeParams);
     return rows;
   } finally {
@@ -65,7 +80,7 @@ async function callProcedure(sql, params = []) {
   const conn = await pool.getConnection();
   try {
     await prepareConnection(conn);
-    const safeParams = params.map((param) => param === undefined ? null : param);
+    const safeParams = params.map((param) => (param === undefined ? null : param));
     const [results] = await conn.query(sql, safeParams);
     return results;
   } finally {
