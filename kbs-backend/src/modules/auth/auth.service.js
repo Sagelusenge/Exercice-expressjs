@@ -14,7 +14,7 @@ const getBcryptRounds = () => {
 };
 
 const shouldExposeVerificationCode = () => {
-  return process.env.AUTH_EXPOSE_VERIFICATION_CODE === "true";
+  return false; // Code de verification ne doit jamais etre expose au frontend
 };
 
 const generateToken = (userId, role, tenantId) => {
@@ -81,10 +81,7 @@ const register = async (tenantId, data) => {
     logger.error("Erreur notification verification email en arriere-plan:", error.message);
   });
 
-  if (shouldExposeVerificationCode()) {
-    user.verification_code = code;
-  }
-
+  // Ne jamais retourner le code de verification au frontend
   return user;
 };
 
@@ -281,7 +278,7 @@ const resendVerificationCode = async (tenantId, email) => {
     logger.error("Erreur renvoi verification email en arriere-plan:", error.message);
   });
 
-  return shouldExposeVerificationCode() ? { verification_code: code } : true;
+  return true; // Ne jamais retourner le code au frontend
 };
 
 const changePassword = async (userId, ancienMdp, nouveauMdp) => {

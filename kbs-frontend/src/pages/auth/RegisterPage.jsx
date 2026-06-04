@@ -40,7 +40,6 @@ export default function RegisterPage() {
       navigate("/verify-email", {
         state: {
           email: form.email,
-          verificationCode: result?.verification_code || "",
         },
       });
     } catch (err) {

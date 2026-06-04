@@ -5,7 +5,6 @@ const { query } = require("../../config/database");
 const register = async (req, res) => {
   const user = await authService.register(req.tenantId, req.body);
   const payload = { code_user: user.code_user, email: user.email };
-  if (user.verification_code) payload.verification_code = user.verification_code;
 
   return R.created(
     res,
@@ -38,9 +37,8 @@ const login = async (req, res) => {
 };
 
 const resendCode = async (req, res) => {
-  const result = await authService.resendVerificationCode(req.tenantId, req.body.email);
-  const payload = result && result.verification_code ? result : null;
-  return R.success(res, payload, "Nouveau code envoye a votre adresse email");
+  await authService.resendVerificationCode(req.tenantId, req.body.email);
+  return R.success(res, null, "Nouveau code envoye a votre adresse email");
 };
 
 const getMe = async (req, res) => {

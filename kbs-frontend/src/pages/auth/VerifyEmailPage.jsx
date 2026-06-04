@@ -21,8 +21,7 @@ export default function VerifyEmailPage() {
   const [resetPassword, { isLoading: isSettingPassword }] = useResetPasswordMutation();
 
   const [email, setEmail] = useState(location.state?.email || "");
-  const [code, setCode] = useState(location.state?.verificationCode || "");
-  const [fallbackCode, setFallbackCode] = useState(location.state?.verificationCode || "");
+  const [code, setCode] = useState("");
   const [step, setStep] = useState("code");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
@@ -81,12 +80,8 @@ export default function VerifyEmailPage() {
 
   const handleResend = async () => {
     try {
-      const result = await resendCode({ email }).unwrap();
-      if (result?.verification_code) {
-        setFallbackCode(result.verification_code);
-        setCode(result.verification_code);
-      }
-      toast.success("Un nouveau code a ete envoye");
+      await resendCode({ email }).unwrap();
+      toast.success("Un nouveau code a ete envoye a votre email");
     } catch (err) {
       toast.error(err.data?.message || "Erreur lors de l'envoi");
     }
@@ -124,17 +119,6 @@ export default function VerifyEmailPage() {
           <div className="flex items-center gap-3 bg-error-container text-on-error-container rounded-lg px-4 py-3 mb-6 text-label-md">
             <AlertCircle size={16} className="flex-shrink-0" />
             {error}
-          </div>
-        )}
-
-        {fallbackCode && step === "code" && (
-          <div className="rounded-lg border border-secondary/30 bg-secondary-container/50 px-4 py-3 mb-6 text-center">
-            <p className="text-label-sm text-on-surface-variant mb-1">
-              Code de verification temporaire
-            </p>
-            <p className="font-montserrat text-2xl font-bold tracking-[0.28em] text-on-surface">
-              {fallbackCode}
-            </p>
           </div>
         )}
 
