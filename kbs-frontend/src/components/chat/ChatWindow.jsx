@@ -50,7 +50,7 @@ const ChatWindow = ({ isOpen, onClose, initialMessages = [] }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed bottom-6 right-6 w-96 h-[550px] bg-white rounded-xl shadow-2xl flex flex-col z-50 overflow-hidden">
+    <div className="fixed bottom-6 right-3 sm:right-6 w-[320px] sm:w-96 h-[550px] bg-white rounded-xl shadow-2xl flex flex-col z-50 overflow-hidden">
       {/* Header */}
       <div className="bg-[#008069] text-white p-4 flex justify-between items-center">
         <div className="flex items-center gap-3">

@@ -6,6 +6,7 @@ const { requireRole } = require("../../middleware/role.middleware");
 const { enforceTenant } = require("../../middleware/tenant.middleware");
 const { logActivity } = require("../../middleware/activityLog.middleware");
 const emailService = require("../../services/email.service");
+const { logger } = require("../../utils/logger.util");
 
 const ADMIN_ROLES = ["SUPER_ADMIN", "BOSS", "GERANT"];
 
@@ -138,11 +139,44 @@ const notifyMessageRecipients = async ({ tenantId, conversationId, sender, conte
       [tenantId, recipient.id, recipient.email, titre]
     );
 
-    await emailService.sendEmail(
-      recipient.email,
-      titre,
-      `<p>Bonjour ${recipient.prenom},</p><p>Vous avez recu un nouveau message de ${sender.prenom} ${sender.nom}.</p><p>${contenu || ""}</p>`
-    );
+    try {
+      const ok = await emailService.sendEmail(
+        recipient.email,
+        titre,
+        `<p>Bonjour ${recipient.prenom},</p><p>Vous avez recu un nouveau message de ${sender.prenom} ${sender.nom}.</p><p>${contenu || ""}</p>`
+      );
+
+      await query(
+        `UPDATE email_logs
+         SET statut = ?
+         WHERE tenant_id = ?
+           AND user_id = ?
+           AND destinataire_email = ?
+           AND sujet = ?
+           AND template_utilise = 'CHAT_NOUVEAU_MESSAGE'
+         ORDER BY date_envoi DESC
+         LIMIT 1`,
+        [ok ? "ENVOYE" : "ECHOUE", tenantId, recipient.id, recipient.email, titre]
+      );
+
+      if (!ok) {
+        logger.warn(`📧 Email CHAT non envoye a ${recipient.email}`);
+      }
+    } catch (err) {
+      logger.error(`❌ Email CHAT erreur a ${recipient.email}:`, { message: err.message });
+      await query(
+        `UPDATE email_logs
+         SET statut = 'ECHOUE'
+         WHERE tenant_id = ?
+           AND user_id = ?
+           AND destinataire_email = ?
+           AND sujet = ?
+           AND template_utilise = 'CHAT_NOUVEAU_MESSAGE'
+         ORDER BY date_envoi DESC
+         LIMIT 1`,
+        [tenantId, recipient.id, recipient.email, titre]
+      );
+    }
   }));
 };
 
