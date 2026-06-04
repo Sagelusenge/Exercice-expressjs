@@ -93,12 +93,26 @@ const sendEmailVerification = async (tenantId, user, code) => {
   );
 
   try {
-    if (process.env.SMTP_HOST) {
-      await emailService.sendEmail(user.email, "Code de vérification KBS", htmlBody);
-      logger.info(`📧 Code vérification envoyé à ${user.email}: ${code}`);
+    logger.info(`📧 Tentative d'envoi du code de verification a ${user.email}...`);
+    if (!process.env.SMTP_HOST) {
+      logger.error("❌ ERREUR: SMTP_HOST non configuré - Email NON envoyé");
+      throw new Error("SMTP non configuré");
     }
+    
+    const result = await emailService.sendEmail(user.email, "Code de vérification KBS", htmlBody);
+    
+    if (!result) {
+      logger.error(`❌ L'envoi d'email a échoué pour ${user.email}`);
+      throw new Error("Envoi d'email échoué");
+    }
+    
+    logger.info(`✅ Code vérification envoyé avec succès à ${user.email}: ${code}`);
   } catch (err) {
-    logger.error("Erreur lors de l'envoi de l'email de vérification:", err.message);
+    logger.error("❌ Erreur lors de l'envoi de l'email de vérification:", {
+      email: user.email,
+      message: err.message,
+      stack: err.stack
+    });
   }
 
   await logEmail(
@@ -135,12 +149,26 @@ const sendWelcome = async (tenantId, user) => {
   );
 
   try {
-    if (process.env.SMTP_HOST) {
-      await emailService.sendEmail(user.email, "Bienvenue chez KBS Buildings !", htmlBody);
-      logger.info(`📧 Email de bienvenue envoyé à ${user.email}`);
+    logger.info(`📧 Tentative d'envoi du mail de bienvenue a ${user.email}...`);
+    if (!process.env.SMTP_HOST) {
+      logger.error("❌ ERREUR: SMTP_HOST non configuré - Email NON envoyé");
+      throw new Error("SMTP non configuré");
     }
+    
+    const result = await emailService.sendEmail(user.email, "Bienvenue chez KBS Buildings !", htmlBody);
+    
+    if (!result) {
+      logger.error(`❌ L'envoi d'email a échoué pour ${user.email}`);
+      throw new Error("Envoi d'email échoué");
+    }
+    
+    logger.info(`✅ Email de bienvenue envoyé à ${user.email}`);
   } catch (err) {
-    logger.error("Erreur lors de l'envoi de l'email de bienvenue:", err.message);
+    logger.error("❌ Erreur lors de l'envoi de l'email de bienvenue:", {
+      email: user.email,
+      message: err.message,
+      stack: err.stack
+    });
   }
 
   await logEmail(
@@ -296,12 +324,26 @@ const sendPasswordResetEmail = async (tenantId, user, code) => {
   );
 
   try {
-    if (process.env.SMTP_HOST) {
-      await emailService.sendEmail(user.email, "Réinitialisation de mot de passe KBS", htmlBody);
-      logger.info(`📧 Email de réinitialisation envoyé à ${user.email}`);
+    logger.info(`📧 Tentative d'envoi du code de reinitialisation a ${user.email}...`);
+    if (!process.env.SMTP_HOST) {
+      logger.error("❌ ERREUR: SMTP_HOST non configuré - Email NON envoyé");
+      throw new Error("SMTP non configuré");
     }
+    
+    const result = await emailService.sendEmail(user.email, "Réinitialisation de mot de passe KBS", htmlBody);
+    
+    if (!result) {
+      logger.error(`❌ L'envoi d'email a échoué pour ${user.email}`);
+      throw new Error("Envoi d'email échoué");
+    }
+    
+    logger.info(`✅ Email de réinitialisation envoyé à ${user.email}`);
   } catch (err) {
-    logger.error("Erreur lors de l'envoi de l'email de réinitialisation:", err.message);
+    logger.error("❌ Erreur lors de l'envoi de l'email de réinitialisation:", {
+      email: user.email,
+      message: err.message,
+      stack: err.stack
+    });
   }
 
   await logEmail(tenantId, user.id, user.email, "Réinitialisation de mot de passe KBS", "PASSWORD_RESET", "SENT");

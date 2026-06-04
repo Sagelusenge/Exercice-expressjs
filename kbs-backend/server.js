@@ -9,6 +9,7 @@ const { startVerifierRetardsJob } = require("./src/jobs/verifier-retards-loyer.j
 const { startRappelEcheanceJob } = require("./src/jobs/rappel-echeance.job");
 const { logger } = require("./src/utils/logger.util");
 const fs = require("fs");
+const emailService = require("./src/services/email.service");
 
 const PORT = process.env.PORT || 3000;
 
@@ -43,6 +44,32 @@ async function bootstrap() {
   try {
     await testConnection();
     await checkTenants();
+
+    // ── Vérification SMTP ──────────────────────────────────────
+    logger.info("🔍 Vérification de la configuration SMTP...");
+    if (!emailService.isConfigured()) {
+      logger.warn("⚠️  SMTP NON CONFIGURÉ - Les emails ne seront PAS envoyés!");
+      logger.warn("   Vérifiez les variables d'environnement:");
+      logger.warn(`   - SMTP_HOST: ${process.env.SMTP_HOST || "❌ NON DÉFINI"}`);
+      logger.warn(`   - SMTP_PORT: ${process.env.SMTP_PORT || "❌ NON DÉFINI"}`);
+      logger.warn(`   - SMTP_USER: ${process.env.SMTP_USER || "❌ NON DÉFINI"}`);
+      logger.warn(`   - SMTP_PASS: ${process.env.SMTP_PASS ? "✅ DÉFINI" : "❌ NON DÉFINI"}`);
+    } else {
+      logger.info("✅ SMTP est configuré correctement");
+      try {
+        await emailService.getTransporter().verify();
+        logger.info("✅ Connexion SMTP vérifiée avec succès!");
+      } catch (smtpError) {
+        logger.error("❌ ERREUR SMTP - Impossible de se connecter au serveur de mail:");
+        logger.error(`   Message: ${smtpError.message}`);
+        logger.error(`   Code: ${smtpError.code}`);
+        logger.error(`   Response: ${smtpError.response}`);
+        logger.warn("   Les emails ne seront PAS envoyés. Vérifiez:");
+        logger.warn("   1. Les identifiants Gmail (email + mot de passe d'application)");
+        logger.warn("   2. Que 2FA est activé sur votre compte Gmail");
+        logger.warn("   3. Que le mot de passe d'application est au bon format");
+      }
+    }
 
     const server = http.createServer(app);
     

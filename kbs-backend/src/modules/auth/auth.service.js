@@ -77,9 +77,13 @@ const register = async (tenantId, data) => {
     role: "CLIENT",
   };
 
-  notificationService.sendEmailVerification(tenantId, user, code).catch((error) => {
-    logger.error("Erreur notification verification email en arriere-plan:", error.message);
-  });
+  // Envoyer l'email de vérification avec gestion d'erreur appropriée
+  try {
+    await notificationService.sendEmailVerification(tenantId, user, code);
+  } catch (error) {
+    logger.error("Erreur lors de l'envoi de l'email de verification:", error.message);
+    // Ne pas rejeter l'inscription, mais logger l'erreur
+  }
 
   // Ne jamais retourner le code de verification au frontend
   return user;
@@ -274,9 +278,13 @@ const resendVerificationCode = async (tenantId, email) => {
     [code, expireAt, user.id]
   );
 
-  notificationService.sendEmailVerification(tenantId, user, code).catch((error) => {
-    logger.error("Erreur renvoi verification email en arriere-plan:", error.message);
-  });
+  // Envoyer l'email de vérification
+  try {
+    await notificationService.sendEmailVerification(tenantId, user, code);
+  } catch (error) {
+    logger.error("Erreur lors du renvoi de l'email de verification:", error.message);
+    // Ne pas rejeter, mais logger l'erreur
+  }
 
   return true; // Ne jamais retourner le code au frontend
 };
