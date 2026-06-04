@@ -46,7 +46,7 @@ const TopBar = ({ title, collapsed, onToggleSidebar }) => {
       </button>
 
       {/* Titre page */}
-      <h1 className="font-montserrat font-bold text-title-lg text-on-surface flex-1">
+      <h1 className="font-montserrat font-bold text-title-lg text-white flex-1">
         {title}
       </h1>
 
@@ -71,10 +71,10 @@ const TopBar = ({ title, collapsed, onToggleSidebar }) => {
         {/* Profil utilisateur */}
         <div className="flex items-center gap-2.5 pl-3 border-l border-outline-variant ml-1">
           <div className="text-right hidden sm:block">
-            <p className="text-label-md font-semibold text-on-surface leading-tight">
+            <p className="text-label-md font-semibold text-white leading-tight">
               {user?.nom} {user?.prenom}
             </p>
-            <p className="text-label-sm text-on-surface-variant">
+            <p className="text-label-sm text-gray-300">
               {user?.code_user}
             </p>
           </div>

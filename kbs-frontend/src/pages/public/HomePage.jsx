@@ -590,6 +590,8 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Footer du site supprimé ici: utiliser uniquement le composant <Footer /> dans PublicLayout */}
+      {false && (
       <footer className="bg-primary-container text-on-primary-container">
         <div className="kbs-container py-16">
           <div className="grid grid-cols-1 gap-12 md:grid-cols-4">
@@ -667,6 +669,7 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
+      )}
 
       <a
         href="tel:+243810000000"
