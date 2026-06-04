@@ -49,6 +49,7 @@ import {
   MesAchatsPage,
   MesPaiementsPage,
   MesVisitesPage,
+  ProfilPage,
 } from "../pages/client";
 
 // Locataire
@@ -140,6 +141,7 @@ export default function AppRoutes() {
           <Route path="paiements" element={<MesPaiementsPage />} />
           <Route path="visites" element={<MesVisitesPage />} />
           <Route path="chat" element={<ChatClientPage />} />
+          <Route path="profil" element={<ProfilPage />} />
         </Route>
 
         {/* ── Locataire ───────────────────────────────────── */}

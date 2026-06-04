@@ -3,6 +3,55 @@ const { callProcedure, query } = require("../../config/database");
 const R = require("../../utils/response.util");
 const { authenticate } = require("../../middleware/auth.middleware");
 const { requireRole } = require("../../middleware/role.middleware");
+const { enforceTenant } = require("../../middleware/tenant.middleware");
+
+router.get("/public-stats", enforceTenant, async (req, res) => {
+  const [parcelles] = await query(`
+    SELECT
+      COUNT(*) AS total_parcelles,
+      COUNT(DISTINCT NULLIF(TRIM(ville), '')) AS villes,
+      COUNT(DISTINCT NULLIF(TRIM(CONCAT_WS('|', ville, commune, quartier)), '')) AS zones
+    FROM parcelles
+    WHERE tenant_id = ?
+      AND deleted_at IS NULL
+      AND statut <> 'ARCHIVEE'`,
+    [req.tenantId]
+  );
+
+  const [clients] = await query(`
+    SELECT COUNT(*) AS total_clients
+    FROM users
+    WHERE tenant_id = ?
+      AND role = 'CLIENT'
+      AND deleted_at IS NULL`,
+    [req.tenantId]
+  );
+
+  const [documents] = await query(`
+    SELECT
+      COUNT(DISTINCT p.id) AS parcelles_avec_documents,
+      COUNT(DISTINCT CASE WHEN pd.id IS NOT NULL THEN p.id END) AS dossiers_documentes
+    FROM parcelles p
+    LEFT JOIN parcelle_documents pd ON pd.parcelle_id = p.id
+    WHERE p.tenant_id = ?
+      AND p.deleted_at IS NULL
+      AND p.statut <> 'ARCHIVEE'`,
+    [req.tenantId]
+  );
+
+  const totalParcelles = Number(parcelles.total_parcelles || 0);
+  const dossiersDocumentes = Number(documents.dossiers_documentes || 0);
+  const dossiersVerifies = totalParcelles
+    ? Math.round((dossiersDocumentes / totalParcelles) * 100)
+    : 0;
+
+  return R.success(res, {
+    parcelles_suivies: totalParcelles,
+    clients_accompagnes: Number(clients.total_clients || 0),
+    dossiers_verifies: dossiersVerifies,
+    zones_couvertes: Number(parcelles.zones || parcelles.villes || 0),
+  });
+});
 
 router.get("/admin", authenticate, async (req, res) => {
   const [parcelles] = await query(`

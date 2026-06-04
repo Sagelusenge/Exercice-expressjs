@@ -21,6 +21,11 @@ export const dashboardApi = baseApi.injectEndpoints({
       providesTags: ["Dashboard"],
       transformResponse: (response) => response.data
     }),
+    getPublicStats:        b.query({
+      query: () => "/dashboard/public-stats",
+      providesTags: ["Dashboard"],
+      transformResponse: (response) => response.data
+    }),
     getActivitesRecentes:  b.query({ 
       query: (l=20) => ({ url: "/dashboard/activites", params: { limit: l } }), 
       providesTags: ["ActivityLogs"],
@@ -33,4 +38,4 @@ export const dashboardApi = baseApi.injectEndpoints({
     }),
   }),
 });
-export const { useGetDashboardAdminQuery, useGetDashboardParcellesQuery, useGetDashboardUsersQuery, useGetDashboardKbsQuery, useGetActivitesRecentesQuery, useGetRapportFinancierQuery } = dashboardApi;
+export const { useGetDashboardAdminQuery, useGetDashboardParcellesQuery, useGetDashboardUsersQuery, useGetDashboardKbsQuery, useGetPublicStatsQuery, useGetActivitesRecentesQuery, useGetRapportFinancierQuery } = dashboardApi;

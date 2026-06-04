@@ -53,12 +53,13 @@ const CLIENT_NAV = [
     group: "Mon espace",
     items: [
       { label: "Dashboard", to: "/client", icon: LayoutDashboard, end: true },
-      { label: "Parcelles", to: "/", icon: Map },
+      { label: "Parcelles", to: "/parcelles", icon: Map },
       { label: "Mes Réservations", to: "/client/reservations", icon: Calendar },
       { label: "Mes Achats", to: "/client/achats", icon: ShoppingBag },
       { label: "Mes Paiements", to: "/client/paiements", icon: CreditCard },
       { label: "Mes Visites", to: "/client/visites", icon: Calendar },
       { label: "Support Chat", to: "/client/chat", icon: MessageSquare },
+      { label: "Mon Profil", to: "/client/profil", icon: Home },
     ],
   },
 ];

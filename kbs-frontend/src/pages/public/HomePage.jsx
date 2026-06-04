@@ -22,6 +22,7 @@ import {
 import toast from "react-hot-toast";
 import { TYPE_PARCELLE_LABELS } from "../../design-system/tokens";
 import { useGetParcellesPubliquesQuery } from "../../store/api/parcellesApi";
+import { useGetPublicStatsQuery } from "../../store/api/dashboardApi";
 import Pagination from "../../components/ui/Pagination";
 
 const getImageUrl = (url) => {
@@ -155,7 +156,7 @@ const trustItems = [
   },
 ];
 
-const stats = [
+const statsFallback = [
   { label: "Parcelles suivies", value: "120+" },
   { label: "Clients accompagnes", value: "450+" },
   { label: "Dossiers verifies", value: "98%" },
@@ -216,9 +217,18 @@ export default function HomePage() {
     page: currentPage,
     limit: itemsPerPage,
   });
+  const { data: publicStats } = useGetPublicStatsQuery();
 
   const allParcelles = Array.isArray(featuredRes?.data) ? featuredRes.data : [];
   const pagination = featuredRes?.pagination || null;
+  const stats = publicStats
+    ? [
+        { label: "Parcelles suivies", value: `${publicStats.parcelles_suivies || 0}+` },
+        { label: "Clients accompagnes", value: `${publicStats.clients_accompagnes || 0}+` },
+        { label: "Dossiers verifies", value: `${publicStats.dossiers_verifies || 0}%` },
+        { label: "Zones couvertes", value: publicStats.zones_couvertes || 0 },
+      ]
+    : statsFallback;
   
   // Filter only parcelles en vedette
   const parcelles = allParcelles.filter(p => p.est_vedette === 1 || p.est_vedette === true);
@@ -673,7 +683,7 @@ export default function HomePage() {
 
       <a
         href="tel:+243810000000"
-        className="group fixed bottom-8 right-8 z-50 flex items-center gap-2 overflow-hidden rounded-full bg-[#c5a059] p-4 text-[#1a365d] shadow-2xl shadow-[#c5a059]/40 transition-all duration-500 hover:scale-105"
+        className="group fixed bottom-24 right-6 z-40 flex items-center gap-2 overflow-hidden rounded-full bg-[#c5a059] p-4 text-[#1a365d] shadow-2xl shadow-[#c5a059]/40 transition-all duration-500 hover:scale-105 sm:right-6"
         aria-label="Nous appeler"
       >
         <Phone size={22} />

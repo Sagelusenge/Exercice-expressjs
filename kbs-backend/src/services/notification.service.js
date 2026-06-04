@@ -92,6 +92,7 @@ const sendEmailVerification = async (tenantId, user, code) => {
     verifyLink
   );
 
+  let sent = false;
   try {
     logger.info(`📧 Tentative d'envoi du code de verification a ${user.email}...`);
     if (!process.env.SMTP_HOST) {
@@ -99,9 +100,9 @@ const sendEmailVerification = async (tenantId, user, code) => {
       throw new Error("SMTP non configuré");
     }
     
-    const result = await emailService.sendEmail(user.email, "Code de vérification KBS", htmlBody);
+    sent = await emailService.sendEmail(user.email, "Code de vérification KBS", htmlBody);
     
-    if (!result) {
+    if (!sent) {
       logger.error(`❌ L'envoi d'email a échoué pour ${user.email}`);
       throw new Error("Envoi d'email échoué");
     }
@@ -120,7 +121,8 @@ const sendEmailVerification = async (tenantId, user, code) => {
     user.id,
     user.email,
     `Code de vérification KBS : ${code}`,
-    "EMAIL_CODE_VERIFICATION"
+    "EMAIL_CODE_VERIFICATION",
+    sent ? "ENVOYE" : "ECHOUE"
   );
 
   // Also create the notification in DB
@@ -148,6 +150,7 @@ const sendWelcome = async (tenantId, user) => {
     null
   );
 
+  let sent = false;
   try {
     logger.info(`📧 Tentative d'envoi du mail de bienvenue a ${user.email}...`);
     if (!process.env.SMTP_HOST) {
@@ -155,9 +158,9 @@ const sendWelcome = async (tenantId, user) => {
       throw new Error("SMTP non configuré");
     }
     
-    const result = await emailService.sendEmail(user.email, "Bienvenue chez KBS Buildings !", htmlBody);
+    sent = await emailService.sendEmail(user.email, "Bienvenue chez KBS Buildings !", htmlBody);
     
-    if (!result) {
+    if (!sent) {
       logger.error(`❌ L'envoi d'email a échoué pour ${user.email}`);
       throw new Error("Envoi d'email échoué");
     }
@@ -176,7 +179,8 @@ const sendWelcome = async (tenantId, user) => {
     user.id,
     user.email,
     "Bienvenue chez KBS Buildings",
-    "EMAIL_BIENVENUE"
+    "EMAIL_BIENVENUE",
+    sent ? "ENVOYE" : "ECHOUE"
   );
 
   await createNotification(tenantId, user.id, {
@@ -288,10 +292,11 @@ const sendLocataireCreationEmail = async (tenantId, user, verificationCode) => {
     resetLink
   );
 
+  let sent = false;
   try {
     const users = await query("SELECT email FROM users WHERE id = ?", [user.id]);
     if (users.length && process.env.SMTP_HOST) {
-      await emailService.sendEmail(users[0].email, "Bienvenue chez KBS Buildings - Activer votre compte", htmlBody);
+      sent = await emailService.sendEmail(users[0].email, "Bienvenue chez KBS Buildings - Activer votre compte", htmlBody);
       logger.info(`Email de création de compte locataire envoyé à ${users[0].email}`);
     }
   } catch (err) {
@@ -299,7 +304,7 @@ const sendLocataireCreationEmail = async (tenantId, user, verificationCode) => {
   }
 
   // Also log the email
-  await logEmail(tenantId, user.id, user.email, "Bienvenue chez KBS Buildings - Activer votre compte", "LOCATAIRE_CREATION", "ENVOYE");
+  await logEmail(tenantId, user.id, user.email, "Bienvenue chez KBS Buildings - Activer votre compte", "LOCATAIRE_CREATION", sent ? "ENVOYE" : "ECHOUE");
 };
 
 const sendPasswordResetEmail = async (tenantId, user, code) => {
@@ -323,6 +328,7 @@ const sendPasswordResetEmail = async (tenantId, user, code) => {
     resetLink
   );
 
+  let sent = false;
   try {
     logger.info(`📧 Tentative d'envoi du code de reinitialisation a ${user.email}...`);
     if (!process.env.SMTP_HOST) {
@@ -330,9 +336,9 @@ const sendPasswordResetEmail = async (tenantId, user, code) => {
       throw new Error("SMTP non configuré");
     }
     
-    const result = await emailService.sendEmail(user.email, "Réinitialisation de mot de passe KBS", htmlBody);
+    sent = await emailService.sendEmail(user.email, "Réinitialisation de mot de passe KBS", htmlBody);
     
-    if (!result) {
+    if (!sent) {
       logger.error(`❌ L'envoi d'email a échoué pour ${user.email}`);
       throw new Error("Envoi d'email échoué");
     }
@@ -346,7 +352,7 @@ const sendPasswordResetEmail = async (tenantId, user, code) => {
     });
   }
 
-  await logEmail(tenantId, user.id, user.email, "Réinitialisation de mot de passe KBS", "PASSWORD_RESET", "SENT");
+  await logEmail(tenantId, user.id, user.email, "Réinitialisation de mot de passe KBS", "PASSWORD_RESET", sent ? "ENVOYE" : "ECHOUE");
 };
 
 module.exports = {
