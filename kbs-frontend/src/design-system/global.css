@@ -297,6 +297,19 @@ input::-webkit-credentials-auto-fill-button {
     animation: heroRise 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
+  .animate-soft-pop {
+    animation: softPop 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .interactive-lift {
+    transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+  }
+
+  .interactive-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 36px rgba(19, 27, 46, 0.12);
+  }
+
   .floating-card {
     animation: floatPanel 6s ease-in-out infinite;
   }
@@ -352,6 +365,17 @@ input::-webkit-credentials-auto-fill-button {
     }
     50% {
       transform: translate3d(0, -16px, 0);
+    }
+  }
+
+  @keyframes softPop {
+    from {
+      opacity: 0;
+      transform: translateY(10px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
     }
   }
 

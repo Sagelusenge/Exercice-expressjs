@@ -90,8 +90,8 @@ const ChatAdminPage = () => {
   }
 
   return (
-    <div className="flex h-full min-h-[calc(100vh-96px)] overflow-hidden bg-surface-lowest">
-      <div className="w-80 border-r border-outline-variant flex flex-col bg-surface">
+    <div className="flex h-full min-h-[calc(100vh-96px)] flex-col overflow-hidden bg-surface-lowest md:flex-row">
+      <div className="h-64 w-full border-b border-outline-variant flex flex-col bg-surface md:h-auto md:w-80 md:border-b-0 md:border-r">
         <div className="p-4 border-b border-outline-variant bg-surface-low">
           <h2 className="font-bold text-on-surface">Clients</h2>
           <p className="text-xs text-on-surface-variant">Choisissez un client pour discuter</p>
@@ -180,7 +180,7 @@ const ChatAdminPage = () => {
                   return (
                     <div key={msg.id} className={`flex ${isAdmin ? 'justify-end' : 'justify-start'}`}>
                       <div
-                        className={`max-w-[70%] px-4 py-2 rounded-lg text-sm ${
+                        className={`max-w-[86%] sm:max-w-[70%] px-4 py-2 rounded-lg text-sm ${
                           isAdmin
                             ? 'bg-primary text-on-primary rounded-br-none'
                             : 'bg-surface border border-outline-variant text-on-surface rounded-bl-none'
@@ -218,11 +218,11 @@ const ChatAdminPage = () => {
                     </div>
                   </div>
                 )}
-                <form onSubmit={handleSend} className="p-4 flex gap-3 items-end">
+                <form onSubmit={handleSend} className="p-3 sm:p-4 flex gap-2 sm:gap-3 items-end">
                   <button
                     type="button"
                     onClick={() => setShowPredefined((value) => !value)}
-                    className="p-2 text-on-surface-variant hover:bg-surface-low rounded-full transition"
+                    className="shrink-0 p-2 text-on-surface-variant hover:bg-surface-low rounded-full transition"
                   >
                     <Smile size={24} />
                   </button>
@@ -231,11 +231,11 @@ const ChatAdminPage = () => {
                     placeholder="Tapez un message..."
                     value={messageText}
                     onChange={(e) => setMessageText(e.target.value)}
-                    className="flex-1 px-4 py-3 border border-outline-variant rounded-full focus:outline-none focus:ring-2 focus:ring-primary bg-surface text-on-surface"
+                    className="min-w-0 flex-1 px-4 py-3 border border-outline-variant rounded-full focus:outline-none focus:ring-2 focus:ring-primary bg-surface text-on-surface"
                   />
                   <button
                     type="submit"
-                    className="p-3 bg-primary text-on-primary rounded-full hover:opacity-90 transition disabled:opacity-50"
+                    className="shrink-0 p-3 bg-primary text-on-primary rounded-full hover:opacity-90 transition disabled:opacity-50"
                     disabled={!messageText.trim()}
                   >
                     <Send size={20} />

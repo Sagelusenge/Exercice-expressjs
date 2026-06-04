@@ -39,9 +39,7 @@ const LocataireCreatePage = () => {
         ...formData,
         montant_mensuel_loyer: parseFloat(formData.montant_mensuel_loyer) || 0
       };
-      console.log('Creating locataire with data:', dataToSend);
       const result = await createLocataire(dataToSend).unwrap();
-      console.log('Locataire created successfully:', result);
       toast.success('Locataire créé avec succès');
       navigate('/admin/kbs/locataires');
     } catch (error) {
@@ -322,8 +320,8 @@ const LocataireCreatePage = () => {
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-outline-variant rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               >
-                <option value="USD">USD</option>
-                <option value="CDF">CDF</option>
+                <option value="USD">$</option>
+                <option value="CDF">Fc</option>
               </select>
             </div>
           </div>

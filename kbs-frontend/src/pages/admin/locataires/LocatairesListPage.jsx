@@ -62,9 +62,6 @@ const LocatairesListPage = () => {
     }
   };
 
-  // Debug
-  console.log('LocatairesListPage state:', { data, isLoading, error });
-
   const locataires = data || [];
 
   return (
@@ -203,7 +200,7 @@ const LocatairesListPage = () => {
 
       {/* Modal Modification */}
       {isModalOpen && selectedLocataire && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/45 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-surface rounded-xl shadow-lg max-w-lg w-full mx-4">
             <div className="p-6 border-b border-outline-variant">
               <h2 className="text-xl font-bold text-on-surface">Modifier le locataire</h2>

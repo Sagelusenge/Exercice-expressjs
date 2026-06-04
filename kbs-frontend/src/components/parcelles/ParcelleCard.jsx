@@ -3,6 +3,7 @@ import { MapPin, Maximize2, Home, Heart, Eye } from "lucide-react";
 import clsx from "clsx";
 import Badge from "../ui/Badge";
 import { TYPE_PARCELLE_LABELS } from "../../design-system/tokens";
+import { formatCurrency } from "../../utils/formatters";
 
 // Helper to get complete image URL
 const getImageUrl = (url) => {
@@ -76,7 +77,7 @@ const ParcelleCard = ({
 
           {showPrice && prix_vente && (
             <p className="font-montserrat font-bold text-body-lg text-on-surface mt-1">
-              {new Intl.NumberFormat("fr-CD").format(prix_vente)} {devise}
+              {formatCurrency(prix_vente, devise)}
             </p>
           )}
         </div>
@@ -183,11 +184,11 @@ const ParcelleCard = ({
         {showPrice && prix_vente && (
           <div className="mb-3 p-2 bg-surface-low rounded-lg">
             <p className="font-montserrat font-bold text-body-md text-on-surface">
-              {new Intl.NumberFormat("fr-CD").format(prix_vente)} {devise}
+              {formatCurrency(prix_vente, devise)}
             </p>
             {montant_restant > 0 && (
               <p className="text-label-sm text-on-surface-variant">
-                Reste: {new Intl.NumberFormat("fr-CD").format(montant_restant)} {devise}
+                Reste: {formatCurrency(montant_restant, devise)}
               </p>
             )}
           </div>

@@ -39,21 +39,21 @@ export default function ClientDashboardPage() {
   return (
     <div className="space-y-8 animate-fade-in">
       {/* ── Bienvenue ────────────────────────────────────── */}
-      <div className="flex items-center gap-4 kbs-card p-6 bg-primary-container text-on-primary-container">
+      <div className="flex flex-col items-start gap-4 kbs-card p-5 bg-primary-container text-white sm:flex-row sm:items-center sm:p-6">
         <Avatar nom={user?.nom} prenom={user?.prenom} photo_url={user?.photo_url} size="xl" />
         <div>
-          <p className="text-label-md text-on-primary-container/60 mb-1">Bienvenue de retour</p>
+          <p className="text-label-md text-white/75 mb-1">Bienvenue de retour</p>
           <h2 className="font-montserrat font-bold text-headline-md">
             {user?.nom} {user?.prenom}
           </h2>
-          <p className="text-label-sm text-on-primary-container/60 mt-1 font-mono">
+          <p className="text-label-sm text-white/75 mt-1 font-mono">
             {user?.code_user}
           </p>
         </div>
       </div>
 
       {/* ── Statistiques rapides ──────────────────────────── */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <QuickCard icon={Calendar}    title="Réservations"     count={activeReservations.length}  to="/client/reservations" color="bg-amber-500" />
         <QuickCard icon={ShoppingBag} title="Mes Achats"       count={achats.length}              to="/client/achats"       color="bg-secondary" />
         <QuickCard icon={CreditCard}  title="Paiements"        count={paiements.length}            to="/client/paiements"    color="bg-emerald-500" />

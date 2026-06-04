@@ -101,9 +101,9 @@ const Sidebar = ({ collapsed = false, onCollapse }) => {
   return (
     <aside
       className={clsx(
-        "flex flex-col h-full bg-primary-container text-on-primary-container",
+        "sticky left-0 top-0 flex flex-col h-screen bg-primary-container text-on-primary-container",
         "transition-all duration-300 ease-in-out",
-        collapsed ? "w-16" : "w-56"
+        collapsed ? "w-14 sm:w-16" : "w-56"
       )}
     >
       {/* Logo */}
@@ -161,7 +161,7 @@ const Sidebar = ({ collapsed = false, onCollapse }) => {
       </nav>
 
       {/* Bottom section */}
-      <div className="border-t border-white/10 p-3 space-y-1">
+      <div className="border-t border-white/10 p-2 sm:p-3 space-y-1 flex-shrink-0">
         {/* Generate Report (admin uniquement) */}
         {["SUPER_ADMIN", "BOSS", "GERANT"].includes(user?.role) && !collapsed && (
           <button 

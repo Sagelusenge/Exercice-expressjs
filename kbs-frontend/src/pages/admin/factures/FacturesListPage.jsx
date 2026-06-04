@@ -319,7 +319,7 @@ const FacturesListPage = () => {
       </div>
 
       {isCreateModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/45 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-surface rounded-xl shadow-lg max-w-md w-full max-h-[90vh] overflow-hidden flex flex-col">
             <div className="flex justify-between items-center p-5 border-b border-outline-variant flex-shrink-0">
               <h2 className="text-lg font-bold text-on-surface">Ajouter Facture</h2>
@@ -386,8 +386,8 @@ const FacturesListPage = () => {
                   onChange={(e) => setCreateForm({ ...createForm, devise: e.target.value })}
                   className="w-full px-3 py-2 border border-outline-variant rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 >
-                  <option value="USD">USD</option>
-                  <option value="CDF">CDF</option>
+                  <option value="USD">$</option>
+                  <option value="CDF">Fc</option>
                 </select>
               </div>
               <div>

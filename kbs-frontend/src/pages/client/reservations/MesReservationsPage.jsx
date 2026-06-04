@@ -6,7 +6,10 @@ import { fr } from 'date-fns/locale';
 import toast from 'react-hot-toast';
 
 const MesReservationsPage = () => {
-  const { data: reservations, isLoading, error } = useGetReservationsMesReservationsQuery();
+  const { data: reservations, isLoading, error } = useGetReservationsMesReservationsQuery(undefined, {
+    pollingInterval: 5000,
+    refetchOnMountOrArgChange: true,
+  });
   const [annulerReservation, { isLoading: isAnnuling }] = useAnnulerReservationMutation();
 
   const handleAnnuler = async (id) => {
@@ -19,9 +22,6 @@ const MesReservationsPage = () => {
       }
     }
   };
-
-  // Debug
-  console.log('MesReservationsPage state:', { reservations, isLoading, error });
 
   if (isLoading) {
     return <div className="p-6">Chargement...</div>;
@@ -44,7 +44,35 @@ const MesReservationsPage = () => {
             <p className="font-inter text-body-md">Vous n'avez aucune réservation en cours.</p>
           </div>
         ) : (
-          <table className="w-full">
+          <>
+          <div className="grid gap-3 p-3 md:hidden">
+            {reservations.map((row) => (
+              <div key={row.id} className="rounded-lg border border-outline-variant bg-surface p-4">
+                <div className="mb-3 flex items-start justify-between gap-3">
+                  <div>
+                    <p className="font-bold text-primary">{row.ref_parcelle}</p>
+                    <p className="mt-1 flex items-center gap-1 text-sm text-on-surface-variant">
+                      <MapPin size={12} /> {row.ville}, {row.commune}
+                    </p>
+                  </div>
+                  <span className="rounded-full bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-700">{row.statut}</span>
+                </div>
+                <p className="text-sm text-on-surface-variant">
+                  Reservee le {format(new Date(row.created_at), 'dd MMM yyyy', { locale: fr })}
+                </p>
+                {['EN_ATTENTE', 'EN_COURS'].includes(row.statut) && (
+                  <button
+                    onClick={() => handleAnnuler(row.id)}
+                    disabled={isAnnuling}
+                    className="mt-4 w-full rounded-lg border border-error/30 px-4 py-2 text-error disabled:opacity-50"
+                  >
+                    Annuler
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+          <table className="hidden w-full md:table">
             <thead>
               <tr className="border-b border-outline-variant">
                 <th className="px-4 py-3 text-left text-label-sm font-semibold text-on-surface-variant uppercase">Parcelle</th>
@@ -110,6 +138,7 @@ const MesReservationsPage = () => {
               ))}
             </tbody>
           </table>
+          </>
         )}
       </div>
     </div>

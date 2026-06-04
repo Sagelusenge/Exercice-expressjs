@@ -14,6 +14,8 @@ export const baseApi = createApi({
       return headers;
     },
   }),
+  refetchOnFocus: true,
+  refetchOnReconnect: true,
   tagTypes: [
     "Parcelles", "Reservations", "Ventes", "Paiements",
     "Visites", "Favoris", "Users", "Locataires", "Factures",

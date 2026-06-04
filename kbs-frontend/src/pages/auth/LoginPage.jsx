@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, LogIn, AlertCircle, ArrowLeft } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { useLoginMutation } from "../../store/api/authApi";
 import { setCredentials } from "../../store/slices/authSlice";
 import toast from "react-hot-toast";
+import KbsLoader from "../../components/ui/KbsLoader";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -14,6 +15,12 @@ export default function LoginPage() {
   const [form, setForm] = useState({ email: "", mot_de_passe: "" });
   const [showPass, setShowPass] = useState(false);
   const [error, setError] = useState("");
+  const [showSplash, setShowSplash] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowSplash(false), 1800);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,16 +40,22 @@ export default function LoginPage() {
     }
   };
 
+  if (showSplash) {
+    return (
+      <div className="grid min-h-screen place-items-center bg-primary-container">
+        <KbsLoader label="Ouverture de KBS Building..." />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-surface flex">
       {/* Panneau gauche — branding */}
       <div className="hidden lg:flex flex-col justify-between w-1/2 bg-primary-container p-12">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-secondary rounded-lg flex items-center justify-center">
-            <span className="font-montserrat font-bold text-on-secondary text-lg">K</span>
-          </div>
+          <img src="/kbs-logo.png" alt="KBS Building" className="h-12 w-12 rounded-full bg-black object-contain p-0.5" />
           <span className="font-montserrat font-bold text-xl text-on-primary-container">
-            KBS Real Estate
+            KBS Building
           </span>
         </div>
 
@@ -74,10 +87,8 @@ export default function LoginPage() {
         <div className="w-full max-w-md">
           {/* Logo mobile */}
           <div className="flex items-center gap-2 mb-8 lg:hidden">
-            <div className="w-8 h-8 bg-primary rounded flex items-center justify-center">
-              <span className="font-montserrat font-bold text-on-primary text-sm">K</span>
-            </div>
-            <span className="font-montserrat font-bold text-lg text-on-surface">KBS Real Estate</span>
+            <img src="/kbs-logo.png" alt="KBS Building" className="h-10 w-10 rounded-full bg-black object-contain p-0.5" />
+            <span className="font-montserrat font-bold text-lg text-on-surface">KBS Building</span>
           </div>
 
           <h1 className="font-montserrat font-bold text-headline-md text-on-surface mb-2">

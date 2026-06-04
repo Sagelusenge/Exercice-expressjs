@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import TopBar from "./TopBar";
@@ -24,6 +24,13 @@ const PAGE_TITLES = {
 const AdminLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
+
+  useEffect(() => {
+    const syncMobile = () => setCollapsed(window.innerWidth < 768);
+    syncMobile();
+    window.addEventListener("resize", syncMobile);
+    return () => window.removeEventListener("resize", syncMobile);
+  }, []);
 
   const title =
     Object.entries(PAGE_TITLES)
@@ -52,7 +59,7 @@ const AdminLayout = () => {
           {location.pathname === "/admin/chat" ? (
             <Outlet />
           ) : (
-            <div className="p-6 lg:p-8 max-w-[1400px] mx-auto">
+            <div className="p-4 sm:p-6 lg:p-8 max-w-[1400px] mx-auto">
               <Outlet />
             </div>
           )}

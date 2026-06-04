@@ -33,7 +33,7 @@ const TopBar = ({ title, collapsed, onToggleSidebar }) => {
   }, [isDark]);
 
   return (
-    <header className="h-16 bg-surface-lowest border-b border-outline-variant flex items-center px-6 gap-4 flex-shrink-0">
+    <header className="h-16 bg-surface-lowest border-b border-outline-variant flex items-center px-3 sm:px-6 gap-2 sm:gap-4 flex-shrink-0">
       {/* Toggle sidebar */}
       <button
         onClick={onToggleSidebar}
@@ -46,12 +46,12 @@ const TopBar = ({ title, collapsed, onToggleSidebar }) => {
       </button>
 
       {/* Titre page */}
-      <h1 className="font-montserrat font-bold text-title-lg text-on-surface flex-1">
+      <h1 className="font-montserrat font-bold text-title-lg text-on-surface flex-1 truncate">
         {title}
       </h1>
 
       {/* Actions droite */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1 sm:gap-2">
         {/* Theme Toggle */}
         <button
           onClick={() => setIsDark(!isDark)}

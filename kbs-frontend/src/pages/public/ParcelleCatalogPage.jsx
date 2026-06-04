@@ -28,11 +28,9 @@ const getImageUrl = (url) => {
 
 const TYPE_OPTIONS = [
   { value: "", label: "Tous types" },
-  { value: "RESIDENTIELLE", label: "Résidentielle" },
+  { value: "RESIDENTIELLE", label: "Residentielle" },
   { value: "COMMERCIALE", label: "Commerciale" },
-  { value: "AGRICOLE", label: "Agricole" },
   { value: "INDUSTRIELLE", label: "Industrielle" },
-  { value: "A_AMORCELLER", label: "À amorceller" },
 ];
 
 // ── Carte parcelle catalogue ──────────────────────────────
@@ -291,11 +289,11 @@ export default function ParcelleCatalogPage() {
   const [applied, setApplied] = useState(filters);
 
   // API — v_parcelles_publiques SANS prix
-  const { data, isLoading, isFetching } = useGetParcellesPubliquesQuery({
+  const { data, isLoading, isFetching, refetch } = useGetParcellesPubliquesQuery({
     page,
     limit: LIMIT,
     ...applied,
-  });
+  }, { refetchOnMountOrArgChange: true });
 
   // Favoris (si connecté CLIENT)
   const { data: favorisData } = useGetFavorisQuery(undefined, {
@@ -360,6 +358,7 @@ export default function ParcelleCatalogPage() {
       toast.success("Réservation effectuée avec succès !");
       setIsReserveModalOpen(false);
       setSelectedParcelle(null);
+      refetch();
     } catch (err) {
       toast.error(err?.data?.message || "Erreur lors de la réservation");
     }
@@ -392,6 +391,7 @@ export default function ParcelleCatalogPage() {
       toast.success("Demande de visite envoyée avec succès !");
       setIsVisitModalOpen(false);
       setSelectedParcelle(null);
+      refetch();
     } catch (err) {
       toast.error(err?.data?.message || "Erreur lors de la demande de visite");
     }
@@ -649,7 +649,7 @@ export default function ParcelleCatalogPage() {
 
       {/* Reservation Modal */}
       {isReserveModalOpen && selectedParcelle && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/45 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-surface rounded-xl shadow-lg max-w-md w-full max-h-[90vh] overflow-hidden flex flex-col">
             <div className="flex items-center justify-between px-4 py-3 border-b border-outline-variant">
               <h2 className="text-lg font-bold text-on-surface">
@@ -712,7 +712,7 @@ export default function ParcelleCatalogPage() {
 
       {/* Visit Request Modal */}
       {isVisitModalOpen && selectedParcelle && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/45 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-surface rounded-xl shadow-lg max-w-md w-full max-h-[90vh] overflow-hidden flex flex-col">
             <div className="flex items-center justify-between px-4 py-3 border-b border-outline-variant">
               <h2 className="text-lg font-bold text-on-surface">

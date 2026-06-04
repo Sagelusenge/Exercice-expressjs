@@ -10,7 +10,10 @@ import toast from 'react-hot-toast';
 
 const ReservationsListPage = () => {
   const [filters, setFilters] = useState({ statut: '', page: 1, limit: 10 });
-  const { data, isLoading, error } = useGetReservationsQuery(filters);
+  const { data, isLoading, error } = useGetReservationsQuery(filters, {
+    pollingInterval: 5000,
+    refetchOnMountOrArgChange: true,
+  });
   const [updateStatut] = useUpdateReservationStatutMutation();
   const [selectedReservation, setSelectedReservation] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -73,7 +76,31 @@ const ReservationsListPage = () => {
             <p className="font-inter text-body-md">Aucune réservation trouvée.</p>
           </div>
         ) : (
-          <table className="w-full">
+          <>
+          <div className="grid gap-3 p-3 md:hidden">
+            {reservations.map((row) => (
+              <div key={row.id} className="rounded-lg border border-outline-variant bg-surface p-4">
+                <div className="mb-3 flex items-start justify-between gap-3">
+                  <div>
+                    <p className="font-semibold text-on-surface">{row.nom_client}</p>
+                    <p className="text-xs text-on-surface-variant">{row.email}</p>
+                  </div>
+                  <span className="rounded-full bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-700">{row.statut}</span>
+                </div>
+                <p className="font-bold text-primary">{row.ref_parcelle}</p>
+                <p className="mt-1 flex items-center gap-1 text-sm text-on-surface-variant">
+                  <MapPin size={12} /> {row.ville}, {row.commune}
+                </p>
+                <button
+                  onClick={() => openModal(row)}
+                  className="mt-4 w-full rounded-lg bg-primary px-4 py-2 text-label-md font-semibold text-on-primary"
+                >
+                  Gerer
+                </button>
+              </div>
+            ))}
+          </div>
+          <table className="hidden w-full md:table">
             <thead>
               <tr className="border-b border-outline-variant">
                 <th className="px-4 py-3 text-left text-label-sm font-semibold text-on-surface-variant uppercase">Client</th>
@@ -146,12 +173,13 @@ const ReservationsListPage = () => {
               ))}
             </tbody>
           </table>
+          </>
         )}
       </div>
 
       {/* Modal Gestion Statut */}
       {isModalOpen && selectedReservation && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/45 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-surface rounded-xl shadow-lg max-w-md w-full max-h-[90vh] overflow-hidden flex flex-col">
             <div className="p-5 border-b border-outline-variant flex-shrink-0">
               <h2 className="text-lg font-bold text-on-surface">Gérer la réservation</h2>

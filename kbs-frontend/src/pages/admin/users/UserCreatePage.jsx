@@ -24,9 +24,7 @@ export default function UserCreatePage() {
     e.preventDefault();
     
     try {
-      console.log('Creating user with data:', formData);
       const result = await createUser(formData).unwrap();
-      console.log('User created successfully:', result);
       toast.success("Utilisateur créé avec succès");
       navigate("/admin/users");
     } catch (error) {

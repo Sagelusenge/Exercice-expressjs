@@ -180,7 +180,6 @@ const VALID_STATUTS = ['DISPONIBLE', 'RESERVEE', 'VENDUE', 'MAINTENANCE', 'MASQU
 router.post("/", upload.single("photo"), authenticate, requireRole("SUPER_ADMIN", "BOSS", "GERANT"), enforceTenant, logActivity("PARCELLES", "PARCELLE_CREEE"), async (req, res) => {
   try {
     const data = req.body;
-    console.log('Creating parcelle with data:', data, 'File:', req.file);
     
     // Valider type_parcelle
     let typeParcelle = data.type_parcelle;

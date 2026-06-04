@@ -64,7 +64,7 @@ const ChatClientPage = () => {
   const handleQuickReply = (text) => setMessageText(text);
 
   return (
-    <div className="flex h-[calc(100vh-120px)] bg-surface-lowest rounded-lg border border-outline-variant overflow-hidden">
+    <div className="flex h-[calc(100vh-120px)] min-h-[560px] bg-surface-lowest rounded-lg border border-outline-variant overflow-hidden">
       <div className="flex-1 flex flex-col">
         <div className="p-4 border-b border-outline-variant bg-surface flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
@@ -89,7 +89,7 @@ const ChatClientPage = () => {
               return (
                 <div key={msg.id} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
                   <div
-                    className={`max-w-[70%] p-3 rounded-2xl text-sm shadow-sm ${
+                    className={`max-w-[86%] sm:max-w-[70%] p-3 rounded-2xl text-sm shadow-sm ${
                       isMine
                         ? 'bg-primary text-on-primary rounded-tr-none'
                         : 'bg-surface text-on-surface rounded-tl-none border border-outline-variant'
@@ -120,18 +120,18 @@ const ChatClientPage = () => {
               </button>
             ))}
           </div>
-          <form onSubmit={handleSend} className="p-4 flex gap-2">
+          <form onSubmit={handleSend} className="p-3 sm:p-4 flex gap-2">
             <input
               type="text"
               placeholder="Votre message..."
               value={messageText}
               onChange={(e) => setMessageText(e.target.value)}
-              className="flex-1 px-4 py-2 border border-outline-variant rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-surface text-on-surface"
+              className="min-w-0 flex-1 px-4 py-2 border border-outline-variant rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-surface text-on-surface"
               disabled={!selectedConv}
             />
             <button
               type="submit"
-              className="p-2 bg-primary text-on-primary rounded-lg hover:opacity-90 transition disabled:opacity-50"
+              className="shrink-0 p-3 bg-primary text-on-primary rounded-lg hover:opacity-90 transition disabled:opacity-50"
               disabled={!messageText.trim() || !selectedConv}
             >
               <Send size={18} />

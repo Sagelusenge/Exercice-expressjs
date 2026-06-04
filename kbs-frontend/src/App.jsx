@@ -5,7 +5,8 @@ import AppRoutes from "./routes";
 import { Toaster } from "react-hot-toast";
 import { useGetMeQuery } from "./store/api/authApi";
 import { logout } from "./store/slices/authSlice";
-import Spinner from "./components/ui/Spinner";
+import KbsLoader from "./components/ui/KbsLoader";
+import GlobalActivityOverlay from "./components/ui/GlobalActivityOverlay";
 
 /**
  * Composant interne pour gérer l'initialisation de l'auth au démarrage
@@ -43,12 +44,7 @@ function AuthInitializer({ children }) {
   if (!isReady) {
     return (
       <div className="h-screen w-full flex items-center justify-center bg-surface">
-        <div className="flex flex-col items-center gap-4">
-          <Spinner size="lg" />
-          <p className="text-on-surface-variant animate-pulse font-medium">
-            Chargement de votre espace...
-          </p>
-        </div>
+        <KbsLoader label="Chargement de votre espace..." />
       </div>
     );
   }
@@ -61,6 +57,7 @@ export default function App() {
     <Provider store={store}>
       <AuthInitializer>
         <AppRoutes />
+        <GlobalActivityOverlay />
         {/* Toaster global unique pour toute l'application */}
         <Toaster 
           position="top-right"

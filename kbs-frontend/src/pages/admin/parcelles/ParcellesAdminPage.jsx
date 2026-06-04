@@ -28,6 +28,7 @@ const ParcellesAdminPage = () => {
   });
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [detailParcelle, setDetailParcelle] = useState(null);
   const [editingParcelle, setEditingParcelle] = useState(null);
   const [editForm, setEditForm] = useState({
     titre: '',
@@ -52,7 +53,6 @@ const ParcellesAdminPage = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer cette parcelle ?')) {
       try {
-        console.log('Deleting parcelle:', id);
         await deleteParcelle(id).unwrap();
         toast.success('Parcelle supprimée avec succès');
       } catch (err) {
@@ -118,9 +118,6 @@ const ParcellesAdminPage = () => {
       setPhotoPreview(URL.createObjectURL(file));
     }
   };
-
-  // Debug: afficher l'état
-  console.log('ParcellesAdminPage state:', { data, isLoading, isFetching, error });
 
   if (isLoading) {
     return <div className="p-6">Chargement...</div>;
@@ -232,7 +229,7 @@ const ParcellesAdminPage = () => {
                   </td>
                   <td className="px-4 py-3">
                     <span className="font-semibold text-secondary">
-                      {parcelle.prix_vente ? formatCurrency(parcelle.prix_vente) : '—'}
+                      {parcelle.prix_vente ? formatCurrency(parcelle.prix_vente, parcelle.devise) : '—'}
                     </span>
                   </td>
                   <td className="px-4 py-3">
@@ -248,7 +245,11 @@ const ParcellesAdminPage = () => {
                   </td>
                   <td className="px-4 py-3 text-right">
                     <div className="flex justify-end gap-1">
-                      <button className="p-2 text-on-surface-variant hover:bg-surface-low rounded" title="Voir">
+                      <button
+                        onClick={() => setDetailParcelle(parcelle)}
+                        className="p-2 text-on-surface-variant hover:bg-surface-low rounded"
+                        title="Voir"
+                      >
                         <Eye size={16} />
                       </button>
                       <button 
@@ -274,9 +275,47 @@ const ParcellesAdminPage = () => {
         )}
       </div>
 
+      {detailParcelle && (
+        <div className="fixed inset-0 bg-black/45 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-surface rounded-xl shadow-lg max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+            <div className="flex items-center justify-between p-5 border-b border-outline-variant">
+              <div>
+                <h2 className="text-lg font-bold text-on-surface">{detailParcelle.titre || detailParcelle.nom}</h2>
+                <p className="text-label-sm text-on-surface-variant">{detailParcelle.reference || detailParcelle.code_parcelle}</p>
+              </div>
+              <button onClick={() => setDetailParcelle(null)} className="p-1 text-on-surface-variant hover:text-on-surface">
+                <X size={18} />
+              </button>
+            </div>
+            <div className="grid gap-4 p-5 text-label-md sm:grid-cols-2">
+              <div>
+                <p className="text-on-surface-variant">Localisation</p>
+                <p className="font-semibold text-on-surface">{detailParcelle.localisation || `${detailParcelle.ville || ''}, ${detailParcelle.commune || ''}`}</p>
+              </div>
+              <div>
+                <p className="text-on-surface-variant">Superficie</p>
+                <p className="font-semibold text-on-surface">{detailParcelle.superficie || 0} m2</p>
+              </div>
+              <div>
+                <p className="text-on-surface-variant">Type</p>
+                <p className="font-semibold text-on-surface">{TYPE_PARCELLE_LABELS[detailParcelle.type_parcelle] || detailParcelle.type_parcelle}</p>
+              </div>
+              <div>
+                <p className="text-on-surface-variant">Prix</p>
+                <p className="font-semibold text-secondary">{detailParcelle.prix_vente_confidentiel ? formatCurrency(detailParcelle.prix_vente_confidentiel, detailParcelle.devise) : 'Non renseigne'}</p>
+              </div>
+              <div className="sm:col-span-2">
+                <p className="text-on-surface-variant">Description</p>
+                <p className="mt-1 text-on-surface">{detailParcelle.description || 'Aucune description.'}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Modal d'édition */}
       {isEditModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/45 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-surface rounded-xl shadow-lg max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
             <div className="flex justify-between items-center p-5 border-b border-outline-variant flex-shrink-0">
               <h2 className="text-lg font-bold text-on-surface">Modifier la Parcelle</h2>
@@ -486,7 +525,7 @@ const ParcellesAdminPage = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-label-sm font-medium text-on-surface mb-2">
-                      Prix de vente (USD) *
+                      Prix de vente ($ / Fc) *
                     </label>
                     <input
                       type="number"

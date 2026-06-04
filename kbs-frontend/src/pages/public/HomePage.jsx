@@ -16,7 +16,6 @@ import {
   Phone,
   Search,
   Shield,
-  Sparkles,
   Users,
 } from "lucide-react";
 import toast from "react-hot-toast";
@@ -282,16 +281,11 @@ export default function HomePage() {
 
         <div className="kbs-container relative z-10 grid min-h-[calc(92vh-6rem)] items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
           <div className="max-w-3xl">
-            <div className="animate-hero-rise inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-label-sm font-semibold uppercase tracking-[0.16em] text-white/85 backdrop-blur">
-              <Sparkles size={14} className="text-[#c5a059]" />
-              KBS Real Estate - Goma, RDC
-            </div>
-
             <h1
               style={{ animationDelay: "0.12s" }}
-              className="animate-hero-rise mt-6 max-w-4xl font-montserrat text-[42px] font-bold leading-[1.04] text-white md:text-[64px] lg:text-[76px]"
+              className="animate-hero-rise mt-6 max-w-3xl font-montserrat text-[36px] font-bold leading-[1.08] text-white md:text-[56px] lg:text-[68px]"
             >
-              Des parcelles verifiees, une experience plus fluide.
+              Des parcelles verifiees,<br className="hidden sm:block" /> une experience<br className="hidden sm:block" /> plus fluide.
             </h1>
 
             <p
@@ -420,6 +414,7 @@ export default function HomePage() {
         </div>
       </section>
 
+      {false && (
       <section className="bg-[#f4f7f9] py-20">
         <div className="kbs-container">
           <Reveal className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
@@ -466,6 +461,7 @@ export default function HomePage() {
           )}
         </div>
       </section>
+      )}
 
       <section className="relative overflow-hidden bg-[#1a365d] py-20 text-white">
         <div className="absolute -right-48 -top-48 h-96 w-96 rounded-full bg-[#c5a059]/10 blur-3xl" />

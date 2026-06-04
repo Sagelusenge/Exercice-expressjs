@@ -104,9 +104,6 @@ const VentesListPage = () => {
     printWindow.document.close();
   };
 
-  // Debug
-  console.log('VentesListPage state:', { data, isLoading, isFetching, error });
-
   if (isLoading) {
     return <div className="p-6">Chargement...</div>;
   }
@@ -215,7 +212,7 @@ const VentesListPage = () => {
 
       {/* Modal Edition */}
       {isEditModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/45 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-surface rounded-xl shadow-lg max-w-lg w-full mx-4">
             <div className="flex justify-between items-center p-6 border-b border-outline-variant">
               <h2 className="text-xl font-bold text-on-surface">Modifier la Vente</h2>

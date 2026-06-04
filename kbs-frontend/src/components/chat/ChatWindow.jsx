@@ -50,7 +50,7 @@ const ChatWindow = ({ isOpen, onClose, initialMessages = [] }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed bottom-6 right-3 sm:right-6 w-[320px] sm:w-96 h-[550px] bg-white rounded-xl shadow-2xl flex flex-col z-50 overflow-hidden">
+    <div className="fixed inset-x-3 bottom-3 top-20 sm:inset-auto sm:bottom-6 sm:right-6 sm:h-[550px] sm:w-96 bg-white rounded-xl shadow-2xl flex flex-col z-50 overflow-hidden">
       {/* Header */}
       <div className="bg-[#008069] text-white p-4 flex justify-between items-center">
         <div className="flex items-center gap-3">
@@ -102,12 +102,12 @@ const ChatWindow = ({ isOpen, onClose, initialMessages = [] }) => {
       </div>
 
       {/* Input area */}
-      <div className="bg-white border-t border-gray-100">
+      <div className="bg-white border-t border-gray-100 flex-shrink-0">
         {/* Predefined messages */}
         {showPredefined && (
           <div className="p-3 border-b border-gray-100 bg-gray-50">
             <p className="text-xs text-gray-500 mb-2">Messages rapides :</p>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex max-h-28 flex-wrap gap-2 overflow-y-auto">
               {CLIENT_PREDEFINED.map((text, idx) => (
                 <button
                   key={idx}
@@ -125,7 +125,7 @@ const ChatWindow = ({ isOpen, onClose, initialMessages = [] }) => {
           <button
             type="button"
             onClick={() => setShowPredefined(!showPredefined)}
-            className="p-2 text-gray-500 hover:bg-gray-100 rounded-full transition"
+            className="shrink-0 p-2 text-gray-500 hover:bg-gray-100 rounded-full transition"
           >
             <Smile size={24} />
           </button>
@@ -134,11 +134,11 @@ const ChatWindow = ({ isOpen, onClose, initialMessages = [] }) => {
             placeholder="Tapez un message..."
             value={messageText}
             onChange={(e) => setMessageText(e.target.value)}
-            className="flex-1 px-4 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-[#25D366] bg-white"
+            className="min-w-0 flex-1 px-4 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-[#25D366] bg-white"
           />
           <button 
             type="submit" 
-            className="p-2 bg-[#25D366] text-white rounded-full hover:bg-[#128C7E] transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="shrink-0 p-3 bg-[#25D366] text-white rounded-full hover:bg-[#128C7E] transition disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={!messageText.trim()}
           >
             <Send size={20} />

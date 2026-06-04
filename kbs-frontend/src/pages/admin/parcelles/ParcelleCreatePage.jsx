@@ -47,7 +47,6 @@ export default function ParcelleCreatePage() {
         formDataToSend.append('photo', formData.photo);
       }
 
-      console.log('Sending parcelle data with FormData');
       await createParcelle(formDataToSend).unwrap();
       toast.success("Parcelle créée avec succès");
       navigate("/admin/parcelles");
@@ -94,7 +93,7 @@ export default function ParcelleCreatePage() {
       </div>
 
       {/* Form */}
-      <div className="kbs-card max-w-4xl">
+      <div className="kbs-card w-full">
         <form onSubmit={handleSubmit} className="space-y-6 p-6">
           {/* Informations de base */}
           <div>
@@ -300,7 +299,7 @@ export default function ParcelleCreatePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-label-sm font-medium text-on-surface mb-2">
-                  Prix de vente (USD) *
+                  Prix de vente ($ / Fc) *
                 </label>
                 <input
                   type="number"

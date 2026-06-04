@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Mail, Phone } from "lucide-react";
+import { ArrowRight, Facebook, Instagram, Mail, Phone, Share2 } from "lucide-react";
 import toast from "react-hot-toast";
 
 const Footer = () => {
   const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [socialOpen, setSocialOpen] = useState(false);
 
   const handleNewsletter = (e) => {
     e.preventDefault();
@@ -22,10 +23,8 @@ const Footer = () => {
         <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
           <div>
             <div className="mb-5 flex items-center gap-3">
-              <div className="grid h-10 w-10 place-items-center rounded-full bg-secondary text-on-secondary">
-                <span className="font-montserrat font-bold">K</span>
-              </div>
-              <span className="font-montserrat text-xl font-bold text-white">KBS Real Estate</span>
+              <img src="/kbs-logo.png" alt="KBS Building" className="h-12 w-12 rounded-full bg-black object-contain p-0.5" />
+              <span className="font-montserrat text-xl font-bold text-white">KBS Building</span>
             </div>
             <p className="max-w-xs text-label-md leading-relaxed text-on-primary-container/75">
               Des standards immobiliers plus clairs, plus rapides et plus fiables en RDC.
@@ -87,7 +86,31 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col items-start justify-between gap-4 border-t border-white/10 pt-6 sm:flex-row sm:items-center">
+        <div className="mt-10 flex flex-wrap items-center gap-3 border-t border-white/10 pt-6">
+          <button
+            type="button"
+            onClick={() => setSocialOpen((open) => !open)}
+            className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-label-md font-semibold text-white transition hover:bg-white/15"
+          >
+            <Share2 size={16} />
+            Reseaux sociaux
+          </button>
+          {socialOpen && (
+            <div className="flex items-center gap-2 animate-fade-in">
+              <a href="https://facebook.com" target="_blank" rel="noreferrer" className="grid h-10 w-10 place-items-center rounded-full bg-white/10 text-white transition hover:bg-secondary hover:text-on-secondary" aria-label="Facebook">
+                <Facebook size={18} />
+              </a>
+              <a href="https://instagram.com" target="_blank" rel="noreferrer" className="grid h-10 w-10 place-items-center rounded-full bg-white/10 text-white transition hover:bg-secondary hover:text-on-secondary" aria-label="Instagram">
+                <Instagram size={18} />
+              </a>
+              <a href="https://wa.me/243810000000" target="_blank" rel="noreferrer" className="grid h-10 w-10 place-items-center rounded-full bg-white/10 text-white transition hover:bg-secondary hover:text-on-secondary" aria-label="WhatsApp">
+                <Phone size={18} />
+              </a>
+            </div>
+          )}
+        </div>
+
+        <div className="mt-6 flex flex-col items-start justify-between gap-4 border-t border-white/10 pt-6 sm:flex-row sm:items-center">
           <p className="text-label-sm text-on-primary-container/60">
             Copyright {new Date().getFullYear()} KBS Real Estate Management. Tous droits reserves.
           </p>

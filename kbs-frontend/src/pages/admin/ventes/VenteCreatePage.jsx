@@ -88,7 +88,7 @@ export default function VenteCreatePage() {
       </div>
 
       {/* Form */}
-      <div className="kbs-card max-w-3xl">
+      <div className="kbs-card w-full">
         <form onSubmit={handleSubmit} className="space-y-6 p-6">
           {/* Client et Parcelle */}
           <div>
@@ -177,8 +177,8 @@ export default function VenteCreatePage() {
                   onChange={handleChange}
                   className="kbs-input w-full"
                 >
-                  <option value="USD">USD - Dollar Américain</option>
-                  <option value="CDF">CDF - Franc Congolais</option>
+                  <option value="USD">$</option>
+                  <option value="CDF">Fc</option>
                 </select>
               </div>
               <div>
