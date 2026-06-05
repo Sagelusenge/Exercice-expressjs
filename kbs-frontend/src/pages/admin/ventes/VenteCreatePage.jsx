@@ -54,7 +54,7 @@ export default function VenteCreatePage() {
         setFormData({
           ...formData,
           parcelle_id: value,
-          montant_total: selectedParcelle.prix || "",
+          montant_total: selectedParcelle.prix_vente || "",
           devise: selectedParcelle.devise || "USD",
         });
         return;

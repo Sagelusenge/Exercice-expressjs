@@ -14,7 +14,7 @@ import GlobalActivityOverlay from "./components/ui/GlobalActivityOverlay";
 function AuthInitializer({ children }) {
   const dispatch = useDispatch();
   const { token, isAuthenticated } = useSelector((s) => s.auth);
-  const [isReady, setIsReady] = useState(false);
+  const [isReady, setIsReady] = useState(!token); // Prêt tout de suite si pas de token
 
   // On tente de récupérer les infos de l'utilisateur si on a un token
   const { error, isSuccess, isLoading } = useGetMeQuery(undefined, {

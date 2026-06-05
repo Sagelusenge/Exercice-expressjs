@@ -92,22 +92,19 @@ router.patch(
       const [vente] = await query("SELECT * FROM ventes WHERE id = ? AND tenant_id = ?", [paiement.vente_id, req.tenantId]);
       
       if (vente) {
-        // Increment montant_paye
+        // Increment montant_paye and update statut in one query
         await query(
-          `UPDATE ventes SET montant_paye = montant_paye + ? WHERE id = ? AND tenant_id = ?`,
-          [paiement.montant, paiement.vente_id, req.tenantId]
+          `UPDATE ventes 
+           SET montant_paye = montant_paye + ?,
+               statut = IF(montant_paye + ? >= montant_total, 'COMPLETE', 'EN_COURS')
+           WHERE id = ? AND tenant_id = ?`,
+          [paiement.montant, paiement.montant, paiement.vente_id, req.tenantId]
         );
         
-        // Check if montant_paye >= montant_total
+        // Check if vente is now COMPLETE to update parcelle
         const [updatedVente] = await query("SELECT * FROM ventes WHERE id = ? AND tenant_id = ?", [paiement.vente_id, req.tenantId]);
         
-        if (updatedVente && updatedVente.montant_paye >= updatedVente.montant_total) {
-          // Set sale to COMPLETE
-          await query(
-            `UPDATE ventes SET statut = 'COMPLETE' WHERE id = ? AND tenant_id = ?`,
-            [paiement.vente_id, req.tenantId]
-          );
-          
+        if (updatedVente && updatedVente.statut === 'COMPLETE') {
           // Set parcelle to VENDUE
           await query(
             `UPDATE parcelles SET statut = 'VENDUE', vendu_a = ?, date_vente = NOW() WHERE id = ? AND tenant_id = ?`,
