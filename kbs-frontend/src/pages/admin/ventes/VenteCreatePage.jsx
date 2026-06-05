@@ -4,6 +4,7 @@ import { ArrowLeft, Save, ShoppingCart, User, MapPin, DollarSign, FileText } fro
 import { useCreateVenteMutation } from "../../../store/api/ventesApi";
 import { useGetUsersQuery } from "../../../store/api/usersApi";
 import { useGetParcellesAdminQuery } from "../../../store/api/parcellesApi";
+import { formatCurrency } from "../../../utils/formatters";
 import toast from "react-hot-toast";
 import Button from "../../../components/ui/Button";
 
@@ -15,6 +16,8 @@ export default function VenteCreatePage() {
 
   const clients = usersData || [];
   const parcelles = (parcellesData?.data || []).filter((p) => !["VENDUE", "ARCHIVEE"].includes(p.statut));
+  const getParcellePrice = (parcelle) =>
+    parcelle?.prix_vente_confidentiel ?? parcelle?.prix_vente ?? parcelle?.prix ?? "";
 
   const [formData, setFormData] = useState({
     user_id: "",
@@ -27,6 +30,7 @@ export default function VenteCreatePage() {
     devise: "USD",
     notes: "",
   });
+  const selectedParcelle = parcelles.find((p) => String(p.id) === String(formData.parcelle_id));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -51,10 +55,11 @@ export default function VenteCreatePage() {
     if (name === "parcelle_id") {
       const selectedParcelle = parcelles.find(p => p.id === parseInt(value));
       if (selectedParcelle) {
+        const prix = getParcellePrice(selectedParcelle);
         setFormData({
           ...formData,
           parcelle_id: value,
-          montant_total: selectedParcelle.prix_vente || "",
+          montant_total: prix !== null && prix !== undefined ? String(prix) : "",
           devise: selectedParcelle.devise || "USD",
         });
         return;
@@ -142,6 +147,32 @@ export default function VenteCreatePage() {
                 </div>
               </div>
             </div>
+            {selectedParcelle && (
+              <div className="mt-4 grid gap-3 rounded-lg border border-outline-variant bg-surface-low p-4 md:grid-cols-4">
+                <div>
+                  <p className="text-label-sm text-on-surface-variant">Reference</p>
+                  <p className="font-semibold text-on-surface">{selectedParcelle.reference}</p>
+                </div>
+                <div>
+                  <p className="text-label-sm text-on-surface-variant">Localisation</p>
+                  <p className="font-semibold text-on-surface">
+                    {selectedParcelle.ville}{selectedParcelle.commune ? `, ${selectedParcelle.commune}` : ""}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-label-sm text-on-surface-variant">Superficie</p>
+                  <p className="font-semibold text-on-surface">{selectedParcelle.superficie || 0} m2</p>
+                </div>
+                <div>
+                  <p className="text-label-sm text-on-surface-variant">Prix admin</p>
+                  <p className="font-bold text-secondary">
+                    {getParcellePrice(selectedParcelle)
+                      ? formatCurrency(getParcellePrice(selectedParcelle), selectedParcelle.devise)
+                      : "Non renseigne"}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Montant */}

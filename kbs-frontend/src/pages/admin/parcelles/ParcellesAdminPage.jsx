@@ -14,8 +14,22 @@ import toast from 'react-hot-toast';
 const getImageUrl = (url) => {
   if (!url) return null;
   if (url.startsWith('http')) return url;
-  return `http://localhost:5000${url}`;
+  const apiRoot = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const baseUrl = apiRoot.replace(/\/api\/v1\/?$/, "");
+  const imagePath = url.startsWith("/") ? url : `/${url}`;
+  return `${baseUrl}${imagePath}`;
 };
+
+const getMainImageUrl = (parcelle) => {
+  const raw =
+    parcelle?.image_principale ||
+    parcelle?.photo_url ||
+    (typeof parcelle?.images === "string" ? parcelle.images.split(",")[0] : null);
+  return getImageUrl(raw);
+};
+
+const getAdminPrice = (parcelle) =>
+  parcelle?.prix_vente_confidentiel ?? parcelle?.prix_vente ?? parcelle?.prix ?? "";
 
 const ParcellesAdminPage = () => {
   const navigate = useNavigate();
@@ -73,12 +87,12 @@ const ParcellesAdminPage = () => {
       quartier: parcelle.quartier || '',
       superficie: parcelle.superficie?.toString() || '',
       type_parcelle: parcelle.type_parcelle || 'RESIDENTIELLE',
-      prix_vente: parcelle.prix_vente?.toString() || '',
+      prix_vente: getAdminPrice(parcelle)?.toString() || '',
       statut: parcelle.statut || 'DISPONIBLE',
       est_vedette: Boolean(parcelle.est_vedette),
       photo: null
     });
-    const imageUrl = getImageUrl(parcelle.photo_url || parcelle.image_principale);
+    const imageUrl = getMainImageUrl(parcelle);
     setPhotoPreview(imageUrl);
     setIsEditModalOpen(true);
   };
@@ -229,7 +243,7 @@ const ParcellesAdminPage = () => {
                   </td>
                   <td className="px-4 py-3">
                     <span className="font-semibold text-secondary">
-                      {parcelle.prix_vente ? formatCurrency(parcelle.prix_vente, parcelle.devise) : '—'}
+                      {getAdminPrice(parcelle) ? formatCurrency(getAdminPrice(parcelle), parcelle.devise) : '—'}
                     </span>
                   </td>
                   <td className="px-4 py-3">
@@ -277,7 +291,7 @@ const ParcellesAdminPage = () => {
 
       {detailParcelle && (
         <div className="fixed inset-0 bg-black/45 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-surface rounded-xl shadow-lg max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+          <div className="bg-surface rounded-xl shadow-lg max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
             <div className="flex items-center justify-between p-5 border-b border-outline-variant">
               <div>
                 <h2 className="text-lg font-bold text-on-surface">{detailParcelle.titre || detailParcelle.nom}</h2>
@@ -287,10 +301,27 @@ const ParcellesAdminPage = () => {
                 <X size={18} />
               </button>
             </div>
-            <div className="grid gap-4 p-5 text-label-md sm:grid-cols-2">
+            <div className="overflow-y-auto">
+              {getMainImageUrl(detailParcelle) ? (
+                <img
+                  src={getMainImageUrl(detailParcelle)}
+                  alt={detailParcelle.titre || "Parcelle"}
+                  className="h-64 w-full object-cover"
+                />
+              ) : (
+                <div className="grid h-52 place-items-center bg-surface-high text-on-surface-variant">
+                  Aucune photo disponible
+                </div>
+              )}
+
+              <div className="grid gap-4 p-5 text-label-md sm:grid-cols-2">
               <div>
                 <p className="text-on-surface-variant">Localisation</p>
                 <p className="font-semibold text-on-surface">{detailParcelle.localisation || `${detailParcelle.ville || ''}, ${detailParcelle.commune || ''}`}</p>
+              </div>
+              <div>
+                <p className="text-on-surface-variant">Quartier</p>
+                <p className="font-semibold text-on-surface">{detailParcelle.quartier || 'Non renseigne'}</p>
               </div>
               <div>
                 <p className="text-on-surface-variant">Superficie</p>
@@ -302,11 +333,20 @@ const ParcellesAdminPage = () => {
               </div>
               <div>
                 <p className="text-on-surface-variant">Prix</p>
-                <p className="font-semibold text-secondary">{detailParcelle.prix_vente_confidentiel ? formatCurrency(detailParcelle.prix_vente_confidentiel, detailParcelle.devise) : 'Non renseigne'}</p>
+                <p className="font-semibold text-secondary">{getAdminPrice(detailParcelle) ? formatCurrency(getAdminPrice(detailParcelle), detailParcelle.devise) : 'Non renseigne'}</p>
+              </div>
+              <div>
+                <p className="text-on-surface-variant">Statut</p>
+                <p className="font-semibold text-on-surface">{detailParcelle.statut || 'DISPONIBLE'}</p>
+              </div>
+              <div>
+                <p className="text-on-surface-variant">Vues</p>
+                <p className="font-semibold text-on-surface">{detailParcelle.nombre_vues || 0}</p>
               </div>
               <div className="sm:col-span-2">
                 <p className="text-on-surface-variant">Description</p>
                 <p className="mt-1 text-on-surface">{detailParcelle.description || 'Aucune description.'}</p>
+              </div>
               </div>
             </div>
           </div>
