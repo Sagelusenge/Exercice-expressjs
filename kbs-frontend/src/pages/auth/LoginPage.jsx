@@ -51,24 +51,41 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-surface flex">
       {/* Panneau gauche — branding */}
-      <div className="hidden lg:flex flex-col justify-between w-1/2 bg-primary-container p-12">
-        <div className="flex items-center gap-3">
-          <img src="/kbs-logo.png" alt="KBS Building" className="h-12 w-12 rounded-full bg-black object-contain p-0.5" />
-          <span className="font-montserrat font-bold text-xl text-on-primary-container">
+      <div className="login-showcase relative hidden w-1/2 overflow-hidden bg-primary-container p-12 lg:flex lg:flex-col lg:justify-between">
+        <div className="login-aurora" />
+        <span className="login-line login-line-a" />
+        <span className="login-line login-line-b" />
+        <span className="login-line login-line-c" />
+
+        <div className="relative z-10 flex items-center gap-4">
+          <div className="login-logo-orbit">
+            <span className="login-logo-ring login-logo-ring-a" />
+            <span className="login-logo-ring login-logo-ring-b" />
+            <img src="/kbs-logo.png" alt="KBS Building" className="login-logo-img" />
+          </div>
+          <span className="font-montserrat text-2xl font-bold text-white">
             KBS Building
           </span>
         </div>
 
-        <div>
-          <blockquote className="text-3xl font-montserrat font-bold text-on-primary-container leading-tight mb-6">
+        <div className="relative z-10">
+          <div className="login-floating-card login-floating-card-a">
+            <span className="text-label-sm text-white/60">Parcelles</span>
+            <strong className="font-montserrat text-2xl text-white">Verifiees</strong>
+          </div>
+          <div className="login-floating-card login-floating-card-b">
+            <span className="text-label-sm text-white/60">Suivi</span>
+            <strong className="font-montserrat text-2xl text-white">Rapide</strong>
+          </div>
+          <blockquote className="max-w-xl text-4xl font-montserrat font-bold leading-tight text-white mb-6">
             "Investissez dans la terre, investissez dans l'avenir."
           </blockquote>
-          <p className="text-on-primary-container/60 text-body-md">
+          <p className="max-w-md text-body-lg leading-relaxed text-white/68">
             La plateforme de référence pour la gestion immobilière en RDC.
           </p>
         </div>
 
-        <p className="text-label-sm text-on-primary-container/40">
+        <p className="relative z-10 text-label-sm text-white/45">
           © 2024 KITUMAINI BALEZI Serge — Goma, RDC
         </p>
       </div>

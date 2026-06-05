@@ -310,6 +310,116 @@ input::-webkit-credentials-auto-fill-button {
     box-shadow: 0 14px 36px rgba(19, 27, 46, 0.12);
   }
 
+  .login-showcase {
+    isolation: isolate;
+  }
+
+  .login-aurora {
+    position: absolute;
+    inset: -22%;
+    background:
+      radial-gradient(circle at 18% 24%, rgba(197, 160, 89, 0.48), transparent 24%),
+      radial-gradient(circle at 78% 18%, rgba(96, 239, 255, 0.22), transparent 28%),
+      radial-gradient(circle at 48% 82%, rgba(255, 255, 255, 0.12), transparent 28%);
+    animation: loginAurora 9s ease-in-out infinite alternate;
+    filter: blur(3px);
+    opacity: 0.95;
+  }
+
+  .login-logo-orbit {
+    position: relative;
+    display: grid;
+    height: 92px;
+    width: 92px;
+    place-items: center;
+  }
+
+  .login-logo-img {
+    position: relative;
+    z-index: 2;
+    height: 66px;
+    width: 66px;
+    border-radius: 999px;
+    background: #000;
+    object-fit: contain;
+    padding: 3px;
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.38), 0 0 28px rgba(96, 239, 255, 0.28);
+    animation: logoFloat 4.2s ease-in-out infinite;
+  }
+
+  .login-logo-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+  }
+
+  .login-logo-ring-a {
+    border-top-color: rgba(197, 160, 89, 0.95);
+    animation: orbitSpin 5.5s linear infinite;
+  }
+
+  .login-logo-ring-b {
+    inset: 12px;
+    border-right-color: rgba(96, 239, 255, 0.9);
+    animation: orbitSpin 4.2s linear infinite reverse;
+  }
+
+  .login-line {
+    position: absolute;
+    height: 2px;
+    width: 42%;
+    background: linear-gradient(90deg, transparent, rgba(96, 239, 255, 0.7), rgba(197, 160, 89, 0.85), transparent);
+    box-shadow: 0 0 24px rgba(96, 239, 255, 0.28);
+    animation: loginTrace 4.5s ease-in-out infinite;
+  }
+
+  .login-line-a {
+    left: 12%;
+    top: 28%;
+    transform: rotate(18deg);
+  }
+
+  .login-line-b {
+    right: 5%;
+    top: 54%;
+    transform: rotate(-14deg);
+    animation-delay: 0.8s;
+  }
+
+  .login-line-c {
+    left: 24%;
+    bottom: 22%;
+    width: 54%;
+    transform: rotate(8deg);
+    animation-delay: 1.4s;
+  }
+
+  .login-floating-card {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.09);
+    padding: 14px 18px;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.24);
+  }
+
+  .login-floating-card-a {
+    right: 5%;
+    top: -72px;
+    animation: floatPanel 6s ease-in-out infinite;
+  }
+
+  .login-floating-card-b {
+    right: 18%;
+    bottom: -90px;
+    animation: floatPanel 7s ease-in-out infinite reverse;
+  }
+
   .floating-card {
     animation: floatPanel 6s ease-in-out infinite;
   }
@@ -376,6 +486,47 @@ input::-webkit-credentials-auto-fill-button {
     to {
       opacity: 1;
       transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes loginAurora {
+    from {
+      transform: translate3d(-2%, -1%, 0) scale(1);
+    }
+    to {
+      transform: translate3d(3%, 2%, 0) scale(1.08);
+    }
+  }
+
+  @keyframes logoFloat {
+    0%,
+    100% {
+      transform: translateY(0) scale(1);
+    }
+    50% {
+      transform: translateY(-8px) scale(1.03);
+    }
+  }
+
+  @keyframes orbitSpin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes loginTrace {
+    0%,
+    100% {
+      opacity: 0.18;
+      clip-path: inset(0 100% 0 0);
+    }
+    46% {
+      opacity: 1;
+      clip-path: inset(0 0 0 0);
+    }
+    72% {
+      opacity: 0.42;
+      clip-path: inset(0 0 0 100%);
     }
   }
 

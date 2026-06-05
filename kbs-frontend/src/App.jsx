@@ -42,9 +42,12 @@ function AuthInitializer({ children }) {
   }, [error, isSuccess, isLoading, token, dispatch]);
 
   if (!isReady) {
+    const currentHash = window.location.hash || "#/";
+    const isHomePage = currentHash === "#/" || currentHash === "";
+
     return (
-      <div className="h-screen w-full flex items-center justify-center bg-surface">
-        <KbsLoader label="Chargement de votre espace..." />
+      <div className="h-screen w-full flex items-center justify-center bg-white">
+        {!isHomePage && <KbsLoader label="Chargement de votre espace..." />}
       </div>
     );
   }

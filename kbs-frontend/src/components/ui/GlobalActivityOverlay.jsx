@@ -24,11 +24,30 @@ const GlobalActivityOverlay = () => {
 
   if (!visible) return null;
 
+  const currentHash = window.location.hash || "#/";
+  const isHomePage = currentHash === "#/" || currentHash.startsWith("#/?");
+
+  if (isHomePage) {
+    return <HomeWhiteOverlay />;
+  }
+
   return (
     <div className="fixed inset-0 z-[9999] grid place-items-center bg-surface/65 backdrop-blur-sm">
       <KbsLoader label="Traitement en cours..." />
     </div>
   );
+};
+
+const HomeWhiteOverlay = () => {
+  const [show, setShow] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShow(false), 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (!show) return null;
+  return <div className="fixed inset-0 z-[9999] bg-white" />;
 };
 
 export default GlobalActivityOverlay;
