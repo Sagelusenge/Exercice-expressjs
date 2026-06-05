@@ -329,22 +329,22 @@ input::-webkit-credentials-auto-fill-button {
   .login-logo-orbit {
     position: relative;
     display: grid;
-    height: 92px;
-    width: 92px;
+    height: 124px;
+    width: 124px;
     place-items: center;
   }
 
   .login-logo-img {
     position: relative;
     z-index: 2;
-    height: 66px;
-    width: 66px;
+    height: 90px;
+    width: 90px;
     border-radius: 999px;
-    background: #000;
+    background: transparent;
     object-fit: contain;
-    padding: 3px;
-    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.38), 0 0 28px rgba(96, 239, 255, 0.28);
-    animation: logoFloat 4.2s ease-in-out infinite;
+    padding: 0;
+    filter: drop-shadow(0 18px 26px rgba(0, 0, 0, 0.42)) drop-shadow(0 0 24px rgba(96, 239, 255, 0.5));
+    animation: logoFloat 3s ease-in-out infinite;
   }
 
   .login-logo-ring {
@@ -356,13 +356,13 @@ input::-webkit-credentials-auto-fill-button {
 
   .login-logo-ring-a {
     border-top-color: rgba(197, 160, 89, 0.95);
-    animation: orbitSpin 5.5s linear infinite;
+    animation: orbitSpin 3.8s linear infinite;
   }
 
   .login-logo-ring-b {
     inset: 12px;
     border-right-color: rgba(96, 239, 255, 0.9);
-    animation: orbitSpin 4.2s linear infinite reverse;
+    animation: orbitSpin 2.8s linear infinite reverse;
   }
 
   .login-line {

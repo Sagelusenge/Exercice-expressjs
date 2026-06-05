@@ -1,7 +1,7 @@
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { ChevronDown, Globe2, LogIn, Menu, Search, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "../ui/Button";
 import Avatar from "../ui/Avatar";
 import NotifBell from "../notifications/NotifBell";
@@ -11,7 +11,7 @@ const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
   const [langSearch, setLangSearch] = useState("");
-  const [language, setLanguage] = useState("fr");
+  const [language, setLanguage] = useState(() => localStorage.getItem("kbs-language") || "fr");
   const navigate = useNavigate();
   const location = useLocation();
   const isHome = location.pathname === "/";
@@ -21,6 +21,11 @@ const Navbar = () => {
     { code: "sw", label: "Kiswahili" },
     { code: "ln", label: "Lingala" },
   ].filter((lang) => lang.label.toLowerCase().includes(langSearch.toLowerCase()));
+
+  useEffect(() => {
+    document.documentElement.lang = language;
+    localStorage.setItem("kbs-language", language);
+  }, [language]);
 
   // Rediriger vers l'espace approprié selon le rôle
   const getDashboardPath = () => {
@@ -32,11 +37,11 @@ const Navbar = () => {
   };
 
   return (
-    <nav className={`${isHome ? "fixed inset-x-0 top-0" : "sticky top-0"} z-50 transition-colors ${isHome ? "bg-primary-container/20 text-white backdrop-blur-md border-b border-white/10" : "bg-surface-lowest border-b border-outline-variant"}`}>
+    <nav className={`${isHome ? "fixed inset-x-0 top-0" : "sticky top-0"} z-50 transition-colors ${isHome ? "bg-primary-container/60 text-white backdrop-blur-md border-b border-white/10" : "bg-surface-lowest border-b border-outline-variant"}`}>
       <div className="kbs-container h-16 flex items-center gap-6">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 flex-shrink-0">
-          <img src="/kbs-logo.png" alt="KBS Building" className="h-10 w-10 rounded-full bg-black object-contain p-0.5" />
+          <img src="/kbs-logo.png" alt="KBS Building" className="h-10 w-10 rounded-full object-contain" />
           <span className={`font-montserrat font-bold text-title-lg hidden sm:block ${isHome ? "text-white" : "text-on-surface"}`}>
             KBS Building
           </span>

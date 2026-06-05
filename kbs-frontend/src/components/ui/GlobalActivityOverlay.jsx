@@ -1,53 +1,38 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { baseApi } from "../../store/api/baseApi";
 import KbsLoader from "./KbsLoader";
 
+const MIN_VISIBLE_MS = 3000;
+
 const GlobalActivityOverlay = () => {
   const apiState = useSelector((state) => state[baseApi.reducerPath]);
   const isBusy = useMemo(() => {
-    const queries = Object.values(apiState?.queries || {});
     const mutations = Object.values(apiState?.mutations || {});
-    return [...queries, ...mutations].some((entry) => entry?.status === "pending");
+    return mutations.some((entry) => entry?.status === "pending");
   }, [apiState]);
   const [visible, setVisible] = useState(false);
+  const startedAtRef = useRef(0);
 
   useEffect(() => {
     let timer;
     if (isBusy) {
-      timer = setTimeout(() => setVisible(true), 120);
+      startedAtRef.current = Date.now();
+      timer = setTimeout(() => setVisible(true), 100);
     } else {
-      timer = setTimeout(() => setVisible(false), 250);
+      const remaining = Math.max(MIN_VISIBLE_MS - (Date.now() - startedAtRef.current), 0);
+      timer = setTimeout(() => setVisible(false), remaining);
     }
     return () => clearTimeout(timer);
   }, [isBusy]);
 
   if (!visible) return null;
 
-  const currentHash = window.location.hash || "#/";
-  const isHomePage = currentHash === "#/" || currentHash.startsWith("#/?");
-
-  if (isHomePage) {
-    return <HomeWhiteOverlay />;
-  }
-
   return (
     <div className="fixed inset-0 z-[9999] grid place-items-center bg-surface/65 backdrop-blur-sm">
       <KbsLoader label="Traitement en cours..." />
     </div>
   );
-};
-
-const HomeWhiteOverlay = () => {
-  const [show, setShow] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setShow(false), 2000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (!show) return null;
-  return <div className="fixed inset-0 z-[9999] bg-white" />;
 };
 
 export default GlobalActivityOverlay;

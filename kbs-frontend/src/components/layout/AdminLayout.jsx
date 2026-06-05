@@ -5,7 +5,7 @@ import TopBar from "./TopBar";
 
 // Mapping route → titre de page
 const PAGE_TITLES = {
-  "/admin": "System Overview",
+  "/admin": "Vue d'ensemble",
   "/admin/users": "Gestion des Utilisateurs",
   "/admin/parcelles": "Inventaire Parcelles",
   "/admin/ventes": "Suivi des Ventes",

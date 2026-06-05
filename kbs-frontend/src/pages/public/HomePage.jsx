@@ -35,12 +35,6 @@ const getImageUrl = (url) => {
   return `${baseUrl}${imagePath}`;
 };
 
-const featuredFallbacks = [
-  "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1400&q=80",
-  "https://images.unsplash.com/photo-1518005020951-eccb494ad742?w=1400&q=80",
-  "https://images.unsplash.com/photo-1494526585095-c41746248156?w=1400&q=80",
-];
-
 const Reveal = ({ children, className = "", delay = 0, direction = "up" }) => {
   const { ref, inView } = useInView({ threshold: 0.16, triggerOnce: true });
 
@@ -66,7 +60,7 @@ const FeaturedParcelleCard = ({ parcelle, index }) => {
   const hasImage = parcelle.image_principale || parcelle.photo_url;
   const completeImageUrl = hasImage
     ? getImageUrl(parcelle.image_principale || parcelle.photo_url)
-    : featuredFallbacks[index % featuredFallbacks.length];
+    : null;
 
   return (
     <Reveal delay={index * 70}>
@@ -75,13 +69,17 @@ const FeaturedParcelleCard = ({ parcelle, index }) => {
         className="group block overflow-hidden rounded-lg border border-white/70 bg-white shadow-[0_18px_50px_rgba(19,27,46,0.08)] transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_28px_70px_rgba(19,27,46,0.18)]"
       >
         <div className="relative aspect-[4/3] overflow-hidden bg-surface-high">
-          <img
-            src={completeImageUrl}
-            alt={parcelle.titre}
-            loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-            onError={(e) => { e.target.src = featuredFallbacks[index % featuredFallbacks.length]; }}
-          />
+          {completeImageUrl ? (
+            <img
+              src={completeImageUrl}
+              alt={parcelle.titre}
+              loading="lazy"
+              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+              onError={(e) => { e.currentTarget.style.display = "none"; }}
+            />
+          ) : (
+            <div className="h-full w-full bg-[linear-gradient(135deg,#1a365d,#2a4d72_45%,#c5a059)]" />
+          )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-80" />
           <div className="absolute left-3 top-3 flex flex-wrap gap-2">
             {parcelle.est_vedette === 1 && (
@@ -364,11 +362,7 @@ export default function HomePage() {
             </div>
 
             <div className="floating-card-slow absolute bottom-20 right-0 w-80 overflow-hidden rounded-lg border border-white/20 bg-white shadow-modal">
-              <img
-                src="https://images.unsplash.com/photo-1494526585095-c41746248156?w=900&q=80"
-                alt="Parcelle residentielle"
-                className="h-44 w-full object-cover"
-              />
+              <div className="h-44 w-full bg-[linear-gradient(135deg,#1a365d,#42617f_48%,#c5a059)]" />
               <div className="p-4 text-on-surface">
                 <p className="text-label-sm font-semibold uppercase tracking-[0.14em] text-[#c5a059]">En vedette</p>
                 <h2 className="mt-1 font-montserrat text-title-lg">Terrain residentiel premium</h2>
@@ -533,39 +527,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="bg-[#f4f7f9] py-20">
-        <div className="kbs-container">
-          <Reveal className="mb-14 text-center">
-            <p className="text-label-sm font-bold uppercase tracking-[0.18em] text-[#c5a059]">Avis clients</p>
-            <h2 className="mt-3 font-montserrat text-headline-lg text-[#1a365d]">Ce que disent nos clients</h2>
-          </Reveal>
-
-          <div className="grid gap-8 md:grid-cols-3">
-            {testimonials.map((item, index) => (
-              <Reveal key={item.name} delay={index * 140} direction="scale">
-                <div className="h-full rounded-lg border border-[#e2e8f0] bg-white p-8 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_10px_25px_-5px_rgba(26,54,93,0.12)]">
-                  <div className="mb-4 flex gap-1">
-                    {[...Array(5)].map((_, star) => (
-                      <span key={star} className="h-4 w-4 rounded-full bg-[#c5a059]" />
-                    ))}
-                  </div>
-                  <p className="mb-6 text-slate-600 italic">"{item.text}"</p>
-                  <div className="flex items-center gap-3">
-                    <div className="grid h-10 w-10 place-items-center rounded-full bg-[#1a365d]/10 font-bold text-[#1a365d]">
-                      {item.name.charAt(0)}
-                    </div>
-                    <div>
-                      <h3 className="text-label-md font-bold text-slate-900">{item.name}</h3>
-                      <p className="text-xs text-slate-400">{item.role}</p>
-                    </div>
-                  </div>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
       <section className="relative overflow-hidden py-20">
         <div className="absolute inset-0 bg-[#1a365d]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(197,160,89,0.28),transparent_55%)] opacity-80" />
@@ -679,10 +640,10 @@ export default function HomePage() {
 
       <a
         href="tel:+243810000000"
-        className="group fixed bottom-24 right-6 z-40 flex items-center gap-2 overflow-hidden rounded-full bg-[#c5a059] p-4 text-[#1a365d] shadow-2xl shadow-[#c5a059]/40 transition-all duration-500 hover:scale-105 sm:right-6"
+        className="group fixed bottom-20 right-6 z-40 flex h-11 w-11 items-center justify-center gap-2 overflow-hidden rounded-full bg-[#c5a059] text-[#1a365d] shadow-2xl shadow-[#c5a059]/40 transition-all duration-500 hover:w-40 hover:scale-105 sm:right-6"
         aria-label="Nous appeler"
       >
-        <Phone size={22} />
+        <Phone size={18} />
         <span className="max-w-0 overflow-hidden whitespace-nowrap font-bold transition-all duration-500 group-hover:max-w-xs">
           Nous appeler
         </span>

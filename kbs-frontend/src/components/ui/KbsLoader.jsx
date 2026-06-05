@@ -7,7 +7,7 @@ const KbsLoader = ({ label = "Chargement..." }) => {
         <img
           src="/kbs-logo.png"
           alt="KBS Building"
-          className="h-20 w-20 rounded-full object-contain bg-black p-1 shadow-card"
+          className="h-20 w-20 rounded-full object-contain p-1 shadow-card"
         />
       </div>
       <p className="text-label-md font-semibold text-on-surface-variant">{label}</p>

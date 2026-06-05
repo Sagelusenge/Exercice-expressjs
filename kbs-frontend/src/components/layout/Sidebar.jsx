@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { useState } from "react";
 import clsx from "clsx";
 import {
   LayoutDashboard, Users, Map, ShoppingBag, Calendar,
@@ -23,7 +24,7 @@ const ADMIN_NAV = [
   {
     group: "Principal",
     items: [
-      { label: "Dashboard", to: "/admin", icon: LayoutDashboard, end: true },
+      { label: "Tableau de bord", to: "/admin", icon: LayoutDashboard, end: true },
       { label: "Utilisateurs", to: "/admin/users", icon: Users },
       { label: "Parcelles", to: "/admin/parcelles", icon: Map },
       { label: "Ventes", to: "/admin/ventes", icon: ShoppingBag },
@@ -52,7 +53,7 @@ const CLIENT_NAV = [
   {
     group: "Mon espace",
     items: [
-      { label: "Dashboard", to: "/client", icon: LayoutDashboard, end: true },
+      { label: "Tableau de bord", to: "/client", icon: LayoutDashboard, end: true },
       { label: "Parcelles", to: "/parcelles", icon: Map },
       { label: "Mes Réservations", to: "/client/reservations", icon: Calendar },
       { label: "Mes Achats", to: "/client/achats", icon: ShoppingBag },
@@ -68,7 +69,7 @@ const LOCATAIRE_NAV = [
   {
     group: "Mon espace KBS",
     items: [
-      { label: "Dashboard", to: "/locataire", icon: LayoutDashboard, end: true },
+      { label: "Tableau de bord", to: "/locataire", icon: LayoutDashboard, end: true },
       { label: "Mes Factures", to: "/locataire/factures", icon: FileCheck },
       { label: "Mes Paiements", to: "/locataire/paiements", icon: Wallet },
       { label: "Mon Profil", to: "/locataire/profil", icon: Home },
@@ -89,6 +90,7 @@ const Sidebar = ({ collapsed = false, onCollapse }) => {
   const { user } = useSelector((s) => s.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [confirmLogout, setConfirmLogout] = useState(false);
 
   const navGroups = NAV_MAP[user?.role] || CLIENT_NAV;
 
@@ -98,7 +100,14 @@ const Sidebar = ({ collapsed = false, onCollapse }) => {
     navigate("/login");
   };
 
+  const confirmLogoutNow = () => {
+    dispatch(logout());
+    toast.success("Vous avez ete deconnecte");
+    navigate("/login");
+  };
+
   return (
+    <>
     <aside
       className={clsx(
         "sticky left-0 top-0 flex flex-col h-screen bg-primary-container text-on-primary-container",
@@ -184,7 +193,7 @@ const Sidebar = ({ collapsed = false, onCollapse }) => {
 
         {/* Déconnexion */}
         <button
-          onClick={handleLogout}
+          onClick={() => setConfirmLogout(true)}
           className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-red-400 hover:bg-red-500/10 hover:text-red-300 transition text-label-md"
         >
           <LogOut size={16} />
@@ -207,6 +216,35 @@ const Sidebar = ({ collapsed = false, onCollapse }) => {
         )}
       </div>
     </aside>
+    {confirmLogout && (
+      <div className="fixed inset-0 z-[9999] grid place-items-center bg-black/45 p-4 backdrop-blur-sm">
+        <div className="kbs-card w-full max-w-sm p-6 text-center shadow-modal">
+          <h2 className="font-montserrat text-title-lg font-bold text-on-surface">
+            Confirmer la deconnexion
+          </h2>
+          <p className="mt-2 text-label-md text-on-surface-variant">
+            Voulez-vous vraiment vous deconnecter ?
+          </p>
+          <div className="mt-6 grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={() => setConfirmLogout(false)}
+              className="rounded-lg border border-outline-variant px-4 py-2.5 font-semibold text-on-surface transition hover:bg-surface-low"
+            >
+              Non
+            </button>
+            <button
+              type="button"
+              onClick={confirmLogoutNow}
+              className="rounded-lg bg-error px-4 py-2.5 font-semibold text-white transition hover:opacity-90"
+            >
+              Oui
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 };
 

@@ -80,13 +80,13 @@ export default function LoginPage() {
           <blockquote className="max-w-xl text-4xl font-montserrat font-bold leading-tight text-white mb-6">
             "Investissez dans la terre, investissez dans l'avenir."
           </blockquote>
-          <p className="max-w-md text-body-lg leading-relaxed text-white/68">
+          <p className="max-w-md text-body-lg font-semibold leading-relaxed text-white/90">
             La plateforme de référence pour la gestion immobilière en RDC.
           </p>
         </div>
 
         <p className="relative z-10 text-label-sm text-white/45">
-          © 2024 KITUMAINI BALEZI Serge — Goma, RDC
+          � 2026 KITUMAINI BALEZI Serge
         </p>
       </div>
 
@@ -104,7 +104,7 @@ export default function LoginPage() {
         <div className="w-full max-w-md">
           {/* Logo mobile */}
           <div className="flex items-center gap-2 mb-8 lg:hidden">
-            <img src="/kbs-logo.png" alt="KBS Building" className="h-10 w-10 rounded-full bg-black object-contain p-0.5" />
+            <img src="/kbs-logo.png" alt="KBS Building" className="h-10 w-10 rounded-full object-contain" />
             <span className="font-montserrat font-bold text-lg text-on-surface">KBS Building</span>
           </div>
 
@@ -197,3 +197,4 @@ export default function LoginPage() {
     </div>
   );
 }
+

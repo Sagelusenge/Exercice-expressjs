@@ -81,7 +81,7 @@ export default function RegisterPage() {
         </div>
 
         <p className="text-label-sm text-on-primary-container/40">
-          © 2024 KITUMAINI BALEZI Serge — Goma, RDC
+          � 2026 KITUMAINI BALEZI Serge
         </p>
       </div>
 

@@ -43,7 +43,7 @@ const KpiCard = ({ title, subtitle, value, icon: Icon, iconBg, accent, loading }
           {Icon && <Icon size={18} className={accent || "text-on-surface-variant"} />}
         </div>
       </div>
-      <p className="font-montserrat font-bold text-3xl text-on-surface">{value ?? "—"}</p>
+      <p className="break-words font-montserrat text-2xl font-bold leading-tight text-on-surface sm:text-3xl">{value ?? "—"}</p>
     </div>
   );
 };
@@ -235,15 +235,15 @@ export default function DashboardPage() {
       {/* ── 3 Graphiques ──────────────────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        {/* BarChart — Sales Performance */}
-        <div className="kbs-card p-6">
+        {/* BarChart — Performance des ventes */}
+        <div className="kbs-card rounded-2xl p-6">
           <div className="flex items-start justify-between mb-1">
             <div>
               <h3 className="font-montserrat font-semibold text-title-lg text-on-surface">
-                Sales Performance
+                Performance des ventes
               </h3>
               <p className="text-label-sm text-on-surface-variant uppercase tracking-wider mt-0.5">
-                PARCELLES VENDUES VS. DISPONIBLES
+                PARCELLES VENDUES VS DISPONIBLES
               </p>
             </div>
             <div className="p-2 bg-surface-low rounded-lg">
@@ -259,7 +259,7 @@ export default function DashboardPage() {
                 contentStyle={{ fontFamily: "Inter", fontSize: 12, borderRadius: 8, border: "1px solid #e0e3e5" }}
                 cursor={{ fill: "#f2f4f6" }}
               />
-              <Bar dataKey="value" fill="#725a42" radius={[3, 3, 0, 0]} name="Nombre" />
+              <Bar dataKey="value" fill="#725a42" radius={[8, 8, 0, 0]} name="Nombre" />
             </BarChart>
           </ResponsiveContainer>
 
@@ -285,15 +285,15 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* LineChart — Revenue Trends */}
-        <div className="kbs-card p-6">
+        {/* LineChart — Evolution des revenus */}
+        <div className="kbs-card rounded-2xl p-6">
           <div className="flex items-start justify-between mb-1">
             <div>
               <h3 className="font-montserrat font-semibold text-title-lg text-on-surface">
-                Revenue Trends
+                Evolution des revenus
               </h3>
               <p className="text-label-sm text-on-surface-variant uppercase tracking-wider mt-0.5">
-                MONTHLY FINANCIAL PERFORMANCE
+                PERFORMANCE FINANCIERE MENSUELLE
               </p>
             </div>
             <div className="p-2 bg-surface-low rounded-lg">
@@ -311,21 +311,21 @@ export default function DashboardPage() {
               />
               <Line
                 type="monotone" dataKey="ventes" stroke="#725a42"
-                strokeWidth={2} dot={{ r: 3, fill: "#725a42" }} name="Ventes Parcelles"
+                strokeWidth={2} dot={{ r: 3, fill: "#725a42" }} name="Ventes de parcelles"
               />
               <Line
                 type="monotone" dataKey="loyers" stroke="#131b2e"
-                strokeWidth={2} dot={{ r: 3, fill: "#131b2e" }} name="Revenus Loyers"
+                strokeWidth={2} dot={{ r: 3, fill: "#131b2e" }} name="Revenus locatifs"
               />
             </LineChart>
           </ResponsiveContainer>
 
           <div className="flex items-center gap-4 mt-2">
             <span className="flex items-center gap-1.5 text-label-sm text-on-surface-variant">
-              <span className="w-4 h-0.5 bg-secondary inline-block rounded" /> Land Sales
+              <span className="w-4 h-0.5 bg-secondary inline-block rounded" /> Ventes de parcelles
             </span>
             <span className="flex items-center gap-1.5 text-label-sm text-on-surface-variant">
-              <span className="w-4 h-0.5 bg-primary-container inline-block rounded" /> Rental Income
+              <span className="w-4 h-0.5 bg-primary-container inline-block rounded" /> Revenus locatifs
             </span>
           </div>
 
@@ -337,15 +337,15 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Donut — Tenant Status */}
-        <div className="kbs-card p-6">
+        {/* Donut — Statut des locataires */}
+        <div className="kbs-card rounded-2xl p-6">
           <div className="flex items-start justify-between mb-1">
             <div>
               <h3 className="font-montserrat font-semibold text-title-lg text-on-surface">
-                Tenant Status
+                Statut des locataires
               </h3>
               <p className="text-label-sm text-on-surface-variant uppercase tracking-wider mt-0.5">
-                PAYMENT COMPLIANCE OVERVIEW
+                SUIVI DES PAIEMENTS
               </p>
             </div>
             <div className="p-2 bg-surface-low rounded-lg">
@@ -446,3 +446,4 @@ export default function DashboardPage() {
     </div>
   );
 }
+

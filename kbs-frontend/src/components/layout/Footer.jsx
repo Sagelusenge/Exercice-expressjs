@@ -23,7 +23,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
           <div>
             <div className="mb-5 flex items-center gap-3">
-              <img src="/kbs-logo.png" alt="KBS Building" className="h-12 w-12 rounded-full bg-black object-contain p-0.5" />
+              <img src="/kbs-logo.png" alt="KBS Building" className="h-12 w-12 rounded-full object-contain" />
               <span className="font-montserrat text-xl font-bold text-white">KBS Building</span>
             </div>
             <p className="max-w-xs text-label-md leading-relaxed text-on-primary-container/75">
