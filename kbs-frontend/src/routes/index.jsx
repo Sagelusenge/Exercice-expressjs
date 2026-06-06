@@ -1,5 +1,9 @@
-import { HashRouter as BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { HashRouter as BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
+import KbsLoader from "../components/ui/KbsLoader";
+import { logout } from "../store/slices/authSlice";
 
 // Layouts
 import PublicLayout from "../components/layout/PublicLayout";
@@ -69,7 +73,7 @@ const ProtectedRoute = ({ children, roles = [] }) => {
   if (!isAuthenticated) return <Navigate to="/login" replace />;
   if (roles.length && !roles.includes(user?.role)) {
     // Rediriger vers l'espace approprié
-    if (["SUPER_ADMIN", "BOSS", "GERANT"].includes(user?.role)) return <Navigate to="/admin" replace />;
+    if (["SUPER_ADMIN", "ADMIN", "BOSS", "GERANT"].includes(user?.role)) return <Navigate to="/admin" replace />;
     if (user?.role === "CLIENT") return <Navigate to="/client" replace />;
     if (user?.role === "LOCATAIRE") return <Navigate to="/locataire" replace />;
   }
@@ -77,11 +81,53 @@ const ProtectedRoute = ({ children, roles = [] }) => {
   return children;
 };
 
-const ADMIN_ROLES = ["SUPER_ADMIN", "BOSS", "GERANT"];
+const ADMIN_ROLES = ["SUPER_ADMIN", "ADMIN", "BOSS", "GERANT"];
+
+const HomeLogoutGuard = () => {
+  const location = useLocation();
+  const dispatch = useDispatch();
+  const { isAuthenticated } = useSelector((s) => s.auth);
+
+  useEffect(() => {
+    if (isAuthenticated && location.pathname === "/") {
+      dispatch(logout());
+      toast.success("Vous avez ete deconnecte.");
+    }
+  }, [dispatch, isAuthenticated, location.pathname]);
+
+  return null;
+};
+
+const RouteChangeLoader = () => {
+  const location = useLocation();
+  const firstRender = useRef(true);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false;
+      return;
+    }
+
+    setVisible(true);
+    const timer = setTimeout(() => setVisible(false), 650);
+    return () => clearTimeout(timer);
+  }, [location.pathname, location.search]);
+
+  if (!visible) return null;
+
+  return (
+    <div className="fixed inset-0 z-[9998] grid place-items-center bg-surface/70 backdrop-blur-sm">
+      <KbsLoader label="Chargement de la page..." />
+    </div>
+  );
+};
 
 export default function AppRoutes() {
   return (
     <BrowserRouter>
+      <HomeLogoutGuard />
+      <RouteChangeLoader />
       <Routes>
         {/* ── Routes publiques ────────────────────────────── */}
         <Route element={<PublicLayout />}>

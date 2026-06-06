@@ -1,4 +1,5 @@
-import { Bell, HelpCircle, Search, PanelLeftClose, PanelLeftOpen, Sun, Moon } from "lucide-react";
+import { MessageCircle, PanelLeftClose, PanelLeftOpen, Sun, Moon } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useState, useEffect } from "react";
 import Avatar from "../ui/Avatar";
@@ -11,6 +12,13 @@ import NotifBell from "../notifications/NotifBell";
 const TopBar = ({ title, collapsed, onToggleSidebar }) => {
   const { user } = useSelector((s) => s.auth);
   const [isDark, setIsDark] = useState(false);
+  const navigate = useNavigate();
+
+  const getChatPath = () => {
+    if (["SUPER_ADMIN", "ADMIN", "BOSS", "GERANT"].includes(user?.role)) return "/admin/chat";
+    if (user?.role === "LOCATAIRE") return "/locataire/chat";
+    return "/client/chat";
+  };
 
   // Initialize theme on mount
   useEffect(() => {
@@ -37,12 +45,14 @@ const TopBar = ({ title, collapsed, onToggleSidebar }) => {
       {/* Toggle sidebar */}
       <button
         onClick={onToggleSidebar}
-        className="p-2 rounded hover:bg-surface-low text-on-surface-variant transition"
+        className="inline-flex items-center gap-2 rounded-full border border-outline-variant bg-surface-low px-3 py-2 text-label-md font-semibold text-on-surface-variant transition hover:bg-surface-container hover:text-on-surface"
+        title={collapsed ? "Ouvrir la navigation" : "Reduire la navigation"}
       >
         {collapsed
           ? <PanelLeftOpen size={18} />
           : <PanelLeftClose size={18} />
         }
+        <span className="hidden sm:inline">{collapsed ? "Menu" : "Navigation"}</span>
       </button>
 
       {/* Titre page */}
@@ -64,8 +74,13 @@ const TopBar = ({ title, collapsed, onToggleSidebar }) => {
         <NotifBell />
 
         {/* Chat — v_chat_actif */}
-        <button className="relative p-2 rounded-full hover:bg-surface-low text-on-surface-variant transition">
-          <HelpCircle size={20} />
+        <button
+          type="button"
+          onClick={() => navigate(getChatPath())}
+          className="relative p-2 rounded-full hover:bg-surface-low text-on-surface-variant transition"
+          title="Ouvrir la discussion"
+        >
+          <MessageCircle size={20} />
         </button>
 
         {/* Profil utilisateur */}
