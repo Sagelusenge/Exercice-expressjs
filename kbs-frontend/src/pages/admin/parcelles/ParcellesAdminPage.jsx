@@ -9,23 +9,14 @@ import { Plus, Search, Edit2, Trash2, Eye, Filter, X, Save, Map, Home, DollarSig
 import { TYPE_PARCELLE_LABELS, STATUS_COLORS } from '../../../design-system/tokens';
 import { formatCurrency } from '../../../utils/formatters';
 import toast from 'react-hot-toast';
-
-// Helper to get complete image URL
-const getImageUrl = (url) => {
-  if (!url) return null;
-  if (url.startsWith('http')) return url;
-  const apiRoot = import.meta.env.VITE_API_URL || "http://localhost:5000";
-  const baseUrl = apiRoot.replace(/\/api\/v1\/?$/, "");
-  const imagePath = url.startsWith("/") ? url : `/${url}`;
-  return `${baseUrl}${imagePath}`;
-};
+import { resolveAssetUrl } from '../../../utils/assets';
 
 const getMainImageUrl = (parcelle) => {
   const raw =
     parcelle?.image_principale ||
     parcelle?.photo_url ||
     (typeof parcelle?.images === "string" ? parcelle.images.split(",")[0] : null);
-  return getImageUrl(raw);
+  return resolveAssetUrl(raw);
 };
 
 const getAdminPrice = (parcelle) =>

@@ -23,17 +23,7 @@ import { TYPE_PARCELLE_LABELS } from "../../design-system/tokens";
 import { useGetParcellesPubliquesQuery } from "../../store/api/parcellesApi";
 import { useGetPublicStatsQuery } from "../../store/api/dashboardApi";
 import Pagination from "../../components/ui/Pagination";
-
-const getImageUrl = (url) => {
-  if (!url) return null;
-  if (url.startsWith("http")) return url;
-  // Build proper URL for images from backend
-  const apiRoot = import.meta.env.VITE_API_URL || "http://localhost:5000";
-  const baseUrl = apiRoot.replace(/\/api\/v1\/?$/, "");
-  // Ensure path starts with /
-  const imagePath = url.startsWith("/") ? url : `/${url}`;
-  return `${baseUrl}${imagePath}`;
-};
+import { resolveAssetUrl } from "../../utils/assets";
 
 const Reveal = ({ children, className = "", delay = 0, direction = "up" }) => {
   const { ref, inView } = useInView({ threshold: 0.16, triggerOnce: true });
@@ -59,7 +49,7 @@ const TypeBadge = ({ type }) => (
 const FeaturedParcelleCard = ({ parcelle, index }) => {
   const hasImage = parcelle.image_principale || parcelle.photo_url;
   const completeImageUrl = hasImage
-    ? getImageUrl(parcelle.image_principale || parcelle.photo_url)
+    ? resolveAssetUrl(parcelle.image_principale || parcelle.photo_url)
     : null;
 
   return (

@@ -37,6 +37,17 @@ const upload = multer({
   }
 });
 
+const getPublicBackendUrl = (req) => {
+  const configured = process.env.PUBLIC_BACKEND_URL || process.env.API_URL || process.env.BACKEND_URL;
+  if (configured) return configured.replace(/\/api\/v1\/?$/, "").replace(/\/$/, "");
+  if (process.env.NODE_ENV === "production") return "https://backend-dx5f.onrender.com";
+
+  const protocol = req.get("x-forwarded-proto") || req.protocol;
+  return `${protocol}://${req.get("host")}`;
+};
+
+const buildUploadUrl = (req, filename) => `${getPublicBackendUrl(req)}/uploads/${filename}`;
+
 // ── Routes publiques ──────────────────────────────────────
 
 // GET /parcelles — Liste publique
@@ -151,7 +162,9 @@ router.get("/admin/liste", authenticate, requireRole("SUPER_ADMIN", "BOSS", "GER
 
   const [{ total }] = await query(`SELECT COUNT(*) AS total FROM parcelles p ${where}`, params);
   const data = await query(
-    `SELECT p.* FROM parcelles p ${where} ORDER BY p.created_at DESC LIMIT ? OFFSET ?`,
+    `SELECT p.*,
+            (SELECT url_image FROM parcelle_images WHERE parcelle_id = p.id ORDER BY ordre LIMIT 1) AS image_principale
+     FROM parcelles p ${where} ORDER BY p.created_at DESC LIMIT ? OFFSET ?`,
     [...params, l, offset]
   );
 
@@ -226,7 +239,7 @@ router.post("/", upload.single("photo"), authenticate, requireRole("SUPER_ADMIN"
     
     // If we have a photo, save it to parcelle_images
     if (req.file) {
-      const imageUrl = `/uploads/${req.file.filename}`;
+      const imageUrl = buildUploadUrl(req, req.file.filename);
       await query(
         `INSERT INTO parcelle_images (parcelle_id, url_image, ordre) VALUES (?, ?, 1)`,
         [parcelleId, imageUrl]
@@ -275,7 +288,7 @@ router.put("/:id", upload.single("photo"), authenticate, requireRole("SUPER_ADMI
   
   // If we have a new photo, update parcelle_images
   if (req.file) {
-    const imageUrl = `/uploads/${req.file.filename}`;
+    const imageUrl = buildUploadUrl(req, req.file.filename);
     
     // Check if there's already a main image (ordre=1)
     const [existingImage] = await query(

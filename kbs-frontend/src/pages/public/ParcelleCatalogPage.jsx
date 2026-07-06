@@ -13,18 +13,9 @@ import { Link } from "react-router-dom";
 import Pagination from "../../components/ui/Pagination";
 import { TYPE_PARCELLE_LABELS } from "../../design-system/tokens";
 import toast from "react-hot-toast";
+import { resolveAssetUrl } from "../../utils/assets";
 
 const LIMIT = 10; // 10 par page, 5 par ligne
-
-// Helper to get complete image URL
-const getImageUrl = (url) => {
-  if (!url) return null;
-  if (url.startsWith('http')) return url;
-  const apiRoot = import.meta.env.VITE_API_URL || "http://localhost:5000";
-  const baseUrl = apiRoot.replace(/\/api\/v1\/?$/, "");
-  const imagePath = url.startsWith("/") ? url : `/${url}`;
-  return `${baseUrl}${imagePath}`;
-};
 
 const TYPE_OPTIONS = [
   { value: "", label: "Tous types" },
@@ -37,7 +28,7 @@ const TYPE_OPTIONS = [
 const CatalogCard = ({ parcelle, viewMode, isFavorite, onFavorite, onReserve, onRequestVisit }) => {
   const isAvailable = parcelle.statut === "DISPONIBLE" || parcelle.statut === "A_AMORCELLER";
   const isAmorcellage = parcelle.statut === "A_AMORCELLER";
-  const completeImageUrl = getImageUrl(parcelle.image_principale || parcelle.photo_url);
+  const completeImageUrl = resolveAssetUrl(parcelle.image_principale || parcelle.photo_url);
 
   if (viewMode === "list") {
     return (

@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { resolveAssetUrl } from "../../utils/assets";
 
 const COLORS = [
   "bg-blue-100 text-blue-700",
@@ -28,7 +29,7 @@ const Avatar = ({ nom, prenom, photo_url, size = "md", className = "" }) => {
   if (photo_url) {
     return (
       <img
-        src={photo_url}
+        src={resolveAssetUrl(photo_url)}
         alt={`${nom} ${prenom}`}
         className={clsx("rounded-full object-cover flex-shrink-0", sizes[size], className)}
       />

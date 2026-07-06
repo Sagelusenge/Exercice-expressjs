@@ -13,15 +13,7 @@ import {
 import { useGetParcellePublicQuery } from "../../store/api/parcellesApi";
 import { useCreateReservationMutation } from "../../store/api/reservationsApi";
 import { TYPE_PARCELLE_LABELS } from "../../design-system/tokens";
-
-const getImageUrl = (url) => {
-  if (!url) return null;
-  if (url.startsWith("http")) return url;
-  const apiRoot = import.meta.env.VITE_API_URL || "http://localhost:5000";
-  const baseUrl = apiRoot.replace(/\/api\/v1\/?$/, "");
-  const imagePath = url.startsWith("/") ? url : `/${url}`;
-  return `${baseUrl}${imagePath}`;
-};
+import { resolveAssetUrl } from "../../utils/assets";
 
 const getImages = (parcelle) => {
   const rawImages = [
@@ -34,7 +26,7 @@ const getImages = (parcelle) => {
           .map((item) => item.trim())),
   ];
 
-  return [...new Set(rawImages.map(getImageUrl).filter(Boolean))];
+  return [...new Set(rawImages.map(resolveAssetUrl).filter(Boolean))];
 };
 
 const DetailItem = ({ icon: Icon, label, value }) => (

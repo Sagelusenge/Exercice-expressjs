@@ -4,16 +4,7 @@ import clsx from "clsx";
 import Badge from "../ui/Badge";
 import { TYPE_PARCELLE_LABELS } from "../../design-system/tokens";
 import { formatCurrency } from "../../utils/formatters";
-
-// Helper to get complete image URL
-const getImageUrl = (url) => {
-  if (!url) return null;
-  if (url.startsWith('http')) return url;
-  const apiRoot = import.meta.env.VITE_API_URL || "http://localhost:5000";
-  const baseUrl = apiRoot.replace(/\/api\/v1\/?$/, "");
-  const imagePath = url.startsWith("/") ? url : `/${url}`;
-  return `${baseUrl}${imagePath}`;
-};
+import { resolveAssetUrl } from "../../utils/assets";
 
 /**
  * Carte parcelle KBS
@@ -37,7 +28,7 @@ const ParcelleCard = ({
     prix_vente, montant_paye, montant_restant, devise,
   } = parcelle;
 
-  const completeImageUrl = getImageUrl(image_principale);
+  const completeImageUrl = resolveAssetUrl(image_principale);
   const isAvailable = statut === "DISPONIBLE";
   const detailPath = isAdmin
     ? `/admin/parcelles/${id}`

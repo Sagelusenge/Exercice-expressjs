@@ -1,9 +1,10 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { getApiBaseUrl } from "../../utils/assets";
 
 export const baseApi = createApi({
   reducerPath: "kbsApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_API_URL || "http://localhost:5000/api/v1",
+    baseUrl: getApiBaseUrl(),
     prepareHeaders: (headers, { getState }) => {
       const token = getState().auth.token;
       if (token) headers.set("Authorization", `Bearer ${token}`);

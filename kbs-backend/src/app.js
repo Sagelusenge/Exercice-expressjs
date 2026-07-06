@@ -11,6 +11,8 @@ const R = require("./utils/response.util");
 const path = require("path");
 const app = express();
 
+app.set("trust proxy", 1);
+
 // Serve static files from uploads directory
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
@@ -19,7 +21,7 @@ app.use(helmet());
 app.use(
   cors({
     origin: (origin, callback) => {
-      const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:5173,http://127.0.0.1:5173")
+      const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:5173,http://127.0.0.1:5173,https://exercice-expressjs.onrender.com")
         .split(",")
         .map((value) => value.trim())
         .filter(Boolean);
